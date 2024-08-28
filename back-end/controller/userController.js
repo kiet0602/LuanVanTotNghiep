@@ -72,15 +72,20 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    //Tìm người dùng
+
+    // Tìm người dùng
     const user = await userModel.findOne({ email });
     if (!user) {
-      res.status(404).send({ error: "Không tìm thấy người dùng" });
+      return res.status(404).send({ error: "Không tìm thấy người dùng" });
     }
+
+    // Kiểm tra mật khẩu
     const passwordCheck = await bcrypt.compare(password, user.password);
     if (!passwordCheck) {
-      res.status(400).send({ error: "Mật khẩu sai" });
+      return res.status(400).send({ error: "Mật khẩu sai" });
     }
+
+    // Tạo token
     const token = jwt.sign(
       {
         userId: user._id,
@@ -90,6 +95,7 @@ const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    // Gửi phản hồi thành công
     return res.status(200).json({
       _id: user._id,
       username: user.username,
@@ -104,6 +110,7 @@ const login = async (req, res) => {
       token,
     });
   } catch (error) {
+    // Gửi phản hồi lỗi
     return res.status(500).send({ error: "Lỗi đăng nhập" });
   }
 };

@@ -27,6 +27,7 @@ import ButtonSighIn from "./ButtonSignIn";
 //data
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 import userAtom from "../Atom/userAtom";
+import { NavLink } from "react-router-dom";
 
 const SignIn = () => {
   //khai báo
@@ -40,7 +41,7 @@ const SignIn = () => {
   //khai báo useCustom
   const { goRegister, goHome } = useNavigateCustom();
 
-  const [setResetUserCurrent] = useRecoilState(userAtom);
+  const setResetUserCurrent = useSetRecoilState(userAtom);
 
   //handle
   const validateEmail = (email) => {
@@ -74,6 +75,7 @@ const SignIn = () => {
       );
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("userCurrent", JSON.stringify(response.data));
+      setResetUserCurrent(response.data);
       toast.success("Đăng nhập thành công!");
       goHome();
     } catch (error) {
@@ -149,17 +151,19 @@ const SignIn = () => {
                 justify={"space-between"}
               >
                 <Text>Quên mật khẩu?</Text>
-
-                <Text
-                  bgClip="text"
-                  bgGradient="linear(to-l, #0ea5e9, #2563eb)"
-                  fontWeight={"bold"}
-                  cursor={"pointer"}
-                  _hover={{ color: "white" }}
-                  onClick={goRegister}
-                >
-                  Lấy lại mật khẩu
-                </Text>
+                <NavLink to={"/enterEmail"}>
+                  {" "}
+                  <Text
+                    bgClip="text"
+                    bgGradient="linear(to-l, #0ea5e9, #2563eb)"
+                    fontWeight={"bold"}
+                    cursor={"pointer"}
+                    _hover={{ color: "white" }}
+                    onClick={goRegister}
+                  >
+                    Lấy lại mật khẩu
+                  </Text>
+                </NavLink>
               </Stack>
 
               <ButtonSighIn handleLogin={handleLogin} isLoading={isLoading} />

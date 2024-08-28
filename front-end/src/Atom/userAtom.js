@@ -3,4 +3,5 @@ const userAtom = atom({
   key: "userAtom",
   default: JSON.parse(localStorage.getItem("userCurrent")),
 });
+
 export default userAtom;

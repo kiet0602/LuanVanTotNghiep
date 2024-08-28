@@ -13,9 +13,14 @@ import OAuthCallback from "./pages/OAuthCallback";
 
 import { useRecoilValue } from "recoil";
 import Test from "./pages/Test";
-import LocationSelector from "./pages/LayTinhThanh";
+
+import EnterEmailPage from "./pages/EnterEmailPage";
+import SubmitCodeOTPPage from "./pages/SubmitCodeOTPPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import userAtom from "./Atom/userAtom";
 
 function App() {
+  const user = useRecoilValue(userAtom);
   return (
     <>
       {/* Set the position to fixed to keep the button in place on scroll */}
@@ -27,15 +32,42 @@ function App() {
           <Route path="/oauth/:token" element={<OAuthCallback />} />
 
           <Route path="/" element={<HomePage />} />
-          <Route path="/signIn" element={<SignInPage />} />
-          <Route path="/signUp" element={<SignUpPage />} />
-          <Route path="/profileUser" element={<PageUser />} />
-          <Route path="/checkOut" element={<CheckoutPage />} />
+          <Route
+            path="/signIn"
+            element={!user ? <SignInPage /> : <Navigate to={"/"} />}
+          />
+          <Route
+            path="/signUp"
+            element={!user ? <SignUpPage /> : <Navigate to={"/"} />}
+          />
+          <Route
+            path="/profileUser"
+            element={user ? <PageUser /> : <Navigate to={"/signIn"} />}
+          />
+          <Route
+            path="/checkOut"
+            element={user ? <CheckoutPage /> : <Navigate to={"/signIn"} />}
+          />
           <Route path="/productDetail" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
+          <Route
+            path="/cart"
+            element={user ? <CartPage /> : <Navigate to={"/signIn"} />}
+          />
           {/* Route for Google Authentication */}
           <Route path="/test" element={<Test />} />
-          <Route path="/tinhthanh" element={<LocationSelector />} />
+
+          <Route
+            path="/enterEmail"
+            element={!user ? <EnterEmailPage /> : <Navigate to={"/"} />}
+          />
+          <Route
+            path="/submitOTP"
+            element={!user ? <SubmitCodeOTPPage /> : <Navigate to={"/"} />}
+          />
+          <Route
+            path="/resetPassword"
+            element={!user ? <ResetPasswordPage /> : <Navigate to={"/"} />}
+          />
         </Routes>
       </Box>
     </>
