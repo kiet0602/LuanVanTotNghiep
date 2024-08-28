@@ -182,6 +182,7 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
         }
       );
       toast.success("Cập nhật thành công!");
+
       setResetUserCurrent((prev) => {
         const updatedUserData = { ...prev, ...response.data.updatedUser };
         localStorage.setItem("userCurrent", JSON.stringify(updatedUserData));

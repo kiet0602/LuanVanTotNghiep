@@ -18,6 +18,7 @@ import EnterEmailPage from "./pages/EnterEmailPage";
 import SubmitCodeOTPPage from "./pages/SubmitCodeOTPPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import userAtom from "./Atom/userAtom";
+import Table1111 from "./pages/Table.jsx";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -68,6 +69,7 @@ function App() {
             path="/resetPassword"
             element={!user ? <ResetPasswordPage /> : <Navigate to={"/"} />}
           />
+          <Route path="/table" element={<Table1111 />} />
         </Routes>
       </Box>
     </>
