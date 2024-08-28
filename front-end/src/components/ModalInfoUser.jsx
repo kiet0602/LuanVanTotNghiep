@@ -41,7 +41,12 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
   const [wards, setWards] = useState([]);
 
   const [resetUserCurrent, setResetUserCurrent] = useRecoilState(userAtom);
-  const token = resetUserCurrent?.token;
+
+  const userData = localStorage.getItem("userCurrent");
+  const userCurrent = userData ? JSON.parse(userData) : null;
+  // const userCurrent = useRecoilValue(userAtom);
+  const token = userCurrent?.token;
+  //  const token = resetUserCurrent?.token;
   const fileInputRef = useRef(null);
 
   // Lấy danh sách tỉnh thành

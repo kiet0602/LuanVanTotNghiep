@@ -29,7 +29,9 @@ const CardInfoUser = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   //data Atom
-  const userCurrent = useRecoilValue(userAtom);
+  const userData = localStorage.getItem("userCurrent");
+  const userCurrent = userData ? JSON.parse(userData) : null;
+  // const userCurrent = useRecoilValue(userAtom);
   const userId = userCurrent?._id;
 
   //handle
