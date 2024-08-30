@@ -132,6 +132,25 @@ const getUser = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    // Tìm tất cả người dùng trong cơ sở dữ liệu
+    const users = await userModel.find();
+
+    // Loại bỏ mật khẩu khỏi các thông tin người dùng trước khi gửi phản hồi
+    const usersWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user.toObject();
+      return rest;
+    });
+
+    // Trả về danh sách người dùng mà không có mật khẩu
+    return res.status(200).json(usersWithoutPassword);
+  } catch (error) {
+    // Xử lý lỗi và trả về thông báo lỗi
+    return res.status(500).json({ error: "Lỗi lấy danh sách người dùng" });
+  }
+};
+
 const updateUser = async (req, res) => {
   const { username, email, numberPhone, ward, district, city } = req.body;
 
@@ -139,13 +158,22 @@ const updateUser = async (req, res) => {
     const { userId } = req.user;
 
     if (!userId) {
-      return res.status(401).send({ error: "User Not Found" });
+      return res
+        .status(401)
+        .send({ error: "Lỗi chưa xác định được người dùng!" });
     }
 
     const existingUser = await userModel.findById(userId);
 
     if (!existingUser) {
-      return res.status(404).send({ error: "User Not Found" });
+      return res.status(404).send({ error: "Không tìm thấy được người dùng!" });
+    }
+
+    if (email && email !== existingUser.email) {
+      const emailExists = await userModel.findOne({ email });
+      if (emailExists) {
+        return res.status(400).send({ error: "Email này đã được sử dụng." });
+      }
     }
 
     const updateFields = {};
@@ -241,4 +269,5 @@ export {
   resetPassword,
   authenticate,
   verifyUser,
+  getAllUsers,
 };

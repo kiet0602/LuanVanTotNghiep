@@ -76,6 +76,16 @@ const updateProduct = async (req, res) => {
         .json({ success: false, message: "Product not found" });
     }
 
+    // Kiểm tra xem tên sản phẩm mới có bị trùng lặp không
+    if (productName && productName !== product.productName) {
+      const productNameExists = await productModel.findOne({ productName });
+      if (productNameExists) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Product name already exists" });
+      }
+    }
+
     // Kiểm tra xem danh mục có tồn tại không
     if (category) {
       const categoryExists = await categoryModel.findById(category);
@@ -100,9 +110,7 @@ const updateProduct = async (req, res) => {
 
     // Trả về phản hồi thành công
     res.status(200).json({
-      success: true,
-      message: "Product updated successfully",
-      product,
+      updateProduct: product,
     });
   } catch (error) {
     // Ghi lỗi vào console
@@ -113,4 +121,50 @@ const updateProduct = async (req, res) => {
   }
 };
 
-export { addProduct, updateProduct };
+// Lấy tất cả sản phẩm
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await productModel.find().populate("category");
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching products" });
+  }
+};
+
+// Lấy sản phẩm theo ID
+const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productModel.findById(id).populate("category");
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching product" });
+  }
+};
+
+// Xóa sản phẩm
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productModel.findByIdAndDelete(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    // Xóa tệp hình ảnh nếu có
+
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting product" });
+  }
+};
+
+export {
+  addProduct,
+  updateProduct,
+  getAllProducts,
+  getProductById,
+  deleteProduct,
+};

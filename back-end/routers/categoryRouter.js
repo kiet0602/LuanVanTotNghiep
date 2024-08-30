@@ -1,5 +1,11 @@
 import express from "express";
-import { addCategory } from "../controller/categoryController.js";
+import {
+  addCategory,
+  deleteCategory,
+  getAllCategories,
+  getCategoryById,
+  updateCategory,
+} from "../controller/categoryController.js";
 import multer from "multer";
 
 const categoryRouter = express.Router();
@@ -17,5 +23,13 @@ categoryRouter.post(
   upload.single("imageCategory"),
   addCategory
 );
+categoryRouter.put(
+  "/updateCategory/:id",
+  upload.single("imageCategory"),
+  updateCategory
+);
+categoryRouter.delete("/deleteCategory/:id", deleteCategory);
+categoryRouter.get("/getAllCategory", getAllCategories);
+categoryRouter.get("/getCategoryById/:id", getCategoryById);
 
 export default categoryRouter;

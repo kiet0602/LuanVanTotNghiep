@@ -3,6 +3,7 @@ import {
   authenticate,
   createResetSession,
   generateOTP,
+  getAllUsers,
   getUser,
   login,
   register,
@@ -38,6 +39,7 @@ userRouter.get("/getUser/:id", getUser);
 userRouter.get("/generateOTP", verifyUser, localVariables, generateOTP);
 userRouter.get("/verifyOTP", verifyOTP);
 userRouter.get("/createResetSession", createResetSession);
+userRouter.get("/getAllUser", getAllUsers);
 
 //PUT
 userRouter.put("/updateUser", Auth, upload.single("avatar"), updateUser);
