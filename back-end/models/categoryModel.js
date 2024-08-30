@@ -6,6 +6,10 @@ const categorySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  imageCategory: {
+    type: String,
+    required: true,
+  },
   characteristic: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Characteristic",

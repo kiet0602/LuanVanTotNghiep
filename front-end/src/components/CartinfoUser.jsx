@@ -31,6 +31,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Breadcrumbss from "./Breadcrumbss.jsx";
 
 const CartinfoUser = () => {
   //khai báo
@@ -74,32 +75,9 @@ const CartinfoUser = () => {
 
   const hasAllData = user?.ward && user?.district && user?.city;
 
-  const featuresList = [
-    {
-      id: 1,
-      title: "24/7 customer support",
-      desc: `Day or night, we’re here for you. Talk to our support team from anywhere in the world,
-      any hour of day.`,
-      icon: <FaHeadphones size="2rem" color="#60B6B5" />,
-    },
-    {
-      id: 2,
-      title: "Global hospitality standards",
-      desc: `Guests review their hosts after each stay. All hosts must maintain a minimum rating
-      and our hospitality standards to be on Airbnb.`,
-      icon: <FaGlobe size="2rem" color="#60B6B5" />,
-    },
-    {
-      id: 3,
-      title: "5-star hosts",
-      desc: `From fresh-pressed sheets to tips on where to get the best brunch, our hosts are full
-      of local hospitality.`,
-      icon: <FaStar size="2rem" color="#60B6B5" />,
-    },
-  ];
-
   return (
-    <Container maxW={"5xl"} py={8} px={{ base: 5, md: 10 }}>
+    <Container maxW={"7xl"} px={{ base: 5, md: 10 }}>
+      <Breadcrumbss />
       {loading ? (
         <Flex justify="center" align="center" height="100vh">
           <Spinner size="xl" />

@@ -1,30 +1,48 @@
-import Category from "../models/categoryModel.js";
+import categoryModel from "../models/categoryModel.js";
 
-// Thêm danh mục
+import path from "path"; // Để xử lý đường dẫn của tệp
+import characteristicModel from "../models/characteristicModel.js";
+
 const addCategory = async (req, res) => {
   try {
-    const { categoryName } = req.body;
-    const existingCategory = await Category.findOne({
-      categoryName: categoryName,
-    });
-    if (existingCategory) {
+    if (!req.file) {
       return res
         .status(400)
-        .json({ success: false, message: "Category already exists" });
+        .json({ success: false, message: "No image file uploaded" });
     }
-    const newCategory = new Category({
-      categoryName: categoryName,
+    // Kiểm tra xem các trường bắt buộc có được cung cấp không
+    const { categoryName, characteristic } = req.body;
+    const imageFilename = req.file.filename;
+
+    const characteristicExists = await characteristicModel.findById(
+      characteristic
+    );
+    if (!characteristicExists) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Characteristic not found" });
+    }
+    const categoryNameExists = await categoryModel.findOne({ categoryName });
+    if (categoryNameExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Category with this name already exists",
+      });
+    }
+
+    // Tạo một danh mục mới
+    const newCategory = new categoryModel({
+      categoryName,
+      characteristic,
+      imageCategory: imageFilename,
     });
+
+    // Lưu danh mục vào cơ sở dữ liệu
     await newCategory.save();
-    res.status(201).json({
-      success: true,
-      message: "Category added successfully",
-      category: newCategory,
-    });
+    res.status(201).json({ category: newCategory }); // Trả về danh mục đã được tạo thành công
   } catch (error) {
-    // Xử lý lỗi và trả về phản hồi lỗi
-    console.error("Error adding category:", error.message);
-    res.status(500).json({ success: false, message: "Error adding category" });
+    res.status(500).json({ message: error.message }); // Xử lý lỗi
   }
 };
+
 export { addCategory };

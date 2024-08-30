@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 
 import path from "path";
 import { fileURLToPath } from "url";
+import characteristicRouter from "./routers/characteristicRouter.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ const __dirname = path.dirname(__filename);
 //kết nối databases
 connectDB();
 // Api endpoint
+app.use("/api/characteristic", characteristicRouter);
 app.use("/api/product", productRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/user", userRouter);

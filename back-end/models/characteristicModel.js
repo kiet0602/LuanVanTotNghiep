@@ -1,15 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const characteristicSchema = new mongoose.Schema({
-  name: {
+  characteristicName: {
     type: String,
     required: true,
     unique: true,
-  },
-  family: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Family", // Tham chiếu đến model Category
-    required: true,
   },
   createdAt: {
     type: Date,
