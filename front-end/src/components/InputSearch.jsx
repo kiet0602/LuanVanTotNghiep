@@ -20,42 +20,30 @@ const InputSearch = () => {
 
   return (
     <>
-      {isOpen ? (
-        <MotionInputGroup
-          maxW="26rem"
-          d={{ base: "none", md: "block" }}
-          animate={{ opacity: 1, scale: 1 }}
-          initial={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Input
-            placeholder="Search..."
-            borderColor={useColorModeValue("white", "gray.300")}
-            borderRadius="20px"
-          />
-          <InputRightElement>
-            <MotionButton
-              borderRadius="0 20px 20px 0"
-              onClick={onToggle}
-              animate={{ opacity: 1, scale: 1 }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.6 }}
-            >
-              <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </MotionButton>
-          </InputRightElement>
-        </MotionInputGroup>
-      ) : (
-        <MotionButton
+      <MotionInputGroup
+        maxW="26rem"
+        d={{ base: "none", md: "block" }}
+        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Input
+          placeholder="Search..."
+          borderColor={useColorModeValue("white", "gray.300")}
           borderRadius="20px"
-          onClick={onToggle}
-          animate={{ opacity: 1, scale: 1 }}
-          initial={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.6 }}
-        >
-          <FontAwesomeIcon icon={faMagnifyingGlass} />
-        </MotionButton>
-      )}
+        />
+        <InputRightElement>
+          <MotionButton
+            borderRadius="0 20px 20px 0"
+            onClick={onToggle}
+            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.6 }}
+          >
+            <FontAwesomeIcon icon={faMagnifyingGlass} />
+          </MotionButton>
+        </InputRightElement>
+      </MotionInputGroup>
     </>
   );
 };

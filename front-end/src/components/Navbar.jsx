@@ -13,7 +13,6 @@ import {
   useDisclosure,
   useColorModeValue,
   Image,
-  Badge,
 } from "@chakra-ui/react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiOutlineClose } from "react-icons/ai";
@@ -26,7 +25,7 @@ import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 // Components
-import InputSearch from "./InputSearch.jsx";
+
 import AvatarUser from "./AvatarUser";
 // Data
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
@@ -34,17 +33,17 @@ import { navLinks, dropdownLinks } from "../assets/data/datalink/datalink.js";
 import userAtom from "../Atom/userAtom.js";
 // Hook custom
 import useNavigateCustom from "../Hook/useNavigateCustom.js";
+import Search from "./Search.jsx";
+import Fillter from "./Fillter.jsx";
 
 const Navbar = () => {
   // Use React
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   // Use Custom Hook
   const { goHome, goRegister, goLogin } = useNavigateCustom();
   // Lấy dữ liệu từ localStorage
   const userData = localStorage.getItem("userCurrent");
   const userCurrent = userData ? JSON.parse(userData) : null;
-
   // Style
   const gradientStart = useColorModeValue("#0ea5e9", "#2563eb");
   const gradientEnd = useColorModeValue("#2563eb", "#0ea5e9");
@@ -92,7 +91,7 @@ const Navbar = () => {
                     textDecoration="none"
                   >
                     <Flex alignItems="center">
-                      <Text>Thể loại</Text>
+                      <Text>Cửa hàng</Text>
                       <Icon
                         as={BiChevronDown}
                         h={5}
@@ -103,7 +102,9 @@ const Navbar = () => {
                       />
                     </Flex>
                   </MenuButton>
-
+                  <Flex alignItems="center" cursor={"pointer"}>
+                    <Fillter />
+                  </Flex>
                   <MenuList
                     zIndex={5}
                     bg={useColorModeValue(
@@ -130,8 +131,8 @@ const Navbar = () => {
             </Menu>
           </HStack>
         </HStack>
-        <Flex alignItems="center" gap={4} wrap="nowrap">
-          <InputSearch />
+        <Flex alignItems="center" gap={3} wrap="nowrap">
+          <Search />
           <Box display="flex" alignItems="center" gap={2}>
             {userCurrent ? (
               <>
@@ -221,9 +222,11 @@ const Navbar = () => {
             {navLinks.map((link, index) => (
               <CustomNavLink key={index} name={link.name} path={link.path} />
             ))}
+            <Fillter />
             <Text fontWeight="semibold" color="gray.500">
-              Thể loại
+              Cửa hàng
             </Text>
+
             <Stack pl={2} spacing={1} mt={"0 !important"}>
               {dropdownLinks.map((link, index) => (
                 <CustomNavLink key={index} name={link.name} path={link.path} />

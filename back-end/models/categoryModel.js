@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
 
-// Định nghĩa schema cho Category
 const categorySchema = new mongoose.Schema({
   categoryName: {
     type: String,
     required: true,
     trim: true,
+  },
+  characteristic: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Characteristic",
+    required: true,
   },
   createdAt: {
     type: Date,

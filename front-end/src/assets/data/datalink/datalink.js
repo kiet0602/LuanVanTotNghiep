@@ -42,35 +42,22 @@ const footerData = [
 
 const navLinks = [
   { name: "Trang chủ", path: "/" },
-  { name: "Giới thiệu" },
-  { name: "Sản phẩm" },
-  { name: "Tin tức" },
+  { name: "Tin tức", path: "/news" },
+  { name: "Bài viết", path: "/blog" },
 ];
 
 const dropdownLinks = [
   {
-    name: "Sen đá",
-    path: "senda",
+    name: "Giới thiệu",
+    path: "/aboutUs",
   },
   {
-    name: "Xương rồng",
-    path: "cayxuongrong",
+    name: "Tất cả sản phẩm",
+    path: "/products",
   },
   {
-    name: "Lưỡi hổ",
-    path: "luoiho",
-  },
-  {
-    name: "Kim tiền",
-    path: "caykietien",
-  },
-  {
-    name: "Dương xỉ",
-    path: "duongxi",
-  },
-  {
-    name: "Bonsai",
-    path: "bonsai",
+    name: "Liên hệ",
+    path: "/contact",
   },
 ];
 

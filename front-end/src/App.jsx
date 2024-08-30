@@ -19,6 +19,7 @@ import SubmitCodeOTPPage from "./pages/SubmitCodeOTPPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import userAtom from "./Atom/userAtom";
 import Table1111 from "./pages/Table.jsx";
+import NewsPage from "./pages/NewsPage.jsx";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -70,6 +71,7 @@ function App() {
             element={!user ? <ResetPasswordPage /> : <Navigate to={"/"} />}
           />
           <Route path="/table" element={<Table1111 />} />
+          <Route path="/news" element={<NewsPage />} />
         </Routes>
       </Box>
     </>
