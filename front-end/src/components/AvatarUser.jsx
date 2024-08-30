@@ -21,10 +21,7 @@ const AvatarUser = ({ userCurrent }) => {
         <MenuButton as={Button} size="sm" px={0} py={0} rounded="full">
           <Avatar
             size="sm"
-            src={`http://localhost:2000/images/${userCurrent?.avatar?.replace(
-              "uploads\\",
-              ""
-            )}`}
+            src={`http://localhost:2000/images/${userCurrent?.avatar}`}
           />
         </MenuButton>
         <MenuList

@@ -185,7 +185,7 @@ const updateUser = async (req, res) => {
     if (city) updateFields.city = city;
 
     if (req.file) {
-      updateFields.avatar = req.file.path;
+      updateFields.avatar = req.file.filename;
     }
 
     await userModel.updateOne({ _id: userId }, { $set: updateFields }).exec();

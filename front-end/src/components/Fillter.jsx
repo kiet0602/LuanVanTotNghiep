@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Drawer,
@@ -15,93 +15,54 @@ import {
   Tab,
   TabPanels,
   TabPanel,
-  VStack,
-  Box,
   Flex,
+  Image,
+  Box,
 } from "@chakra-ui/react";
+import axios from "axios";
 
-// Sample data for categories
-const categories = [
-  {
-    _id: "64e7a0f9d6f59b001b6a5c68",
-    categoryName: "Desert Plants",
-    characteristic: {
-      _id: "64e7a0f9d6f59b001b6a5c60",
-      name: "Common Feature",
-    },
-    createdAt: "2024-08-29T10:30:00.000Z",
-    updatedAt: "2024-08-29T10:30:00.000Z",
-  },
-  {
-    _id: "64e7a0f9d6f59b001b6a5c76",
-    categoryName: "Cacti",
-    characteristic: {
-      _id: "64e7a0f9d6f59b001b6a5c60",
-      name: "Common Feature",
-    },
-    createdAt: "2024-08-29T11:20:00.000Z",
-    updatedAt: "2024-08-29T11:20:00.000Z",
-  },
-  {
-    _id: "64e7a0f9d6f59b001b6a5c78",
-    categoryName: "Succulents",
-    characteristic: {
-      _id: "64e7a0f9d6f59b001b6a5c60",
-      name: "Common Feature",
-    },
-    createdAt: "2024-08-29T11:30:00.000Z",
-    updatedAt: "2024-08-29T11:30:00.000Z",
-  },
-  {
-    _id: "64e7a0f9d6f59b001b6a5c80",
-    categoryName: "Flowering Plants",
-    characteristic: {
-      _id: "64e7a0f9d6f59b001b6a5c60",
-      name: "Common Feature",
-    },
-    createdAt: "2024-08-29T11:40:00.000Z",
-    updatedAt: "2024-08-29T11:40:00.000Z",
-  },
-  {
-    _id: "64e7a0f9d6f59b001b6a5c82",
-    categoryName: "Fern",
-    characteristic: {
-      _id: "64e7a0f9d6f59b001b6a5c60",
-      name: "Common Feature",
-    },
-    createdAt: "2024-08-29T11:50:00.000Z",
-    updatedAt: "2024-08-29T11:50:00.000Z",
-  },
-  {
-    _id: "64e7a0f9d6f59b001b6a5c84",
-    categoryName: "Orchids",
-    characteristic: {
-      _id: "64e7a0f9d6f59b001b6a5c60",
-      name: "Common Feature",
-    },
-    createdAt: "2024-08-29T12:00:00.000Z",
-    updatedAt: "2024-08-29T12:00:00.000Z",
-  },
-];
-
-// Group categories by characteristic name
-const groupByCharacteristic = (categories) => {
-  return categories.reduce((acc, category) => {
-    const key = category.characteristic.name;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(category);
-    return acc;
-  }, {});
-};
-
+// Component để hiển thị danh mục
 function Fillter() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [categories, setCategories] = useState([]);
+  const [characteristicGroups, setCharacteristicGroups] = useState({});
 
-  const characteristicGroups = groupByCharacteristic(categories);
+  useEffect(() => {
+    // Gọi API để lấy danh mục
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:2000/api/category/getAllCategory"
+        );
+        const data = response.data;
+
+        // Cập nhật danh mục
+        setCategories(data);
+
+        // Nhóm danh mục theo đặc điểm
+        const grouped = groupByCharacteristic(data);
+        setCharacteristicGroups(grouped);
+      } catch (error) {
+        console.error("Error fetching categories:", error.message);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Nhóm danh mục theo tên đặc điểm
+  const groupByCharacteristic = (categories) => {
+    return categories.reduce((acc, category) => {
+      const key = category.characteristic.characteristicName;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(category);
+      return acc;
+    }, {});
+  };
+
   const characteristicNames = Object.keys(characteristicGroups);
-
   const handleMouseEnter = () => {
     onOpen();
   };
@@ -115,7 +76,7 @@ function Fillter() {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader></DrawerHeader>
+          <DrawerHeader>Loại</DrawerHeader>
           <DrawerBody>
             <Tabs variant="soft-rounded" colorScheme="green">
               <TabList>
@@ -127,22 +88,25 @@ function Fillter() {
               <TabPanels>
                 {characteristicNames.map((name, index) => (
                   <TabPanel key={index}>
-                    <Flex
-                      wrap="wrap" // Cho phép phần tử xuống hàng khi không còn đủ chỗ
-                      gap={2} // Khoảng cách giữa các phần tử (10px tương đương với 2 * 4px)
-                      justify="center" // Căn giữa các phần tử trong hàng
-                    >
+                    <Flex wrap="wrap" gap={2} justify="center">
                       {characteristicGroups[name].map((category) => (
                         <Flex
                           key={category._id}
                           p={4}
                           shadow="md"
                           borderWidth="1px"
-                          flexBasis="23%" // Chiếm khoảng 1/4 chiều rộng (với padding và margin còn lại)
+                          flexBasis="23%"
                           align="center"
                           justify="center"
-                          direction="row"
+                          direction="column"
                         >
+                          <Image
+                            src={`http://localhost:2000/images/${category.imageCategory}`} // Đường dẫn tới hình ảnh
+                            alt={category.categoryName}
+                            boxSize="100px"
+                            objectFit="cover"
+                            mb={2}
+                          />
                           <Text fontWeight="bold" fontSize="lg">
                             {category.categoryName}
                           </Text>

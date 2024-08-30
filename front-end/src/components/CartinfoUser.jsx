@@ -103,11 +103,8 @@ const CartinfoUser = () => {
               <Text> {user?.username}</Text>{" "}
               <Avatar
                 size="sm"
-                src={`http://localhost:2000/images/${user?.avatar?.replace(
-                  "uploads\\",
-                  ""
-                )}`}
-              />{" "}
+                src={`http://localhost:2000/images/${user?.avatar}`}
+              />
               <Tooltip label="Cập nhật thông tin" hasArrow arrowSize={15}>
                 <FontAwesomeIcon
                   onClick={() => OpenModal()}
