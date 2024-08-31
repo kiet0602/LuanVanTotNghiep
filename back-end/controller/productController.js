@@ -161,10 +161,23 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getProductByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const products = await productModel.find({ category: categoryId });
+    res.status(200).json(products);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching products", error: error.message });
+  }
+};
+
 export {
   addProduct,
   updateProduct,
   getAllProducts,
   getProductById,
   deleteProduct,
+  getProductByCategory,
 };

@@ -20,6 +20,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { NavLink } from "react-router-dom";
 
 // Component để hiển thị danh mục
 function Fillter() {
@@ -70,13 +71,13 @@ function Fillter() {
   return (
     <>
       <Text cursor={"pointer"} onClick={handleMouseEnter}>
-        Loại cây
+        Nơi trang trí của bạn
       </Text>
       <Drawer placement={"top"} onClose={onClose} isOpen={isOpen} size={"lg"}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Loại</DrawerHeader>
+          <DrawerHeader></DrawerHeader>
           <DrawerBody>
             <Tabs variant="soft-rounded" colorScheme="green">
               <TabList>
@@ -90,27 +91,37 @@ function Fillter() {
                   <TabPanel key={index}>
                     <Flex wrap="wrap" gap={2} justify="center">
                       {characteristicGroups[name].map((category) => (
-                        <Flex
+                        <NavLink
                           key={category._id}
-                          p={4}
-                          shadow="md"
-                          borderWidth="1px"
-                          flexBasis="23%"
-                          align="center"
-                          justify="center"
-                          direction="column"
+                          to={`/category/${category._id}`} // Đường dẫn đến trang sản phẩm của danh mục
                         >
-                          <Image
-                            src={`http://localhost:2000/images/${category.imageCategory}`} // Đường dẫn tới hình ảnh
-                            alt={category.categoryName}
-                            boxSize="100px"
-                            objectFit="cover"
-                            mb={2}
-                          />
-                          <Text fontWeight="bold" fontSize="lg">
-                            {category.categoryName}
-                          </Text>
-                        </Flex>
+                          <Flex
+                            key={category._id}
+                            p={4}
+                            shadow="md"
+                            borderWidth="1px"
+                            flexBasis="23%"
+                            align="center"
+                            justify="center"
+                            direction="column"
+                          >
+                            <Image
+                              src={`http://localhost:2000/images/${category.imageCategory}`} // Đường dẫn tới hình ảnh
+                              alt={category.categoryName}
+                              boxSize="100px"
+                              objectFit="cover"
+                              mb={2}
+                              borderRadius={"10px"}
+                            />
+                            <Text
+                              fontWeight="bold"
+                              fontSize="lg"
+                              textAlign="center" // Căn giữa chữ trong Text
+                            >
+                              {category.categoryName}
+                            </Text>
+                          </Flex>
+                        </NavLink>
                       ))}
                     </Flex>
                   </TabPanel>

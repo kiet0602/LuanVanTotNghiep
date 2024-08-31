@@ -3,6 +3,7 @@ import {
   addProduct,
   deleteProduct,
   getAllProducts,
+  getProductByCategory,
   getProductById,
   updateProduct,
 } from "../controller/productController.js";
@@ -26,5 +27,7 @@ productRouter.put("/updateProduct/:id", upload.single("image"), updateProduct);
 productRouter.get("/getAllProducts", getAllProducts);
 productRouter.get("/getProductById/:id", getProductById);
 productRouter.delete("/deleteProduct/:id", deleteProduct);
+
+productRouter.get("/getProductByCategoryId/:categoryId", getProductByCategory);
 
 export default productRouter;

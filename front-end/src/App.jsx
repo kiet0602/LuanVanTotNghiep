@@ -20,6 +20,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import userAtom from "./Atom/userAtom";
 import Table1111 from "./pages/Table.jsx";
 import NewsPage from "./pages/NewsPage.jsx";
+import ProductsCategoryPage from "./pages/ProductsCategoryPage.jsx";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -72,6 +73,10 @@ function App() {
           />
           <Route path="/table" element={<Table1111 />} />
           <Route path="/news" element={<NewsPage />} />
+          <Route
+            path="/category/:categoryId"
+            element={<ProductsCategoryPage />}
+          />
         </Routes>
       </Box>
     </>

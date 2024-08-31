@@ -5,8 +5,8 @@ let nodeConfig = {
   host: "smtp.ethereal.email",
   port: 587,
   auth: {
-    user: "brendan.pouros71@ethereal.email",
-    pass: "7avR2NdnXYMQsJ5dBX",
+    user: "margarita.ortiz@ethereal.email",
+    pass: "gEm6t1dMRkpTCtj24Q",
   },
 };
 

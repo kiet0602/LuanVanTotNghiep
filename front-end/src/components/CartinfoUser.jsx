@@ -68,7 +68,6 @@ const CartinfoUser = () => {
     fetchUser();
   }, [userId]);
 
-  console.log(user);
   const getRole = (role) => {
     return role ? "Admin" : "Khách hàng";
   };
