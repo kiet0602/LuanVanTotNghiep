@@ -9,6 +9,9 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import characteristicRouter from "./routers/characteristicRouter.js";
+import imageRouter from "./routers/imageRouter.js";
+import variantRouter from "./routers/variantRouter.js";
+import colorRouter from "./routers/colorRouter.js";
 
 dotenv.config();
 
@@ -29,6 +32,9 @@ app.use("/api/characteristic", characteristicRouter);
 app.use("/api/product", productRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/user", userRouter);
+app.use("/api/image", imageRouter);
+app.use("/api/variant", variantRouter);
+app.use("/api/color", colorRouter);
 
 app.use("/images", express.static(path.join(__dirname, "uploads")));
 

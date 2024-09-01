@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
   Drawer,
   DrawerOverlay,
   DrawerContent,
@@ -17,16 +16,14 @@ import {
   TabPanel,
   Flex,
   Image,
-  Box,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
+import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 
-// Component để hiển thị danh mục
 function Fillter() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [categories, setCategories] = useState([]);
-  const [characteristicGroups, setCharacteristicGroups] = useState({});
 
   useEffect(() => {
     // Gọi API để lấy danh mục
@@ -35,14 +32,7 @@ function Fillter() {
         const response = await axios.get(
           "http://localhost:2000/api/category/getAllCategory"
         );
-        const data = response.data;
-
-        // Cập nhật danh mục
-        setCategories(data);
-
-        // Nhóm danh mục theo đặc điểm
-        const grouped = groupByCharacteristic(data);
-        setCharacteristicGroups(grouped);
+        setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error.message);
       }
@@ -51,19 +41,6 @@ function Fillter() {
     fetchCategories();
   }, []);
 
-  // Nhóm danh mục theo tên đặc điểm
-  const groupByCharacteristic = (categories) => {
-    return categories.reduce((acc, category) => {
-      const key = category.characteristic.characteristicName;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(category);
-      return acc;
-    }, {});
-  };
-
-  const characteristicNames = Object.keys(characteristicGroups);
   const handleMouseEnter = () => {
     onOpen();
   };
@@ -71,7 +48,7 @@ function Fillter() {
   return (
     <>
       <Text cursor={"pointer"} onClick={handleMouseEnter}>
-        Nơi trang trí của bạn
+        Loại
       </Text>
       <Drawer placement={"top"} onClose={onClose} isOpen={isOpen} size={"lg"}>
         <DrawerOverlay />
@@ -81,51 +58,65 @@ function Fillter() {
           <DrawerBody>
             <Tabs variant="soft-rounded" colorScheme="green">
               <TabList>
-                {characteristicNames.map((name, index) => (
-                  <Tab key={index}>{name}</Tab>
-                ))}
+                <Flex gap={2} alignItems="center">
+                  <Image
+                    borderRadius={"20px"}
+                    src={imgSenda}
+                    alt=""
+                    h={8}
+                    w={8}
+                  />
+                  <Text
+                    cursor={"pointer"}
+                    bgGradient="linear(to-l, #0ea5e9, #2563eb)" // Linear gradient from right to left
+                    bgClip="text" // Clips the background to the text
+                    fontSize="20px" // Example font size
+                    fontWeight="bold"
+                    as="i"
+                  >
+                    Plant Paradise
+                  </Text>
+                </Flex>
               </TabList>
               <Divider marginTop={"20px"} />
               <TabPanels>
-                {characteristicNames.map((name, index) => (
-                  <TabPanel key={index}>
-                    <Flex wrap="wrap" gap={2} justify="center">
-                      {characteristicGroups[name].map((category) => (
-                        <NavLink
-                          key={category._id}
-                          to={`/category/${category._id}`} // Đường dẫn đến trang sản phẩm của danh mục
+                <TabPanel>
+                  <Flex wrap="wrap" gap={2} justify="center">
+                    {categories.map((category) => (
+                      <NavLink
+                        key={category._id}
+                        to={`/category/${category._id}`} // Đường dẫn đến trang sản phẩm của danh mục
+                        onClick={onClose} // Tắt TabPanel sau khi click
+                      >
+                        <Flex
+                          p={4}
+                          shadow="md"
+                          borderWidth="1px"
+                          flexBasis="23%"
+                          align="center"
+                          justify="center"
+                          direction="column"
                         >
-                          <Flex
-                            key={category._id}
-                            p={4}
-                            shadow="md"
-                            borderWidth="1px"
-                            flexBasis="23%"
-                            align="center"
-                            justify="center"
-                            direction="column"
+                          <Image
+                            src={`http://localhost:2000/images/${category.imageCategory}`} // Đường dẫn tới hình ảnh
+                            alt={category.categoryName}
+                            boxSize="100px"
+                            objectFit="cover"
+                            mb={2}
+                            borderRadius={"10px"}
+                          />
+                          <Text
+                            fontWeight="bold"
+                            fontSize="lg"
+                            textAlign="center" // Căn giữa chữ trong Text
                           >
-                            <Image
-                              src={`http://localhost:2000/images/${category.imageCategory}`} // Đường dẫn tới hình ảnh
-                              alt={category.categoryName}
-                              boxSize="100px"
-                              objectFit="cover"
-                              mb={2}
-                              borderRadius={"10px"}
-                            />
-                            <Text
-                              fontWeight="bold"
-                              fontSize="lg"
-                              textAlign="center" // Căn giữa chữ trong Text
-                            >
-                              {category.categoryName}
-                            </Text>
-                          </Flex>
-                        </NavLink>
-                      ))}
-                    </Flex>
-                  </TabPanel>
-                ))}
+                            {category.categoryName}
+                          </Text>
+                        </Flex>
+                      </NavLink>
+                    ))}
+                  </Flex>
+                </TabPanel>
               </TabPanels>
             </Tabs>
           </DrawerBody>
