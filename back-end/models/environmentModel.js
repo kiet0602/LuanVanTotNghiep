@@ -5,7 +5,6 @@ const environmentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // Thêm các trường khác nếu cần
   createdAt: {
     type: Date,
     default: Date.now,

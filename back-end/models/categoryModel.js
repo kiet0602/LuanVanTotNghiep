@@ -10,11 +10,10 @@ const categorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  /*   characteristic: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Characteristic",
+  descriptionCategory: {
+    type: String,
     required: true,
-  }, */
+  },
   createdAt: {
     type: Date,
     default: Date.now,

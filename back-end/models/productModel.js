@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const productSchema = new mongoose.Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Category", // Tham chiếu đến model Category
+    ref: "Category",
     required: true,
   },
   productName: {
@@ -12,28 +12,36 @@ const productSchema = new mongoose.Schema({
   },
   environment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Environment", // Tham chiếu đến model Environment
+    ref: "Environment",
     required: true,
   },
   color: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Color", // Tham chiếu đến model Color
+    ref: "Color",
     required: true,
   },
   description: {
     type: String,
     required: true,
   },
-  image: {
+  image: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  originalPrice: {
+    type: Number,
+    required: true,
+  },
+  discount: {
+    type: Number,
+    default: 0, // Khuyến mãi mặc định là 0%
+  },
+  size: {
     type: String,
     required: true,
   },
-  variants: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Variant", // Tham chiếu đến mô hình Variant
-    },
-  ],
   ratingsCount: {
     type: Number,
     default: 0,
@@ -46,6 +54,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  favoriteCount: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -55,6 +67,12 @@ const productSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Tính toán giá cuối cùng sau khi giảm giá
+productSchema.virtual("finalPrice").get(function () {
+  return this.originalPrice * (1 - this.discount / 100);
+});
+
 const productModel = mongoose.model("Product", productSchema);
 
 export default productModel;

@@ -1,5 +1,4 @@
 import categoryModel from "../models/categoryModel.js";
-import characteristicModel from "../models/characteristicModel.js";
 
 const addCategory = async (req, res) => {
   try {
@@ -10,31 +9,18 @@ const addCategory = async (req, res) => {
         .json({ success: false, message: "Chưa upload ảnh!" });
     }
     // Lấy dữ liệu từ body của yêu cầu
-    const { categoryName /* characteristic  */ } = req.body;
-    // Kiểm tra xem categoryName và characteristic có được cung cấp không
-    if (!categoryName) {
+    const { categoryName, descriptionCategory } = req.body;
+
+    // Kiểm tra xem categoryName và description có được cung cấp không
+    if (!categoryName || !descriptionCategory) {
       return res.status(400).json({
         success: false,
-        message: "Tên danh mục không được để trống!",
+        message: "Tên danh mục và mô tả không được để trống!",
       });
     }
-    /*   if (!characteristic) {
-      return res.status(400).json({
-        success: false,
-        message: "Nơi trang trí không được để trống!",
-      });
-    } */
+
     // Lấy tên tệp hình ảnh
     const imageFilename = req.file.filename;
-    // Kiểm tra sự tồn tại của characteristic
-    /*   const characteristicExists = await characteristicModel.findById(
-      characteristic
-    );
-    if (!characteristicExists) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Không tìm thấy nơi trang trí!" });
-    } */
 
     // Kiểm tra sự tồn tại của categoryName
     const categoryNameExists = await categoryModel.findOne({ categoryName });
@@ -47,7 +33,7 @@ const addCategory = async (req, res) => {
     // Tạo một danh mục mới
     const newCategory = new categoryModel({
       categoryName,
-      /*   characteristic, */
+      descriptionCategory,
       imageCategory: imageFilename,
     });
 
@@ -104,7 +90,7 @@ const deleteCategory = async (req, res) => {
 
 // Cập nhật danh mục
 const updateCategory = async (req, res) => {
-  const { categoryName /*  characteristic */ } = req.body;
+  const { categoryName, descriptionCategory } = req.body;
 
   try {
     const { id } = req.params;
@@ -112,51 +98,29 @@ const updateCategory = async (req, res) => {
     // Tìm danh mục hiện tại theo ID
     const existingCategory = await categoryModel.findById(id);
     if (!existingCategory) {
-      return res.status(404).send({ error: "Loại không tìm thấy" });
+      return res.status(404).json({ error: "Loại không tìm thấy" });
     }
 
-    // Nếu tất cả các trường đều trống, không thực hiện cập nhật và trả về danh mục cũ
-    if (!categoryName && /* !characteristic && */ !req.file) {
-      return res.status(200).send({ updatedCategory: existingCategory });
-    }
+    // Tạo một đối tượng chứa các giá trị cập nhật
+    const updateFields = {
+      categoryName: categoryName || existingCategory.categoryName, // Giữ lại giá trị cũ nếu không có giá trị mới
+      descriptionCategory:
+        descriptionCategory || existingCategory.descriptionCategory, // Giữ lại giá trị cũ nếu không có giá trị mới
+      imageCategory: req.file
+        ? req.file.filename
+        : existingCategory.imageCategory, // Giữ lại ảnh cũ nếu không có ảnh mới
+    };
 
-    const updateFields = {};
+    // Cập nhật danh mục trong cơ sở dữ liệu
+    const updatedCategory = await categoryModel.findByIdAndUpdate(
+      id,
+      { $set: updateFields },
+      { new: true }
+    );
 
-    // Kiểm tra xem tên danh mục có bị trùng lặp không
-    if (categoryName && categoryName !== existingCategory.categoryName) {
-      const categoryNameExists = await categoryModel.findOne({ categoryName });
-      if (categoryNameExists) {
-        return res.status(400).send({ error: "Tên danh mục đã tồn tại" });
-      }
-      updateFields.categoryName = categoryName;
-    }
-
-    // Kiểm tra sự tồn tại của đặc điểm nếu có thay đổi
-    /*   if (characteristic) {
-      const characteristicExists = await characteristicModel.findById(
-        characteristic
-      );
-      if (!characteristicExists) {
-        return res.status(400).send({ error: "Không tìm thấy nơi trang trí" });
-      }
-      updateFields.characteristic = characteristic;
-    } */
-
-    // Cập nhật ảnh nếu có tệp được tải lên
-    if (req.file) {
-      updateFields.imageCategory = req.file.filename;
-    }
-
-    // Cập nhật danh mục trong cơ sở dữ liệu nếu có thay đổi
-    if (Object.keys(updateFields).length > 0) {
-      await categoryModel.updateOne({ _id: id }, { $set: updateFields }).exec();
-    }
-
-    // Lấy danh mục đã được cập nhật
-    const updatedCategory = await categoryModel.findById(id);
-    return res.status(200).send({ updatedCategory });
+    return res.status(200).json({ updatedCategory });
   } catch (error) {
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
