@@ -12,8 +12,29 @@ import {
 import CardProductDetail from "../components/CardProductDetail";
 import Layout from "../components/Layout";
 import Review from "../components/Review";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const ProductDetailPage = () => {
+  const [product, setProduct] = useState(null);
+  const { productId } = useParams();
+
+  useEffect(() => {
+    if (!productId) return;
+    const fetchProductsById = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:2000/api/product/getProductById/${productId}`
+        );
+        setProduct(response.data);
+      } catch (error) {
+        toast.error("Không thể lấy sản phẩm theo thể loại.");
+      }
+    };
+    fetchProductsById();
+  }, [productId]);
+
   // Sample product data
   const productDescription =
     "This exquisite miniature ornamental plant is perfect for enhancing any space with a touch of natural beauty. Easy to care for and perfect for small spaces.";
@@ -27,13 +48,13 @@ const ProductDetailPage = () => {
 
   return (
     <Layout>
-      <CardProductDetail />
+      <CardProductDetail product={product} />
       <Divider />
 
       <Flex justify="center" mt={8}>
         <Tabs variant="soft-rounded" colorScheme="green" maxW={"7xl"}>
           <TabList>
-            <Tab>Description</Tab>
+            <Tab></Tab>
             <Tab>Care Instructions</Tab>
           </TabList>
           <TabPanels>

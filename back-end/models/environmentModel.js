@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const environmentSchema = new mongoose.Schema({
-  name: {
+  nameEnviroment: {
     type: String,
     required: true,
   },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -14,34 +14,25 @@ import {
   useColorModeValue,
   List,
   ListItem,
+  Badge,
 } from "@chakra-ui/react";
 import { MdLocalShipping } from "react-icons/md";
 import Breadcrumbss from "./Breadcrumbss";
 
-const CardProductDetail = () => {
-  const products = [
-    {
-      name: "Miniature Bonsai Tree",
-      price: "45.00 USD",
-      description:
-        "Bring a touch of nature to your home with this exquisite miniature bonsai tree.",
-      details:
-        "This bonsai is perfect for beginners and experienced growers alike. It's easy to care for and adds a serene atmosphere to any room.",
-      features: {
-        general: ["Indoor Plant", "Easy Maintenance", "Decorative"],
-        special: ["Pot Included", "Ideal for Gifting", "Evergreen"],
-      },
-      mainImage:
-        "https://images.unsplash.com/photo-1596516109370-29001ec8ec36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyODE1MDl8MHwxfGFsbHx8fHx8fHx8fDE2Mzg5MzY2MzE&ixlib=rb-1.2.1&q=80&w=1080",
-      images: [
-        "https://images.unsplash.com/photo-1596516109370-29001ec8ec36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyODE1MDl8MHwxfGFsbHx8fHx8fHx8fDE2Mzg5MzY2MzE&ixlib=rb-1.2.1&q=80&w=1080",
-        "https://bit.ly/dan-abramov",
-        "https://images.unsplash.com/photo-1596516109370-29001ec8ec36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyODE1MDl8MHwxfGFsbHx8fHx8fHx8fDE2Mzg5MzY2MzE&ixlib=rb-1.2.1&q=80&w=1080",
-        "https://images.unsplash.com/photo-1596516109370-29001ec8ec36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyODE1MDl8MHwxfGFsbHx8fHx8fHx8fDE2Mzg5MzY2MzE&ixlib=rb-1.2.1&q=80&w=1080",
-      ],
-    },
-  ];
-  const [mainImage, setMainImage] = useState(products[0].mainImage);
+const CardProductDetail = ({ product }) => {
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  useEffect(() => {
+    if (product?.variants.length) {
+      setSelectedVariant(product.variants[0]);
+    }
+  }, [product]);
+
+  const handleVariantChange = (variant) => {
+    setSelectedVariant(variant);
+  };
+
+  if (!selectedVariant) return null; // Đảm bảo rằng có variant được chọn trước khi hiển thị
 
   return (
     <Container maxW={"7xl"}>
@@ -50,38 +41,19 @@ const CardProductDetail = () => {
       <SimpleGrid
         columns={{ base: 1, lg: 2 }}
         spacing={{ base: 8, md: 10 }}
-        py={{ base: 12, md: 16 }} // Giảm giá trị này để giảm khoảng cách theo chiều dọc
-        mt={{ base: -6, md: -8 }} // Thêm giá trị âm để kéo SimpleGrid lên gần hơn với phần tử trên
+        py={{ base: 12, md: 16 }}
+        mt={{ base: -6, md: -8 }}
       >
-        <Stack spacing={4}>
-          {/* Main Product Image */}
-          <Flex>
-            <Image
-              rounded={"md"}
-              alt={"product image"}
-              src={mainImage}
-              fit={"cover"}
-              align={"center"}
-              w={"100%"}
-              h={{ base: "100%", sm: "400px", lg: "500px" }}
-            />
-          </Flex>
-
-          {/* Small Images Row */}
-          <SimpleGrid columns={4} spacing={4}>
-            {products[0].images.map((image, index) => (
-              <Image
-                key={index}
-                rounded={"md"}
-                alt={"product image"}
-                src={image}
-                fit={"cover"}
-                h={"100px"}
-                onClick={() => setMainImage(image)}
-                cursor={"pointer"}
-              />
-            ))}
-          </SimpleGrid>
+        <Stack>
+          <Image
+            rounded={"md"}
+            alt={"product image"}
+            src={`http://localhost:2000/images/${product?.image}`}
+            fit={"cover"}
+            align={"center"}
+            w={"100%"}
+            h={{ base: "100%", sm: "400px", lg: "500px" }}
+          />
         </Stack>
 
         <Stack spacing={{ base: 6, md: 10 }}>
@@ -92,14 +64,33 @@ const CardProductDetail = () => {
               fontWeight={600}
               fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
             >
-              {products[0].name}
+              {product?.productName}
             </Heading>
             <Text
-              color={useColorModeValue("gray.900", "gray.400")}
+              color={useColorModeValue("red.400", "gray.400")}
               fontWeight={300}
               fontSize={"2xl"}
             >
-              {products[0].price}
+              <Flex alignItems="center">
+                <Text mr={4} fontSize="xl" fontWeight="bold">
+                  Giá:
+                </Text>
+                <Badge
+                  rounded="full"
+                  px="4" // Điều chỉnh padding-x để thẻ lớn hơn
+                  py="2" // Điều chỉnh padding-y nếu cần
+                  colorScheme="teal"
+                  fontSize="lg" // Điều chỉnh kích thước font
+                >
+                  ${selectedVariant?.price}
+                </Badge>
+              </Flex>
+            </Text>
+            <Text color={useColorModeValue("gray.400", "gray.400")}>
+              Kích thước: {selectedVariant?.size}
+            </Text>
+            <Text color={useColorModeValue("gray.400", "gray.400")}>
+              Số lượng còn lại: {selectedVariant?.quantity}
             </Text>
           </Box>
 
@@ -113,17 +104,41 @@ const CardProductDetail = () => {
               />
             }
           >
-            <VStack spacing={{ base: 4, sm: 6 }}>
+            <VStack spacing={{ base: 4, sm: 1 }} align="start">
               <Text
                 color={useColorModeValue("gray.500", "gray.400")}
                 fontSize={"2xl"}
                 fontWeight={"300"}
               >
-                {products[0].description}
+                MÔ TẢ
               </Text>
-              <Text fontSize={"lg"}>{products[0].details}</Text>
+              <Flex width="100%" justify="space-between" mb={2}>
+                <Box width="40%" fontWeight="bold">
+                  Màu sắc:
+                </Box>
+                <Box width="60%" textAlign="center">
+                  {product?.color?.nameColor}
+                </Box>
+              </Flex>
+              <Flex width="100%" justify="space-between" mb={2}>
+                <Box width="40%" fontWeight="bold">
+                  Thuộc loại:
+                </Box>
+                <Box width="60%" textAlign="center">
+                  {product?.category?.categoryName}
+                </Box>
+              </Flex>
+              <Flex width="100%" justify="space-between" mb={2}>
+                <Box width="40%" fontWeight="bold">
+                  Môi trường ưa thích:
+                </Box>
+                <Box width="60%" textAlign="center">
+                  {product?.environment?.nameEnviroment}
+                </Box>
+              </Flex>
             </VStack>
 
+            {/* Variant Selection */}
             <Box>
               <Text
                 fontSize={{ base: "16px", lg: "18px" }}
@@ -132,29 +147,45 @@ const CardProductDetail = () => {
                 textTransform={"uppercase"}
                 mb={"4"}
               >
-                Features
+                Chọn kích thước:
               </Text>
-
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-                {Object.entries(products[0].features).map(
-                  ([category, features], index) => (
-                    <List spacing={2} key={index}>
-                      {features.map((feature, index) => (
-                        <ListItem key={index}>{feature}</ListItem>
-                      ))}
-                    </List>
-                  )
-                )}
-              </SimpleGrid>
+              <Stack direction="row" spacing={4}>
+                {product?.variants.map((variant) => (
+                  <Button
+                    key={variant.id}
+                    onClick={() => handleVariantChange(variant)}
+                    border="2px solid"
+                    borderColor={
+                      selectedVariant?.id === variant.id
+                        ? "green.500"
+                        : "gray.300"
+                    }
+                    bg={
+                      selectedVariant?.id === variant.id
+                        ? "white"
+                        : "transparent"
+                    }
+                    color={
+                      selectedVariant?.id === variant.id
+                        ? "green.500"
+                        : "gray.700"
+                    }
+                    _hover={{ bg: "gray.100" }}
+                    _active={{ bg: "gray.200" }}
+                    px={4}
+                    py={2}
+                  >
+                    {variant.size}
+                  </Button>
+                ))}
+              </Stack>
             </Box>
           </Stack>
 
           <Button
             rounded={"none"}
             w={"full"}
-            mt={8}
             size={"lg"}
-            py={"7"}
             bg={useColorModeValue("green.900", "green.50")}
             color={useColorModeValue("white", "green.900")}
             textTransform={"uppercase"}

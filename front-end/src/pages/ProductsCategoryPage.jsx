@@ -55,10 +55,9 @@ const ProductsCategory = () => {
         <Container maxW="6xl" p={{ base: 5, md: 10 }}>
           {category && (
             <Tiltel
+              key={category?._id}
               title={category?.categoryName}
-              ratingText="Các sản phẩm được đánh giá cao"
-              ratingValue="5 sao"
-              customerText="với hơn 20 khách hàng"
+              imageCategory={category?.imageCategory}
               iconColor="#FF5733"
             />
           )}

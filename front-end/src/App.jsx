@@ -51,7 +51,10 @@ function App() {
             path="/checkOut"
             element={user ? <CheckoutPage /> : <Navigate to={"/signIn"} />}
           />
-          <Route path="/productDetail" element={<ProductDetailPage />} />
+          <Route
+            path="/productDetail/:productId"
+            element={<ProductDetailPage />}
+          />
           <Route
             path="/cart"
             element={user ? <CartPage /> : <Navigate to={"/signIn"} />}

@@ -12,6 +12,9 @@ import characteristicRouter from "./routers/characteristicRouter.js";
 import imageRouter from "./routers/imageRouter.js";
 import variantRouter from "./routers/variantRouter.js";
 import colorRouter from "./routers/colorRouter.js";
+import environmentRouter from "./routers/environmentRouter.js";
+import commentRouter from "./routers/commentRouter.js";
+import cartRouter from "./routers/cartRouter.js";
 
 dotenv.config();
 
@@ -35,6 +38,11 @@ app.use("/api/user", userRouter);
 app.use("/api/image", imageRouter);
 app.use("/api/variant", variantRouter);
 app.use("/api/color", colorRouter);
+app.use("/api/environment", environmentRouter);
+
+//chưa test server
+app.use("/api/comment", commentRouter);
+app.use("/api/cart", cartRouter);
 
 app.use("/images", express.static(path.join(__dirname, "uploads")));
 

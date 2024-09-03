@@ -9,23 +9,29 @@ import {
   Text,
   IconButton,
   Tooltip,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { FaHeart, FaEye, FaShoppingCart } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 const CardNew = ({ products }) => {
+  const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
+  const textColor = useColorModeValue("black", "white"); // Text color
+  const hoverBg = useColorModeValue("blue.50", "blue.600");
+  const borderColor = useColorModeValue("blue.500", "blue.300");
+
   return (
     <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
       <SimpleGrid columns={[1, 2, 3]} spacing="15px">
-        {products.map((product) => {
+        {products.map((product, index) => {
           return (
             <Box
               position="relative"
-              key={product.id}
+              key={index}
               _hover={{ ".overlay": { opacity: 1 } }}
             >
               {/* Nhãn dán khuyến mãi */}
-              <Box
+              {/*   <Box
                 position="absolute"
                 top="5px"
                 left="5px"
@@ -39,10 +45,8 @@ const CardNew = ({ products }) => {
                 textAlign="center"
                 fontSize="sm"
                 color="red.500"
-              >
-                -10%
-              </Box>
-
+              ></Box>
+ */}
               {/* Các nút thêm vào giỏ hàng và yêu thích */}
               <Box
                 className="overlay"
@@ -56,52 +60,61 @@ const CardNew = ({ products }) => {
                 zIndex="1"
                 p="2"
               >
-                <Tooltip label="Add to Cart" aria-label="Add to Cart">
+                <Tooltip
+                  label="Thêm vào giỏ hàng"
+                  aria-label="Thêm vào giỏ hàng"
+                >
                   <IconButton
                     icon={<FaShoppingCart />}
                     size="md"
                     variant="outline"
-                    colorScheme="teal"
+                    colorScheme="blue"
                     aria-label="Add to Cart"
-                    borderColor="teal.500"
+                    borderColor={borderColor}
                     borderWidth="2px"
                     borderRadius="full"
-                    bg="white"
-                    _hover={{ bg: "teal.50" }}
+                    bg={bgColor}
+                    _hover={{ bg: hoverBg }}
+                    _active={{ bg: hoverBg, borderColor: borderColor }}
+                    _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
                   />
                 </Tooltip>
-                <Tooltip label="Add to Favorite" aria-label="Add to Favorite">
+                <Tooltip label="Yêu thích" aria-label="Yêu thích">
                   <IconButton
                     icon={<FaHeart />}
                     size="md"
                     variant="outline"
-                    colorScheme="pink"
+                    colorScheme="red"
                     aria-label="Add to Favorite"
-                    borderColor="pink.500"
+                    borderColor={borderColor}
                     borderWidth="2px"
                     borderRadius="full"
-                    bg="white"
-                    _hover={{ bg: "pink.50" }}
+                    bg={bgColor}
+                    _hover={{ bg: hoverBg }}
+                    _active={{ bg: hoverBg, borderColor: borderColor }}
+                    _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
                   />
                 </Tooltip>
-                <Tooltip label="View Details" aria-label="View Details">
+                <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                   <IconButton
                     icon={<FaEye />}
                     size="md"
                     variant="outline"
-                    colorScheme="blue"
+                    colorScheme="white"
                     aria-label="View Details"
-                    borderColor="blue.500"
+                    borderColor={borderColor}
                     borderWidth="2px"
                     borderRadius="full"
-                    bg="white"
-                    _hover={{ bg: "blue.50" }}
+                    bg={bgColor}
+                    _hover={{ bg: hoverBg }}
+                    _active={{ bg: hoverBg, borderColor: borderColor }}
+                    _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
                   />
                 </Tooltip>
               </Box>
 
               {/* Nội dung thẻ */}
-              <NavLink to="#">
+              <NavLink to={`/productDetail/${product?._id}`}>
                 <Box
                   borderWidth="1px"
                   shadow="md"
@@ -115,30 +128,70 @@ const CardNew = ({ products }) => {
                     // Ensure the image covers the container
                   />
                   <Box p={{ base: 4, lg: 6 }}>
-                    <Box d="flex" alignItems="baseline">
+                    <Box d="flex" alignItems="center" justifyContent="center">
                       <Box
                         fontWeight="semibold"
                         as="h2"
                         letterSpacing="wide"
                         textTransform="uppercase"
                         ml="2"
+                        textAlign="center"
                       >
                         {product?.productName}
                       </Box>
                     </Box>
                     <Box>
-                      <Box color="gray.600" fontSize="sm">
+                      {/* Price centered */}
+                      <Box display="flex" justifyContent="center">
+                        <Box
+                          fontWeight="semibold"
+                          as="h2"
+                          letterSpacing="wide"
+                          ml="2"
+                          textAlign="center"
+                        >
+                          <Text
+                            as="span"
+                            fontStyle="italic"
+                            fontWeight="light"
+                            mr="2"
+                            textColor
+                          >
+                            Loại:
+                          </Text>
+                          <Badge rounded="full" px="3" fontSize="xl">
+                            ${product?.variants[0].price}
+                          </Badge>
+                        </Box>
+                      </Box>
+
+                      {/* Other badges aligned to the end */}
+                      <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        gap="2" // Optional: adds space between badges
+                        color="gray.600"
+                        fontSize="large"
+                        mt="2" // Optional: adds some margin-top for spacing
+                      >
                         <Badge rounded="full" px="2" colorScheme="teal">
-                          {product?.price}
+                          Màu sắc: {product?.color?.nameColor}
+                        </Badge>
+                        <Badge rounded="full" px="2" colorScheme="teal">
+                          Đánh giá: {product?.ratingsCount}
+                        </Badge>
+                        <Badge rounded="full" px="2" colorScheme="teal">
+                          Bán: {product?.orderCount}
                         </Badge>
                       </Box>
                     </Box>
+
                     <Text
                       mt="1"
                       fontWeight="semibold"
                       noOfLines={3}
                       lineHeight="tight"
-                      color="gray.600"
+                      textColor
                       fontSize="sm"
                     >
                       {product?.description}

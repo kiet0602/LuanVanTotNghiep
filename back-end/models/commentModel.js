@@ -11,7 +11,7 @@ const commentSchema = new mongoose.Schema({
     ref: "Product", // Tham chiếu đến model Product
     required: true,
   },
-  content: {
+  commentText: {
     type: String,
     required: true,
   },
@@ -27,6 +27,6 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-const Comment = mongoose.model("Comment", commentSchema);
+const commentModel = mongoose.model("Comment", commentSchema);
 
-export default Comment;
+export default commentModel;
