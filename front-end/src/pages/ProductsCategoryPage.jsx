@@ -51,17 +51,16 @@ const ProductsCategory = () => {
 
   return (
     <Layout>
+      {category && (
+        <Tiltel
+          key={category?._id}
+          title={category?.categoryName}
+          imageCategory={category?.imageCategory}
+          iconColor="#FF5733"
+        />
+      )}
       <Box bg={useColorModeValue("white", "black")}>
         <Container maxW="6xl" p={{ base: 5, md: 10 }}>
-          {category && (
-            <Tiltel
-              key={category?._id}
-              title={category?.categoryName}
-              imageCategory={category?.imageCategory}
-              iconColor="#FF5733"
-            />
-          )}
-
           {products.length === 0 ? (
             <Box textAlign="center" mt={10}>
               <Image

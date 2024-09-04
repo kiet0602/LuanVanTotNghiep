@@ -12,198 +12,231 @@ import {
   SimpleGrid,
   StackDivider,
   useColorModeValue,
-  List,
-  ListItem,
   Badge,
+  Spinner,
+  Center,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Divider,
 } from "@chakra-ui/react";
 import { MdLocalShipping } from "react-icons/md";
 import Breadcrumbss from "./Breadcrumbss";
+import AccordionDetailProduct from "./AccordionDetailProduct";
 
 const CardProductDetail = ({ product }) => {
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [mainImage, setMainImage] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const borderColor = useColorModeValue("teal.500", "teal.300"); // Light and dark mode colors
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
 
   useEffect(() => {
-    if (product?.variants.length) {
-      setSelectedVariant(product.variants[0]);
+    if (product?.image && product.image.length > 0) {
+      setMainImage(`http://localhost:2000/images/${product.image[0]}`);
+    } else {
+      setMainImage(null); // Default image handling or empty state
     }
   }, [product]);
 
-  const handleVariantChange = (variant) => {
-    setSelectedVariant(variant);
-  };
+  const displayPrice =
+    product?.discount > 0 ? product.finalPrice : product.originalPrice;
 
-  if (!selectedVariant) return null; // Đảm bảo rằng có variant được chọn trước khi hiển thị
+  const priceToDisplay = displayPrice ?? 0;
+
+  const totalPriceProduct = product.finalPrice * quantity;
 
   return (
-    <Container maxW={"7xl"}>
-      {/* Breadcrumbs component at the top */}
-      <Breadcrumbss />
-      <SimpleGrid
-        columns={{ base: 1, lg: 2 }}
-        spacing={{ base: 8, md: 10 }}
-        py={{ base: 12, md: 16 }}
-        mt={{ base: -6, md: -8 }}
-      >
-        <Stack>
-          <Image
-            rounded={"md"}
-            alt={"product image"}
-            src={`http://localhost:2000/images/${product?.image}`}
-            fit={"cover"}
-            align={"center"}
-            w={"100%"}
-            h={{ base: "100%", sm: "400px", lg: "500px" }}
-          />
-        </Stack>
-
-        <Stack spacing={{ base: 6, md: 10 }}>
-          {/* Product Title and Price */}
-          <Box as={"header"}>
-            <Heading
-              lineHeight={1.1}
-              fontWeight={600}
-              fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
-            >
-              {product?.productName}
-            </Heading>
-            <Text
-              color={useColorModeValue("red.400", "gray.400")}
-              fontWeight={300}
-              fontSize={"2xl"}
-            >
-              <Flex alignItems="center">
-                <Text mr={4} fontSize="xl" fontWeight="bold">
-                  Giá:
-                </Text>
-                <Badge
-                  rounded="full"
-                  px="4" // Điều chỉnh padding-x để thẻ lớn hơn
-                  py="2" // Điều chỉnh padding-y nếu cần
-                  colorScheme="teal"
-                  fontSize="lg" // Điều chỉnh kích thước font
-                >
-                  ${selectedVariant?.price}
-                </Badge>
-              </Flex>
-            </Text>
-            <Text color={useColorModeValue("gray.400", "gray.400")}>
-              Kích thước: {selectedVariant?.size}
-            </Text>
-            <Text color={useColorModeValue("gray.400", "gray.400")}>
-              Số lượng còn lại: {selectedVariant?.quantity}
-            </Text>
-          </Box>
-
-          {/* Product Description and Details */}
-          <Stack
-            spacing={{ base: 4, sm: 6 }}
-            direction={"column"}
-            divider={
-              <StackDivider
-                borderColor={useColorModeValue("gray.200", "gray.600")}
+    <>
+      {!product ? (
+        <Center height="100vh">
+          <Spinner size="xl" color="teal.500" />
+        </Center>
+      ) : (
+        <Container maxW={"7xl"}>
+          <Breadcrumbss />
+          <SimpleGrid
+            columns={{ base: 1, lg: 2 }}
+            spacing={{ base: 8, md: 10 }}
+            py={{ base: 12, md: 16 }}
+            mt={{ base: -6, md: -8 }}
+          >
+            <Stack>
+              <Image
+                rounded={"md"}
+                alt={"product image"}
+                src={mainImage}
+                fit={"cover"}
+                align={"center"}
+                w={"100%"}
+                h={{ base: "100%", sm: "400px", lg: "500px" }}
+                bgColor={bgColor}
               />
-            }
-          >
-            <VStack spacing={{ base: 4, sm: 1 }} align="start">
-              <Text
-                color={useColorModeValue("gray.500", "gray.400")}
-                fontSize={"2xl"}
-                fontWeight={"300"}
-              >
-                MÔ TẢ
-              </Text>
-              <Flex width="100%" justify="space-between" mb={2}>
-                <Box width="40%" fontWeight="bold">
-                  Màu sắc:
-                </Box>
-                <Box width="60%" textAlign="center">
-                  {product?.color?.nameColor}
-                </Box>
-              </Flex>
-              <Flex width="100%" justify="space-between" mb={2}>
-                <Box width="40%" fontWeight="bold">
-                  Thuộc loại:
-                </Box>
-                <Box width="60%" textAlign="center">
-                  {product?.category?.categoryName}
-                </Box>
-              </Flex>
-              <Flex width="100%" justify="space-between" mb={2}>
-                <Box width="40%" fontWeight="bold">
-                  Môi trường ưa thích:
-                </Box>
-                <Box width="60%" textAlign="center">
-                  {product?.environment?.nameEnviroment}
-                </Box>
-              </Flex>
-            </VStack>
 
-            {/* Variant Selection */}
-            <Box>
-              <Text
-                fontSize={{ base: "16px", lg: "18px" }}
-                color={useColorModeValue("green.500", "green.300")}
-                fontWeight={"500"}
-                textTransform={"uppercase"}
-                mb={"4"}
-              >
-                Chọn kích thước:
-              </Text>
-              <Stack direction="row" spacing={4}>
-                {product?.variants.map((variant) => (
-                  <Button
-                    key={variant.id}
-                    onClick={() => handleVariantChange(variant)}
-                    border="2px solid"
-                    borderColor={
-                      selectedVariant?.id === variant.id
-                        ? "green.500"
-                        : "gray.300"
+              <Flex mt={4}>
+                {product?.image.map((img, idx) => (
+                  <Image
+                    key={idx}
+                    src={`http://localhost:2000/images/${img}`}
+                    alt={`product image ${idx + 1}`}
+                    fit={"cover"}
+                    boxSize={"80px"}
+                    objectFit="cover"
+                    borderRadius={"10px"}
+                    border={
+                      mainImage === `http://localhost:2000/images/${img}`
+                        ? `2px solid ${borderColor}`
+                        : "none"
                     }
-                    bg={
-                      selectedVariant?.id === variant.id
-                        ? "white"
-                        : "transparent"
+                    cursor="pointer"
+                    onClick={() =>
+                      setMainImage(`http://localhost:2000/images/${img}`)
                     }
-                    color={
-                      selectedVariant?.id === variant.id
-                        ? "green.500"
-                        : "gray.700"
-                    }
-                    _hover={{ bg: "gray.100" }}
-                    _active={{ bg: "gray.200" }}
-                    px={4}
-                    py={2}
-                  >
-                    {variant.size}
-                  </Button>
+                    mr={2}
+                  />
                 ))}
+              </Flex>
+            </Stack>
+
+            <Stack spacing={{ base: 6, md: 10 }}>
+              <Box as={"header"}>
+                <Heading
+                  lineHeight={1.1}
+                  fontWeight={600}
+                  fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
+                  color={textColor}
+                >
+                  {product?.productName}
+                </Heading>
+                <Box fontWeight={300} fontSize={"2xl"}>
+                  <Flex alignItems="center">
+                    <Text mr={4} fontSize="xl" fontWeight="bold">
+                      Giá:
+                    </Text>
+                    <Badge
+                      rounded="full"
+                      px="4"
+                      py="2"
+                      colorScheme="teal"
+                      fontSize="lg"
+                    >
+                      {priceToDisplay.toLocaleString("vi-VN")} VND
+                    </Badge>
+                  </Flex>
+                </Box>
+              </Box>
+              <Stack
+                spacing={{ base: 4, sm: 6 }}
+                direction={"column"}
+                divider={<StackDivider />}
+              >
+                <VStack spacing={{ base: 4, sm: 1 }} align="start">
+                  <Text fontSize={"2xl"} fontWeight={"300"}>
+                    MÔ TẢ
+                  </Text>
+                  <Flex width="100%" justify="space-between" mb={2}>
+                    <Box width="40%" as="i">
+                      Màu sắc:
+                    </Box>
+                    <Box width="60%" textAlign="end" fontWeight="bold">
+                      {product?.color?.nameColor}
+                    </Box>
+                  </Flex>
+                  <Flex width="100%" justify="space-between" mb={2}>
+                    <Box width="40%" as="i">
+                      Thuộc loại:
+                    </Box>
+                    <Box width="60%" textAlign="end" fontWeight="bold">
+                      {product?.category?.categoryName}
+                    </Box>
+                  </Flex>
+                  <Flex width="100%" justify="space-between" mb={2}>
+                    <Box width="40%" as="i">
+                      Môi trường ưa thích:
+                    </Box>
+                    <Box width="60%" textAlign="end" fontWeight="bold">
+                      {product?.environment?.nameEnviroment}
+                    </Box>
+                  </Flex>
+                  <Flex width="100%" justify="space-between" mb={2}>
+                    <Box width="40%" as="i">
+                      Chiều cao:
+                    </Box>
+                    <Box width="60%" textAlign="end" fontWeight="bold">
+                      {product?.size}
+                    </Box>
+                  </Flex>
+                  <Divider />
+                  <Flex width="100%" justify="space-between" mb={2}>
+                    <Box width="40%" as="i">
+                      Số lượng còn lại:
+                    </Box>
+                    <Box width="60%" textAlign="end" fontWeight="bold">
+                      {product?.quantity}
+                    </Box>
+                  </Flex>
+                </VStack>
               </Stack>
-            </Box>
-          </Stack>
+              <Box mt={4}>
+                <Flex alignItems="center">
+                  <Text fontSize={"xl"} fontWeight="bold" mr={4}>
+                    Số lượng:
+                  </Text>
+                  <NumberInput
+                    defaultValue={1}
+                    min={1}
+                    max={product?.quantity} // Ensure quantity does not exceed available stock
+                    value={quantity}
+                    onChange={(valueString) =>
+                      setQuantity(parseInt(valueString))
+                    }
+                    size="md"
+                    maxW="150px"
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <Box mx={5} display={"flex"}>
+                    Tạm tính:
+                    <Text color={"red"}>
+                      {totalPriceProduct.toLocaleString("vi-VN")} VNĐ
+                    </Text>
+                  </Box>
+                </Flex>
+              </Box>
 
-          <Button
-            rounded={"none"}
-            w={"full"}
-            size={"lg"}
-            bg={useColorModeValue("green.900", "green.50")}
-            color={useColorModeValue("white", "green.900")}
-            textTransform={"uppercase"}
-            _hover={{
-              transform: "translateY(2px)",
-              boxShadow: "lg",
-            }}
-          >
-            Add to cart
-          </Button>
-
-          <Stack direction="row" alignItems="center" justifyContent={"center"}>
-            <MdLocalShipping />
-            <Text>2-3 business days delivery</Text>
-          </Stack>
-        </Stack>
-      </SimpleGrid>
-    </Container>
+              <Button
+                bgColor={"gray.300"}
+                rounded={"10"}
+                w={"full"}
+                size={"lg"}
+                textTransform={"uppercase"}
+                _hover={{
+                  transform: "translateY(5px)",
+                  boxShadow: "lg",
+                }}
+              >
+                Thêm vào giỏ hàng
+              </Button>
+              <AccordionDetailProduct description={product?.description} />
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent={"center"}
+              >
+                <MdLocalShipping />
+                <Text ml={2}>2-3 ngày làm việc để giao hàng</Text>
+              </Stack>
+            </Stack>
+          </SimpleGrid>
+        </Container>
+      )}
+    </>
   );
 };
 

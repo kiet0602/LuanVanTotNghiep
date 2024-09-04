@@ -17,23 +17,32 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const ProductDetailPage = () => {
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState("");
   const { productId } = useParams();
 
   useEffect(() => {
-    if (!productId) return;
+    if (!productId) {
+      console.error("Không xác thực được ID");
+      return;
+    }
     const fetchProductsById = async () => {
       try {
         const response = await axios.get(
           `http://localhost:2000/api/product/getProductById/${productId}`
         );
-        setProduct(response.data);
+
+        if (response.status === 200) {
+          setProduct(response.data);
+        } else {
+          console.error("Failed to fetch product: ", response.status);
+        }
       } catch (error) {
-        toast.error("Không thể lấy sản phẩm theo thể loại.");
+        console.error("Error fetching product:", error);
       }
     };
+
     fetchProductsById();
-  }, [productId]);
+  }, []);
 
   // Sample product data
   const productDescription =
@@ -85,6 +94,7 @@ const ProductDetailPage = () => {
           </TabPanels>
         </Tabs>
       </Flex>
+
       <Review />
     </Layout>
   );

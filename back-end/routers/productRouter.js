@@ -12,7 +12,11 @@ import {
 const productRouter = express.Router();
 
 productRouter.post("/addProduct", upload.array("image", 5), addProduct);
-productRouter.put("/updateProduct/:id", upload.array("image"), updateProduct);
+productRouter.put(
+  "/updateProduct/:id",
+  upload.array("image", 5),
+  updateProduct
+);
 productRouter.delete("/deleteProduct/:id", deleteProduct);
 productRouter.get("/getAllProducts", getAllProducts);
 productRouter.get("/getProductById/:id", getProductById);

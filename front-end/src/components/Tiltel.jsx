@@ -15,12 +15,12 @@ const Tiltel = ({ title, imageCategory, iconColor }) => {
 
   return (
     <Box
+      my={"2"}
       bgImage={`http://localhost:2000/images/${imageCategory}`}
       bgSize="cover"
       bgPosition="center"
       width="100%"
       maxW="100%"
-      borderRadius="20px"
       _before={{
         content: `""`,
         bg: bgColor,

@@ -31,22 +31,27 @@ const CardNew = ({ products }) => {
               _hover={{ ".overlay": { opacity: 1 } }}
             >
               {/* Nhãn dán khuyến mãi */}
-              {/*   <Box
-                position="absolute"
-                top="5px"
-                left="5px"
-                backgroundColor="white"
-                borderRadius="full"
-                borderWidth="2px"
-                borderColor="red.400"
-                px="3"
-                py="1"
-                zIndex="1"
-                textAlign="center"
-                fontSize="sm"
-                color="red.500"
-              ></Box>
- */}
+              {product?.discount > 0 && (
+                <Box
+                  position="absolute"
+                  top="5px"
+                  left="5px"
+                  backgroundColor="white"
+                  borderRadius="full"
+                  borderWidth="2px"
+                  borderColor="red.400"
+                  px="3"
+                  py="1"
+                  zIndex="1"
+                  textAlign="center"
+                  fontSize="sm"
+                  color="red.500"
+                  as="i"
+                >
+                  - {product?.discount}%
+                </Box>
+              )}
+
               {/* Các nút thêm vào giỏ hàng và yêu thích */}
               <Box
                 className="overlay"
@@ -95,22 +100,25 @@ const CardNew = ({ products }) => {
                     _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
                   />
                 </Tooltip>
-                <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
-                  <IconButton
-                    icon={<FaEye />}
-                    size="md"
-                    variant="outline"
-                    colorScheme="white"
-                    aria-label="View Details"
-                    borderColor={borderColor}
-                    borderWidth="2px"
-                    borderRadius="full"
-                    bg={bgColor}
-                    _hover={{ bg: hoverBg }}
-                    _active={{ bg: hoverBg, borderColor: borderColor }}
-                    _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
-                  />
-                </Tooltip>
+                <NavLink to={`/productDetail/${product?._id}`}>
+                  {" "}
+                  <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
+                    <IconButton
+                      icon={<FaEye />}
+                      size="md"
+                      variant="outline"
+                      colorScheme="white"
+                      aria-label="View Details"
+                      borderColor={borderColor}
+                      borderWidth="2px"
+                      borderRadius="full"
+                      bg={bgColor}
+                      _hover={{ bg: hoverBg }}
+                      _active={{ bg: hoverBg, borderColor: borderColor }}
+                      _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
+                    />
+                  </Tooltip>
+                </NavLink>
               </Box>
 
               {/* Nội dung thẻ */}
@@ -123,7 +131,7 @@ const CardNew = ({ products }) => {
                   position="relative"
                 >
                   <Image
-                    src={`http://localhost:2000/images/${product?.image}`}
+                    src={`http://localhost:2000/images/${product.image[0]}`}
                     alt="Blog image"
                     // Ensure the image covers the container
                   />
@@ -157,10 +165,10 @@ const CardNew = ({ products }) => {
                             mr="2"
                             textColor
                           >
-                            Loại:
+                            Giá:
                           </Text>
                           <Badge rounded="full" px="3" fontSize="xl">
-                            ${product?.variants[0].price}
+                            {product.finalPrice.toLocaleString("vi-VN")}Đ
                           </Badge>
                         </Box>
                       </Box>

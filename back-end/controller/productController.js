@@ -1,9 +1,5 @@
 import productModel from "../models/productModel.js";
-// import categoryModel from "../models/categoryModel.js";
-// import EnvironmentModel from "../models/environmentModel.js";
-// import ColorModel from "../models/colorModel.js";
-// import fs from "fs";
-// import mongoose from "mongoose";
+// import các model khác nếu cần
 
 // Thêm sản phẩm
 const addProduct = async (req, res) => {
@@ -15,25 +11,29 @@ const addProduct = async (req, res) => {
       color,
       description,
       originalPrice,
-      discount = 0, // Mặc định discount là 0 nếu không được cung cấp
+      discount = 0,
       size,
+      quantity, // Thêm trường quantity
     } = req.body;
 
-    // Kiểm tra các trường bắt buộc
-    if (!category || !environment || !color || !size || !originalPrice) {
+    if (
+      !category ||
+      !environment ||
+      !color ||
+      !size ||
+      !originalPrice ||
+      quantity === undefined
+    ) {
       return res.status(400).json({ error: "Thiếu trường bắt buộc" });
     }
 
-    // Kiểm tra trùng tên sản phẩm
     const existingProduct = await productModel.findOne({ productName });
     if (existingProduct) {
       return res.status(400).json({ error: "Tên sản phẩm đã tồn tại" });
     }
 
-    // Lưu tên file ảnh nếu có ảnh được upload
     const images = req.files ? req.files.map((file) => file.filename) : [];
 
-    // Tạo sản phẩm mới
     const newProduct = new productModel({
       productName,
       category,
@@ -43,6 +43,7 @@ const addProduct = async (req, res) => {
       originalPrice,
       discount,
       size,
+      quantity, // Thêm trường quantity
       image: images,
     });
 
@@ -53,6 +54,8 @@ const addProduct = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Cập nhật sản phẩm
 const updateProduct = async (req, res) => {
   try {
     const {
@@ -64,17 +67,16 @@ const updateProduct = async (req, res) => {
       originalPrice,
       discount = 0,
       size,
+      quantity, // Thêm trường quantity
     } = req.body;
 
     const { id } = req.params;
 
-    // Kiểm tra sản phẩm tồn tại
     const existingProduct = await productModel.findById(id);
     if (!existingProduct) {
       return res.status(404).json({ error: "Sản phẩm không tìm thấy" });
     }
 
-    // Kiểm tra tên sản phẩm trùng lặp
     if (productName) {
       const productWithSameName = await productModel.findOne({ productName });
       if (productWithSameName && productWithSameName._id.toString() !== id) {
@@ -82,7 +84,6 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    // Cập nhật thông tin sản phẩm
     const updatedData = {
       productName: productName || existingProduct.productName,
       category: category || existingProduct.category,
@@ -92,11 +93,17 @@ const updateProduct = async (req, res) => {
       originalPrice: originalPrice || existingProduct.originalPrice,
       discount: discount || existingProduct.discount,
       size: size || existingProduct.size,
-      image: req.files
-        ? req.files.map((file) => file.filename)
-        : existingProduct.image, // Sử dụng ảnh mới nếu có
+      quantity: quantity !== undefined ? quantity : existingProduct.quantity, // Cập nhật quantity nếu có
       updatedAt: Date.now(),
     };
+
+    if (req.files && req.files.length > 0) {
+      updatedData.image = req.files.map((file) => file.filename);
+      console.log("Updated images:", updatedData.image);
+    } else {
+      updatedData.image = existingProduct.image;
+      console.log("Retaining existing images:", updatedData.image);
+    }
 
     const updatedProduct = await productModel.findByIdAndUpdate(
       id,
@@ -109,15 +116,16 @@ const updateProduct = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Lấy tất cả sản phẩm
 const getAllProducts = async (req, res) => {
   try {
     const products = await productModel
       .find()
-      .populate("category", "categoryName imageCategory descriptionCategory") // Lấy thông tin của category
-      .populate("environment", "nameEnviroment") // Lấy thông tin của environment
-      .populate("color", "nameColor"); // Lấy thông tin của color
+      .populate("category", "categoryName imageCategory descriptionCategory")
+      .populate("environment", "nameEnviroment")
+      .populate("color", "nameColor");
 
-    // Tính toán finalPrice cho tất cả sản phẩm
     const productsWithFinalPrice = products.map((product) => {
       const finalPrice =
         product.originalPrice -
@@ -134,25 +142,24 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+// Lấy sản phẩm theo ID
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const product = await productModel
       .findById(id)
-      .populate("category", "categoryName imageCategory descriptionCategory") // Lấy thông tin của category
-      .populate("environment", "nameEnviroment") // Lấy thông tin của environment
-      .populate("color", "nameColor"); // Lấy thông tin của color
+      .populate("category", "categoryName imageCategory descriptionCategory")
+      .populate("environment", "nameEnviroment")
+      .populate("color", "nameColor");
 
     if (!product) {
       return res.status(404).json({ error: "Sản phẩm không tìm thấy" });
     }
 
-    // Tính toán finalPrice
     const finalPrice =
       product.originalPrice - (product.originalPrice * product.discount) / 100;
 
-    // Thêm finalPrice vào kết quả
     const productWithFinalPrice = {
       ...product.toObject(),
       finalPrice,
@@ -163,12 +170,12 @@ const getProductById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-// API để xóa một sản phẩm theo ID
+
+// Xóa sản phẩm theo ID
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Tìm và xóa sản phẩm theo ID
     const product = await productModel.findByIdAndDelete(id);
     if (!product) {
       return res.status(404).json({ error: "Sản phẩm không tìm thấy" });
@@ -180,16 +187,16 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// Lấy sản phẩm theo ID danh mục
 const getProductsByCategoryId = async (req, res) => {
   try {
     const { categoryId } = req.params;
 
-    // Tìm các sản phẩm thuộc categoryId
     const products = await productModel
       .find({ category: categoryId })
-      .populate("category", "categoryName imageCategory descriptionCategory") // Lấy thông tin của category
-      .populate("environment", "nameEnviroment") // Lấy thông tin của environment
-      .populate("color", "nameColor"); // Lấy thông tin của color
+      .populate("category", "categoryName imageCategory descriptionCategory")
+      .populate("environment", "nameEnviroment")
+      .populate("color", "nameColor");
 
     if (products.length === 0) {
       return res
@@ -197,7 +204,6 @@ const getProductsByCategoryId = async (req, res) => {
         .json({ error: "Không tìm thấy sản phẩm cho category này" });
     }
 
-    // Tính toán finalPrice cho tất cả sản phẩm
     const productsWithFinalPrice = products.map((product) => {
       const finalPrice =
         product.originalPrice -
