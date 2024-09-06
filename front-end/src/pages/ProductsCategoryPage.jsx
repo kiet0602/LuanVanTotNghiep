@@ -18,6 +18,7 @@ import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 const ProductsCategory = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState(null);
+  const [loading, setLoading] = useState(true); // Start with loading true
 
   const { categoryId } = useParams();
 
@@ -45,8 +46,13 @@ const ProductsCategory = () => {
         toast.error("Không thể lấy tên thể loại này.");
       }
     };
-    fetchProductsCategoryID();
-    fetchCategory();
+
+    const fetchData = async () => {
+      await Promise.all([fetchProductsCategoryID(), fetchCategory()]);
+      setLoading(false); // Set loading to false after fetching
+    };
+
+    fetchData();
   }, [categoryId]);
 
   return (
@@ -61,7 +67,11 @@ const ProductsCategory = () => {
       )}
       <Box bg={useColorModeValue("white", "black")}>
         <Container maxW="6xl" p={{ base: 5, md: 10 }}>
-          {products.length === 0 ? (
+          {loading ? (
+            <Box textAlign="center" mt={10}>
+              <Spinner size="xl" />
+            </Box>
+          ) : products.length === 0 ? (
             <Box textAlign="center" mt={10}>
               <Image
                 borderRadius={"20px"}

@@ -10,6 +10,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import colorRouter from "./routers/colorRouter.js";
 import environmentRouter from "./routers/environmentRouter.js";
+import cartRouter from "./routers/cartRouter.js";
 /* import commentRouter from "./routers/commentRouter.js";
 import cartRouter from "./routers/cartRouter.js"; */
 
@@ -34,6 +35,7 @@ app.use("/api/category", categoryRouter);
 app.use("/api/user", userRouter);
 app.use("/api/color", colorRouter);
 app.use("/api/environment", environmentRouter);
+app.use("/api/cart", cartRouter);
 
 //chưa test server
 /* app.use("/api/comment", commentRouter);
