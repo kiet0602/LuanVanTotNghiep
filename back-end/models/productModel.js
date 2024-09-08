@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
+  // Các trường hiện tại
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -62,6 +63,16 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+    },
+  ],
+  commentCount: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -72,7 +83,6 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-// Tính toán giá cuối cùng sau khi giảm giá
 productSchema.virtual("finalPrice").get(function () {
   return this.originalPrice * (1 - this.discount / 100);
 });

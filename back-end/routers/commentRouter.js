@@ -2,15 +2,16 @@ import express from "express";
 import {
   addComment,
   deleteComment,
-  getAllComments,
+  getCommentsByProduct,
   updateComment,
 } from "../controller/commentController.js";
+import Auth from "../middleware/auth.js";
 
 const commentRouter = express.Router();
 
-commentRouter.post("/addComments", addComment);
-commentRouter.delete("/deleteComments", deleteComment);
-commentRouter.put("/updateComments", updateComment);
-commentRouter.get("/getAllComments", getAllComments);
+commentRouter.post("/products/:productId/comments", Auth, addComment);
+commentRouter.delete("/comments/:commentId", Auth, deleteComment);
+commentRouter.put("/comments/:commentId", Auth, updateComment);
+commentRouter.get("/products/:productId/comments", getCommentsByProduct);
 
 export default commentRouter;

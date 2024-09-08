@@ -3,154 +3,136 @@ import productModel from "../models/productModel.js";
 
 export const addComment = async (req, res) => {
   try {
-    const { productId, userId, rating, commentText } = req.body;
+    const { productId } = req.params;
+    const { content, rating } = req.body;
+    const { userId } = req.user;
 
     // Tạo bình luận mới
-    const newComment = new commentModel({
-      product: productId,
-      user: userId,
-      rating,
-      commentText,
-    });
+    const comment = new commentModel({ productId, userId, content, rating });
+    await comment.save();
 
-    // Lưu bình luận vào database
-    await newComment.save();
-
-    // Tìm sản phẩm và cập nhật ratingsCount và averageRating
+    // Cập nhật sản phẩm để tăng số lượng bình luận và cập nhật số lượng đánh giá và điểm trung bình
     const product = await productModel.findById(productId);
-
     if (product) {
-      // Cập nhật số lượng đánh giá và tính toán lại điểm trung bình
-      product.ratingsCount += 1;
-      product.averageRating =
-        (product.averageRating * (product.ratingsCount - 1) + rating) /
-        product.ratingsCount;
+      const totalRatings = product.ratingsCount + 1;
+      const updatedAverageRating =
+        (product.averageRating * product.ratingsCount + rating) / totalRatings;
 
-      // Lưu thay đổi vào database
-      await product.save();
+      await productModel.findByIdAndUpdate(productId, {
+        $push: { comments: comment._id },
+        $inc: { ratingsCount: 1 },
+        $set: { averageRating: updatedAverageRating },
+      });
     }
 
-    return res.status(201).json({
-      message: "Comment added successfully",
-      comment: newComment,
-    });
+    res.status(201).send(comment);
   } catch (error) {
-    return res.status(500).json({
-      message: "Failed to add comment",
-      error: error.message,
-    });
+    res.status(500).send(error.message);
   }
 };
 
+// Controller để xóa bình luận
 export const deleteComment = async (req, res) => {
   try {
-    const { commentId } = req.body;
+    const { commentId } = req.params;
+    const userId = req.userId; // Lấy userId từ middleware xác thực
 
     // Tìm và xóa bình luận
-    const comment = await commentModel.findByIdAndDelete(commentId);
+    const comment = await commentModel.findById(commentId);
+    if (!comment) return res.status(404).send("Bình luận không tồn tại");
 
-    if (comment) {
-      // Tìm sản phẩm tương ứng với bình luận
-      const product = await productModel.findById(comment.product);
+    // Kiểm tra quyền sở hữu bình luận
+    if (comment.userId.toString() !== userId.toString()) {
+      return res.status(403).send("Bạn không có quyền xóa bình luận này");
+    }
 
-      if (product) {
-        // Cập nhật số lượng đánh giá và tính toán lại điểm trung bình
-        product.ratingsCount -= 1;
+    // Lấy thông tin sản phẩm để cập nhật số lượng bình luận và điểm trung bình
+    const product = await productModel.findById(comment.productId);
+    if (product) {
+      const totalRatings = product.ratingsCount - 1;
+      const updatedAverageRating =
+        totalRatings > 0
+          ? (product.averageRating * product.ratingsCount - comment.rating) /
+            totalRatings
+          : 0;
 
-        if (product.ratingsCount > 0) {
-          product.averageRating =
-            (product.averageRating * (product.ratingsCount + 1) -
-              comment.rating) /
-            product.ratingsCount;
-        } else {
-          product.averageRating = 0; // Nếu không còn bình luận nào, đặt averageRating về 0
-        }
-
-        // Lưu thay đổi vào database
-        await product.save();
-      }
-
-      return res.status(200).json({
-        message: "Comment deleted successfully",
-        comment: comment,
-      });
-    } else {
-      return res.status(404).json({
-        message: "Comment not found",
+      await productModel.findByIdAndUpdate(comment.productId, {
+        $pull: { comments: commentId },
+        $inc: { ratingsCount: -1 },
+        $set: { averageRating: updatedAverageRating },
       });
     }
+
+    // Xóa bình luận
+    await commentModel.findByIdAndDelete(commentId);
+
+    res.status(200).send({ message: "Bình luận đã được xóa" });
   } catch (error) {
-    return res.status(500).json({
-      message: "Failed to delete comment",
-      error: error.message,
-    });
+    res.status(500).send(error.message);
   }
 };
 
 export const updateComment = async (req, res) => {
   try {
-    const { commentId, rating, commentText } = req.body;
+    const { commentId } = req.params;
+    const { content, rating } = req.body;
+    const userId = req.userId; // Lấy userId từ middleware xác thực
 
-    // Tìm bình luận cũ
-    const oldComment = await commentModel.findById(commentId);
+    // Tìm bình luận cần cập nhật
+    const comment = await commentModel.findById(commentId);
+    if (!comment) return res.status(404).send("Bình luận không tồn tại");
 
-    if (oldComment) {
-      // Tìm sản phẩm tương ứng
-      const product = await productModel.findById(oldComment.product);
-      if (product) {
-        // Nếu có thay đổi rating, cập nhật lại averageRating
-        if (rating && rating !== oldComment.rating) {
-          product.averageRating =
-            (product.averageRating * product.ratingsCount -
-              oldComment.rating +
-              rating) /
-            product.ratingsCount;
-
-          // Lưu thay đổi vào database
-          await product.save();
-        }
-      }
-
-      // Cập nhật bình luận
-      const updatedComment = await Comment.findByIdAndUpdate(
-        commentId,
-        { rating, commentText },
-        { new: true }
-      );
-
-      return res.status(200).json({
-        message: "Comment updated successfully",
-        comment: updatedComment,
-      });
-    } else {
-      return res.status(404).json({
-        message: "Comment not found",
-      });
+    // Kiểm tra quyền sở hữu bình luận
+    if (comment.userId.toString() !== userId.toString()) {
+      return res.status(403).send("Bạn không có quyền cập nhật bình luận này");
     }
-  } catch (error) {
-    return res.status(500).json({
-      message: "Failed to update comment",
-      error: error.message,
+
+    // Tìm sản phẩm liên quan
+    const product = await productModel.findById(comment.productId);
+    if (!product) return res.status(404).send("Sản phẩm không tồn tại");
+
+    // Tính toán sự thay đổi của điểm đánh giá trung bình
+    const oldRating = comment.rating;
+    const totalRatings = product.ratingsCount;
+    const updatedAverageRating =
+      (product.averageRating * totalRatings - oldRating + rating) /
+      totalRatings;
+
+    // Cập nhật bình luận
+    comment.content = content;
+    comment.rating = rating;
+    await comment.save();
+
+    // Cập nhật sản phẩm
+    await productModel.findByIdAndUpdate(comment.productId, {
+      $set: { averageRating: updatedAverageRating },
     });
+
+    res.status(200).send(comment);
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 };
 
-export const getAllComments = async (req, res) => {
+// Controller để lấy tất cả bình luận của một sản phẩm
+// Controller để lấy tất cả bình luận của một sản phẩm
+export const getCommentsByProduct = async (req, res) => {
   try {
-    // Lấy tất cả bình luận từ cơ sở dữ liệu
-    const comments = await commentModel
-      .find()
-      .populate("product")
-      .populate("user"); // Giả sử bạn muốn populate các trường product và user
+    const { productId } = req.params;
 
-    return res.status(200).json({
-      message: "Comments fetched successfully",
-      comments,
+    // Lấy tất cả bình luận của sản phẩm với thông tin người dùng
+    const product = await productModel.findById(productId).populate({
+      path: "comments",
+      populate: {
+        path: "userId", // Assuming comments have a reference to a user
+        select: "username avatar", // Include user name, image, and ID
+      },
     });
+
+    if (!product) return res.status(404).send("Sản phẩm không tồn tại");
+
+    res.status(200).send(product.comments);
   } catch (error) {
-    return res.status(500).json({
-      message: "Failed to fetch comments",
-      error: error.message,
-    });
+    res.status(500).send(error.message);
   }
 };

@@ -23,8 +23,15 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { MdLocalShipping } from "react-icons/md";
+//component
 import Breadcrumbss from "./Breadcrumbss";
 import AccordionDetailProduct from "./AccordionDetailProduct";
+//services
+import { addToCart } from "../service/cartService.js";
+//Atom
+import userAtom from "../Atom/userAtom.js";
+import { useRecoilValue } from "recoil";
+import { toast } from "react-toastify";
 
 const CardProductDetail = ({ product }) => {
   const [mainImage, setMainImage] = useState(null);
@@ -43,10 +50,24 @@ const CardProductDetail = ({ product }) => {
 
   const displayPrice =
     product?.discount > 0 ? product.finalPrice : product.originalPrice;
-
   const priceToDisplay = displayPrice ?? 0;
-
   const totalPriceProduct = product.finalPrice * quantity;
+
+  const user = useRecoilValue(userAtom);
+
+  const handleAddToCart = async (productId) => {
+    if (!user?._id) {
+      toast.error("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
+    try {
+      const userId = user._id;
+      const response = await addToCart(userId, productId, quantity);
+      toast.success("Sản phẩm đã thêm vào giỏ hàng");
+    } catch (error) {
+      toast.error("Lỗi thêm sản phẩm!");
+    }
+  };
 
   return (
     <>
@@ -211,6 +232,7 @@ const CardProductDetail = ({ product }) => {
               </Box>
 
               <Button
+                onClick={() => handleAddToCart(product?._id)}
                 bgColor={"gray.300"}
                 rounded={"10"}
                 w={"full"}

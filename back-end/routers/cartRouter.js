@@ -12,7 +12,7 @@ const cartRouter = express.Router();
 //cartRouter.get("/getAllcolor", getAllColors);
 cartRouter.get("/getProductFromCart/:userId", getCartById);
 cartRouter.post("/AddToCart", addToCart);
-cartRouter.put("/updateProductFromCart", updateItemQuantity);
-cartRouter.delete("/deleteProductFromCart", removeFromCart);
+cartRouter.post("/updateProductFromCart", updateItemQuantity);
+cartRouter.post("/deleteProductFromCart", removeFromCart);
 
 export default cartRouter;

@@ -183,29 +183,31 @@ const Navbar = () => {
             )}
           </Box>
 
-          <Box position="relative" display="inline-block">
-            <FontAwesomeIcon
-              icon={faCartShopping}
-              size="lg"
-              style={{ opacity: 0.5 }} // Adjust opacity as needed
-            />
-            <Box
-              position="absolute"
-              top="-1"
-              right="-1"
-              backgroundColor="red.500"
-              color="white"
-              fontSize="xs"
-              borderRadius="full"
-              width="16px"
-              height="16px"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              0
+          <NavLink to={"/cart"}>
+            <Box position="relative" display="inline-block">
+              <FontAwesomeIcon
+                icon={faCartShopping}
+                size="lg"
+                style={{ opacity: 0.5 }} // Adjust opacity as needed
+              />
+              <Box
+                position="absolute"
+                top="-1"
+                right="-1"
+                backgroundColor="red.500"
+                color="white"
+                fontSize="xs"
+                borderRadius="full"
+                width="16px"
+                height="16px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                0
+              </Box>
             </Box>
-          </Box>
+          </NavLink>
           <IconButton
             size="md"
             icon={isOpen ? <AiOutlineClose /> : <GiHamburgerMenu />}

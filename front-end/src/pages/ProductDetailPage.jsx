@@ -95,7 +95,7 @@ const ProductDetailPage = () => {
         </Tabs>
       </Flex>
 
-      <Review />
+      <Review productId={productId} />
     </Layout>
   );
 };

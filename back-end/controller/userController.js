@@ -2,6 +2,7 @@ import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
+import validator from "validator";
 
 const verifyUser = async (req, res, next) => {
   const { email } = req.method === "GET" ? req.query : req.body;
@@ -31,11 +32,13 @@ const register = async (req, res) => {
       return res.status(400).send({ error: "Email này đã tồn tại" });
     }
 
-    // Kiểm tra numberPhone tồn tại
-    if (numberPhone === null || numberPhone === undefined) {
-      return res
-        .status(400)
-        .send({ error: "Số điện thoại là bắt buộc và không thể là null." });
+    // Kiểm tra numberPhone có hợp lệ không
+    if (!numberPhone) {
+      return res.status(400).send({ error: "Số điện thoại là bắt buộc" });
+    }
+
+    if (!validator.isMobilePhone(numberPhone, "vi-VN")) {
+      return res.status(400).send({ error: "Số điện thoại không hợp lệ" });
     }
 
     const existNumberPhone = await userModel.findOne({ numberPhone });
@@ -46,24 +49,20 @@ const register = async (req, res) => {
     }
 
     // Mã hóa password
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Tạo user mới
-      const user = new userModel({
-        username,
-        email,
-        password: hashedPassword,
-        avatar: avatar || "",
-        numberPhone,
-      });
+    // Tạo user mới
+    const user = new userModel({
+      username,
+      email,
+      password: hashedPassword,
+      avatar: avatar || "",
+      numberPhone,
+    });
 
-      // Lưu user và trả về kết quả
-      const result = await user.save();
-      return res.status(201).send({ msg: "Đăng kí thành công" });
-    } else {
-      return res.status(400).send({ error: "Password là bắt buộc" });
-    }
+    // Lưu user và trả về kết quả
+    const result = await user.save();
+    return res.status(201).send({ msg: "Đăng kí thành công", user: result });
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
@@ -91,7 +90,7 @@ const login = async (req, res) => {
         userId: user._id,
         email: user.email,
       },
-      process.env.JWT_SECRET, // Sử dụng biến môi trường từ .env
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
@@ -100,7 +99,7 @@ const login = async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
-      password: null,
+      password: null, // Ẩn mật khẩu
       ward: user.ward || "",
       district: user.district || "",
       city: user.city || "",
@@ -110,7 +109,6 @@ const login = async (req, res) => {
       token,
     });
   } catch (error) {
-    // Gửi phản hồi lỗi
     return res.status(500).send({ error: "Lỗi đăng nhập" });
   }
 };
@@ -176,6 +174,19 @@ const updateUser = async (req, res) => {
       }
     }
 
+    if (numberPhone && numberPhone !== existingUser.numberPhone) {
+      if (!validator.isMobilePhone(numberPhone, "vi-VN")) {
+        return res.status(400).send({ error: "Số điện thoại không hợp lệ" });
+      }
+
+      const numberPhoneExists = await userModel.findOne({ numberPhone });
+      if (numberPhoneExists) {
+        return res
+          .status(400)
+          .send({ error: "Số điện thoại này đã được sử dụng." });
+      }
+    }
+
     const updateFields = {};
     if (username) updateFields.username = username;
     if (email) updateFields.email = email;
@@ -188,7 +199,7 @@ const updateUser = async (req, res) => {
       updateFields.avatar = req.file.filename;
     }
 
-    await userModel.updateOne({ _id: userId }, { $set: updateFields }).exec();
+    await userModel.updateOne({ _id: userId }, { $set: updateFields });
 
     const updatedUser = await userModel.findById(userId);
     return res.status(200).send({ updatedUser });

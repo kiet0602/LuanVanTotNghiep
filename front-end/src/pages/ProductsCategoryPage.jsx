@@ -12,14 +12,17 @@ import {
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+
+// component
 import CardNew from "../components/CardNew";
+//data
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
+// services
 
 const ProductsCategory = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true); // Start with loading true
-
   const { categoryId } = useParams();
 
   useEffect(() => {
@@ -46,12 +49,10 @@ const ProductsCategory = () => {
         toast.error("Không thể lấy tên thể loại này.");
       }
     };
-
     const fetchData = async () => {
       await Promise.all([fetchProductsCategoryID(), fetchCategory()]);
       setLoading(false); // Set loading to false after fetching
     };
-
     fetchData();
   }, [categoryId]);
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Badge,
@@ -13,12 +13,119 @@ import {
 } from "@chakra-ui/react";
 import { FaHeart, FaEye, FaShoppingCart } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
+//services
+import { addToCart } from "../service/cartService.js";
+//Atom
+import userAtom from "../Atom/userAtom.js";
+import { useRecoilState, useRecoilValue } from "recoil";
+//service
+import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
+import {
+  addFavoriteProduct,
+  getAllFavoriteProducts,
+  removeFavoriteProduct,
+} from "../service/favoritesService.js";
 
 const CardNew = ({ products }) => {
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
   const textColor = useColorModeValue("black", "white"); // Text color
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
+  //Atom
+  const user = useRecoilValue(userAtom);
+  const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
+  const [favoritesCount, setFavoritesCount] =
+    useRecoilState(favoritesCountAtom);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (!user?._id) return; // If userId is not available, exit early
+
+      try {
+        const userId = user._id;
+        const favorites = await getAllFavoriteProducts(userId);
+        setFavoriteProducts(favorites);
+        setFavoritesCount(favorites.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách yêu thích:", error);
+      }
+    };
+
+    fetchFavorites();
+  }, [user, setFavoriteProducts, setFavoritesCount]); // Dependency on user
+
+  const isFavorite = (productId) =>
+    favoriteProducts.some((fav) => fav._id === productId);
+
+  //Hàm sử lý
+  const handleAddToCart = async (productId) => {
+    if (!user?._id) {
+      toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
+      return;
+    }
+
+    try {
+      const quantity = 1;
+      const response = await addToCart(user._id, productId, quantity);
+      toast.success("Sản phẩm đã thêm vào giỏ hàng");
+    } catch (error) {
+      toast.error("Lỗi thêm sản phẩm!");
+    }
+  };
+
+  const handleAddFavorite = async (productId) => {
+    if (!user?._id) {
+      toast.error("Bạn cần đăng nhập để thêm sản phẩm vào yêu thích");
+      return;
+    }
+
+    try {
+      await addFavoriteProduct(user._id, productId);
+      toast.success("Đã thích sản phẩm");
+      setFavoriteProducts((prevFavorites) => [
+        ...prevFavorites,
+        { _id: productId },
+      ]);
+      setFavoritesCount((prevCount) => {
+        const newCount = prevCount + 1;
+        localStorage.setItem("favoritesCount", JSON.stringify(newCount));
+        return newCount;
+      });
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleRemoveFavorite = async (productId) => {
+    if (!user?._id) {
+      toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
+      return;
+    }
+
+    try {
+      await removeFavoriteProduct(user._id, productId);
+      toast.success("Đã bỏ thích sản phẩm");
+      setFavoriteProducts((prevFavorites) =>
+        prevFavorites.filter((fav) => fav._id !== productId)
+      );
+      setFavoritesCount((prevCount) => {
+        const newCount = prevCount - 1;
+        localStorage.setItem("favoritesCount", JSON.stringify(newCount));
+        return newCount;
+      });
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleFavoriteToggle = (productId) => {
+    if (isFavorite(productId)) {
+      handleRemoveFavorite(productId);
+    } else {
+      handleAddFavorite(productId);
+    }
+  };
 
   return (
     <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
@@ -70,6 +177,7 @@ const CardNew = ({ products }) => {
                   aria-label="Thêm vào giỏ hàng"
                 >
                   <IconButton
+                    onClick={() => handleAddToCart(product._id)}
                     icon={<FaShoppingCart />}
                     size="md"
                     variant="outline"
@@ -86,6 +194,7 @@ const CardNew = ({ products }) => {
                 </Tooltip>
                 <Tooltip label="Yêu thích" aria-label="Yêu thích">
                   <IconButton
+                    onClick={() => handleFavoriteToggle(product._id)}
                     icon={<FaHeart />}
                     size="md"
                     variant="outline"
@@ -97,11 +206,11 @@ const CardNew = ({ products }) => {
                     bg={bgColor}
                     _hover={{ bg: hoverBg }}
                     _active={{ bg: hoverBg, borderColor: borderColor }}
-                    _focus={{ boxShadow: "outline" }} // Ensures proper focus styles
+                    _focus={{ boxShadow: "outline" }}
+                    color={isFavorite(product._id) ? "red.500" : "black"}
                   />
                 </Tooltip>
                 <NavLink to={`/productDetail/${product?._id}`}>
-                  {" "}
                   <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                     <IconButton
                       icon={<FaEye />}
@@ -132,7 +241,7 @@ const CardNew = ({ products }) => {
                 >
                   <Image
                     src={`http://localhost:2000/images/${product.image[0]}`}
-                    alt="Blog image"
+                    alt="Product image"
                     // Ensure the image covers the container
                   />
                   <Box p={{ base: 4, lg: 6 }}>

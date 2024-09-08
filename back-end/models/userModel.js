@@ -36,6 +36,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  favoritesProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   avatar: { type: String },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },

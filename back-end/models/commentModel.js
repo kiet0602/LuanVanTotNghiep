@@ -1,25 +1,25 @@
 import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Tham chiếu đến model User
-    required: true,
-  },
   productId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Product", // Tham chiếu đến model Product
+    ref: "Product",
     required: true,
   },
-  commentText: {
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
     type: String,
     required: true,
   },
   rating: {
     type: Number,
-    required: true,
-    min: 1,
-    max: 5,
+    min: 1, // Điểm đánh giá thấp nhất là 1
+    max: 5, // Điểm đánh giá cao nhất là 5
+    required: true, // Bạn có thể thay đổi trường này thành không bắt buộc nếu cần
   },
   createdAt: {
     type: Date,

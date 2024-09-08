@@ -1,6 +1,12 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+//Atom
+import userAtom from "./Atom/userAtom";
+//components
+import ButtonIconModeColor from "./components/ButtonIconModeColor";
+//pages
 import PageUser from "./pages/PageUser";
 import HomePage from "./pages/HomePage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -8,16 +14,11 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
-import ButtonIconModeColor from "./components/ButtonIconModeColor";
 import OAuthCallback from "./pages/OAuthCallback";
-
-import { useRecoilValue } from "recoil";
 import Test from "./pages/Test";
-
 import EnterEmailPage from "./pages/EnterEmailPage";
 import SubmitCodeOTPPage from "./pages/SubmitCodeOTPPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import userAtom from "./Atom/userAtom";
 import Table1111 from "./pages/Table.jsx";
 import NewsPage from "./pages/NewsPage.jsx";
 import ProductsCategoryPage from "./pages/ProductsCategoryPage.jsx";
