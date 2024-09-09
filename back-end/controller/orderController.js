@@ -6,7 +6,7 @@ import userModel from "../models/userModel.js";
 
 // Hàm xử lý checkout
 export const checkout = async (req, res) => {
-  const { userId, couponCode = null } = req.body;
+  const { userId, couponCode = null, shippingMethod, paymentMethod } = req.body;
 
   try {
     // 1. Lấy giỏ hàng của người dùng
@@ -77,11 +77,12 @@ export const checkout = async (req, res) => {
       })),
       totalPrice: cart.totalPrice,
       shippingFee: cart.shippingFee,
+      shippingMethod: shippingMethod, // Thêm phương thức vận chuyển
       discount: discount,
       finalPrice: finalPrice,
       shippingAddress: shippingAddress,
-      paymentMethod: "Credit Card", // Ví dụ, thay đổi theo phương thức thanh toán thực tế
-      status: "Pending",
+      paymentMethod: paymentMethod, // Ví dụ, thay đổi theo phương thức thanh toán thực tế
+      status: "Chờ xử lý",
     });
 
     await order.save();
@@ -97,6 +98,114 @@ export const checkout = async (req, res) => {
     }
 
     res.status(201).json({ message: "Checkout thành công", order });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const updates = req.body;
+
+  try {
+    // Kiểm tra các trường hợp hợp lệ cho giá cuối cùng
+    if (updates.finalPrice !== undefined && updates.finalPrice < 0) {
+      return res.status(400).json({ message: "Giá cuối cùng không hợp lệ" });
+    }
+
+    // Kiểm tra trạng thái hợp lệ
+    if (updates.status !== undefined) {
+      const validStatuses = [
+        "Chờ xử lý",
+        "Đang xử lý",
+        "Đã giao hàng",
+        "Đã nhận hàng",
+        "Đã hủy",
+      ];
+      if (!validStatuses.includes(updates.status)) {
+        return res
+          .status(400)
+          .json({ message: "Trạng thái đơn hàng không hợp lệ" });
+      }
+    }
+
+    // Cập nhật đơn hàng theo ID
+    const order = await orderModel.findByIdAndUpdate(orderId, updates, {
+      new: true, // Trả về đơn hàng đã được cập nhật
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    }
+
+    res.status(200).json({ message: "Cập nhật đơn hàng thành công", order });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await orderModel.findByIdAndDelete(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    }
+
+    res.status(200).json({ message: "Xóa đơn hàng thành công" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Hàm lấy đơn hàng theo ID
+export const getOrderById = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Lấy đơn hàng theo ID và populate toàn bộ thông tin người dùng
+    const order = await orderModel.findById(orderId).populate("user"); // Populate toàn bộ thông tin của người dùng
+
+    if (!order) {
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Hàm lấy danh sách đơn hàng của người dùng
+export const getOrders = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Lấy tất cả đơn hàng của người dùng và populate toàn bộ thông tin người dùng và sản phẩm
+    const orders = await orderModel.find({ user: userId }).populate("user"); // Populate toàn bộ thông tin của user
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng nào" });
+    }
+
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllOrders = async (req, res) => {
+  try {
+    // Lấy tất cả các đơn hàng và populate thông tin người dùng và sản phẩm
+    const orders = await orderModel.find().populate("user"); // Populate thông tin người dùng
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "Không có đơn hàng nào" });
+    }
+
+    res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -16,15 +16,21 @@ const orderSchema = new mongoose.Schema(
     items: [orderItemSchema], // Các sản phẩm trong đơn hàng
     totalPrice: { type: Number, required: true }, // Tổng giá của đơn hàng
     shippingFee: { type: Number, default: 0 }, // Phí vận chuyển
-
+    shippingMethod: { type: String, required: true }, // Phương thức vận chuyển
     discount: { type: Number, default: 0 }, // Giảm giá áp dụng cho đơn hàng
     finalPrice: { type: Number, required: true }, // Giá cuối cùng của đơn hàng sau giảm giá
     shippingAddress: { type: String, required: true }, // Địa chỉ giao hàng
     paymentMethod: { type: String, required: true }, // Phương thức thanh toán
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"], // Trạng thái đơn hàng
-      default: "Pending",
+      enum: [
+        "Chờ xử lý",
+        "Đang xử lý",
+        "Đã giao hàng",
+        "Đã nhận hàng",
+        "Đã hủy",
+      ],
+      default: "Chờ xử lý",
     },
   },
   { timestamps: true }
