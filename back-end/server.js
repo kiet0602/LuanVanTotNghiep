@@ -13,6 +13,8 @@ import environmentRouter from "./routers/environmentRouter.js";
 import cartRouter from "./routers/cartRouter.js";
 import favoriteRouter from "./routers/favoriteRouter.js";
 import commentRouter from "./routers/commentRouter.js";
+import couponRouter from "./routers/couponRouter.js";
+import checkoutRouter from "./routers/checkoutRouter.js";
 /* import commentRouter from "./routers/commentRouter.js";
 import cartRouter from "./routers/cartRouter.js"; */
 
@@ -40,6 +42,8 @@ app.use("/api/environment", environmentRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/favorites", favoriteRouter);
 app.use("/api/comment", commentRouter);
+app.use("/api/coupon", couponRouter);
+app.use("/api/checkout", checkoutRouter);
 
 //chưa test server
 /* app.use("/api/comment", commentRouter);

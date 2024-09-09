@@ -69,10 +69,7 @@ const productSchema = new mongoose.Schema({
       ref: "Comment",
     },
   ],
-  commentCount: {
-    type: Number,
-    default: 0,
-  },
+
   createdAt: {
     type: Date,
     default: Date.now,

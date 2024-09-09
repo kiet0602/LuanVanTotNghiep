@@ -50,8 +50,8 @@ const ItemCart = () => {
       const cartData = await getCartById(userId);
       setCart(cartData); // Cập nhật giỏ hàng
       setLoading(false); // Đặt loading về false khi dữ liệu đã được tải xong
+      console.log(cartData);
     } catch (error) {
-      console.log(error);
       setLoading(false); // Dừng loading ngay cả khi xảy ra lỗi
     }
   };
@@ -74,11 +74,22 @@ const ItemCart = () => {
     if (isNaN(quantity) || quantity < 1) {
       return;
     }
+
+    // Kiểm tra sản phẩm có tồn tại trong giỏ hàng trước khi cập nhật số lượng
+    const productInCart = cart.items.find(
+      (item) => item.product._id === productId
+    );
+
+    if (!productInCart) {
+      toast.error("Sản phẩm không tồn tại trong giỏ hàng.");
+      return;
+    }
+
     try {
       await updateItemQuantity(userId, productId, quantity);
-      fetchCart();
+      fetchCart(); // Sau khi thay đổi số lượng, cập nhật lại giỏ hàng từ server
     } catch (error) {
-      toast.error(`Lỗi khi cập nhật số lượng: ${error.message}`);
+      console.log(`Lỗi khi cập nhật số lượng: ${error.message}`);
     }
   };
 
@@ -98,8 +109,15 @@ const ItemCart = () => {
       );
 
       if (response.status === 200) {
-        fetchCart();
         toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
+
+        // Cập nhật giỏ hàng ngay lập tức sau khi xóa sản phẩm
+        setCart((prevCart) => {
+          const updatedItems = prevCart.items.filter(
+            (item) => item.product._id !== productId // Sửa item.productId thành item.product._id
+          );
+          return { ...prevCart, items: updatedItems };
+        });
       } else {
         toast.error(`Lỗi khi xóa sản phẩm: ${response.data.message}`);
       }
