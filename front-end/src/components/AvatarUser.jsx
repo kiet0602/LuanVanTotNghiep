@@ -44,9 +44,11 @@ const AvatarUser = ({ userCurrent }) => {
           <MenuItem>
             <Text fontWeight="500">Dashboard</Text>
           </MenuItem>
-          <MenuItem>
-            <Text fontWeight="500">Create Post</Text>
-          </MenuItem>
+          <NavLink to="/favirotesProduct">
+            <MenuItem>
+              <Text fontWeight="500">Sản phẩm yêu thích</Text>
+            </MenuItem>
+          </NavLink>
           <MenuItem>
             <Text fontWeight="500">Reading List</Text>
           </MenuItem>

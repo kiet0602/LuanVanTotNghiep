@@ -265,7 +265,7 @@ const ItemCart = () => {
           </Heading>
           <Link
             as={NavLink}
-            to="/shop"
+            to="/"
             textDecoration="none"
             fontStyle="italic"
             _hover={{

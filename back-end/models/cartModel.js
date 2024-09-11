@@ -29,7 +29,6 @@ const cartSchema = new mongoose.Schema({
     default: 0,
   },
   shippingFee: { type: Number, default: 0 }, // Thêm phí giao hàng
-
   finalPrice: { type: Number, default: 0 }, // Tổng giá sau khi cộng phí và giảm giá
   createdAt: {
     type: Date,

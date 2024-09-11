@@ -22,6 +22,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Table1111 from "./pages/Table.jsx";
 import NewsPage from "./pages/NewsPage.jsx";
 import ProductsCategoryPage from "./pages/ProductsCategoryPage.jsx";
+import FavoritesPage from "./pages/FavoritesPage.jsx";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -62,6 +63,8 @@ function App() {
           />
           {/* Route for Google Authentication */}
           <Route path="/test" element={<Test />} />
+
+          <Route path="/favirotesProduct" element={<FavoritesPage />} />
 
           <Route
             path="/enterEmail"

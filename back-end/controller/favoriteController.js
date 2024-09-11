@@ -70,12 +70,27 @@ export const getAllFavoriteProducts = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Tìm kiếm user
+    // Tìm kiếm user và populate các sản phẩm yêu thích
     const user = await userModel.findById(userId).populate("favoritesProducts");
+
     if (!user) return res.status(404).send("User not found");
 
-    // Trả về danh sách sản phẩm yêu thích
-    res.status(200).send(user.favoritesProducts);
+    // Lấy danh sách sản phẩm yêu thích
+    const products = user.favoritesProducts;
+
+    // Tính toán finalPrice cho từng sản phẩm
+    const productsWithFinalPrice = products.map((product) => {
+      const finalPrice =
+        product.originalPrice -
+        (product.originalPrice * product.discount) / 100;
+      return {
+        ...product.toObject(),
+        finalPrice,
+      };
+    });
+
+    // Trả về danh sách sản phẩm yêu thích với finalPrice
+    res.status(200).send(productsWithFinalPrice);
   } catch (error) {
     res.status(500).send(error.message);
   }
