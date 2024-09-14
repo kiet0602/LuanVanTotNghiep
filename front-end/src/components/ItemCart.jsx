@@ -211,7 +211,7 @@ const ItemCart = () => {
                       width="100%"
                       p={4}
                     >
-                      <FontAwesomeIcon
+                      {/* <FontAwesomeIcon
                         icon={faCartShopping}
                         cursor={"pointer"}
                         style={{
@@ -219,7 +219,7 @@ const ItemCart = () => {
                           fontSize: "24px",
                           marginRight: "16px",
                         }}
-                      />
+                      /> */}
                       <FontAwesomeIcon
                         onClick={() => handleRemoveFromCart(item?.product._id)}
                         cursor={"pointer"}

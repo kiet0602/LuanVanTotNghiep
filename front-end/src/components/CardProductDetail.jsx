@@ -136,15 +136,41 @@ const CardProductDetail = ({ product }) => {
                     <Text mr={4} fontSize="xl" fontWeight="bold">
                       Giá:
                     </Text>
-                    <Badge
-                      rounded="full"
-                      px="4"
-                      py="2"
-                      colorScheme="teal"
-                      fontSize="lg"
-                    >
-                      {priceToDisplay.toLocaleString("vi-VN")} VND
-                    </Badge>
+                    {/* Kiểm tra nếu có giá giảm và khác với giá gốc */}
+                    {product?.finalPrice !== product?.originalPrice ? (
+                      <>
+                        <Badge
+                          rounded="full"
+                          px="4"
+                          py="2"
+                          colorScheme="gray"
+                          fontSize="lg"
+                          textDecoration="line-through"
+                        >
+                          {product.originalPrice.toLocaleString("vi-VN")} VND
+                        </Badge>
+                        <Badge
+                          rounded="full"
+                          px="4"
+                          py="2"
+                          colorScheme="teal"
+                          fontSize="lg"
+                        >
+                          {product.finalPrice.toLocaleString("vi-VN")} VND
+                        </Badge>
+                      </>
+                    ) : (
+                      // Nếu không có giá giảm, chỉ hiển thị giá gốc
+                      <Badge
+                        rounded="full"
+                        px="4"
+                        py="2"
+                        colorScheme="teal"
+                        fontSize="lg"
+                      >
+                        {product.originalPrice.toLocaleString("vi-VN")} VND
+                      </Badge>
+                    )}
                   </Flex>
                 </Box>
               </Box>
@@ -179,6 +205,14 @@ const CardProductDetail = ({ product }) => {
                     </Box>
                     <Box width="60%" textAlign="end" fontWeight="bold">
                       {product?.environment?.nameEnviroment}
+                    </Box>
+                  </Flex>
+                  <Flex width="100%" justify="space-between" mb={2}>
+                    <Box width="40%" as="i">
+                      Mức độ cần chăm sóc:
+                    </Box>
+                    <Box width="60%" textAlign="end" fontWeight="bold">
+                      {product?.care}
                     </Box>
                   </Flex>
                   <Flex width="100%" justify="space-between" mb={2}>

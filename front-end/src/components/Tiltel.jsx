@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 
-const Tiltel = ({ title, imageCategory, iconColor }) => {
+const Tiltel = ({ title, imageCategory, iconColor, descriptionCategory }) => {
   // Use useColorModeValue to switch between light and dark modes
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
   const textColor = useColorModeValue("black", "white"); // Text color
@@ -52,7 +52,13 @@ const Tiltel = ({ title, imageCategory, iconColor }) => {
         >
           {title}
         </Heading>
-
+        <Text
+          fontWeight={"bold"}
+          fontStyle="italic" // Chữ nghiêng
+          textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)" // Đổ bóng chữ
+        >
+          {descriptionCategory}
+        </Text>
         <Flex alignItems={{ base: "start", md: "center" }}>
           <svg
             viewBox="0 0 24 24"

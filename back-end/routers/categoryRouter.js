@@ -3,6 +3,7 @@ import {
   addCategory,
   deleteCategory,
   getAllCategories,
+  getCategoriesByClassification,
   getCategoryById,
   updateCategory,
 } from "../controller/categoryController.js";
@@ -31,5 +32,9 @@ categoryRouter.put(
 categoryRouter.delete("/deleteCategory/:id", deleteCategory);
 categoryRouter.get("/getAllCategory", getAllCategories);
 categoryRouter.get("/getCategoryById/:id", getCategoryById);
+categoryRouter.get(
+  "/getCategoriesByClassification/:id",
+  getCategoriesByClassification
+);
 
 export default categoryRouter;

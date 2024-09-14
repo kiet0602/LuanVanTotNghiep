@@ -34,6 +34,7 @@ const ProductsCategory = () => {
           `http://localhost:2000/api/product/getProductByCategoryId/${categoryId}`
         );
         setProducts(response.data);
+        console.log(response.data);
       } catch (error) {
         toast.error("Không thể lấy sản phẩm theo thể loại.");
       }
@@ -63,6 +64,7 @@ const ProductsCategory = () => {
           key={category?._id}
           title={category?.categoryName}
           imageCategory={category?.imageCategory}
+          descriptionCategory={category?.descriptionCategory}
           iconColor="#FF5733"
         />
       )}

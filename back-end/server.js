@@ -15,6 +15,7 @@ import favoriteRouter from "./routers/favoriteRouter.js";
 import commentRouter from "./routers/commentRouter.js";
 import couponRouter from "./routers/couponRouter.js";
 import checkoutRouter from "./routers/checkoutRouter.js";
+import classificationRouter from "./routers/classificationRouter.js";
 /* import commentRouter from "./routers/commentRouter.js";
 import cartRouter from "./routers/cartRouter.js"; */
 
@@ -44,6 +45,7 @@ app.use("/api/favorites", favoriteRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/checkout", checkoutRouter);
+app.use("/api/classification", classificationRouter);
 
 //chưa test server
 /* app.use("/api/comment", commentRouter);

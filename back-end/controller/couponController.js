@@ -38,6 +38,7 @@ export const createCoupon = async (req, res) => {
       minimumPurchaseAmount,
       isActive,
       maxUsage,
+      usedBy: [], // Khởi tạo mảng danh sách người dùng đã sử dụng
     });
 
     const savedCoupon = await newCoupon.save();
@@ -56,8 +57,8 @@ export const getAllCoupons = async (req, res) => {
     // Chuyển đổi ngày từ đối tượng Date sang DD-MM-YYYY
     const formattedCoupons = coupons.map((coupon) => ({
       ...coupon._doc,
-      startDate: format(coupon.startDate, "dd-MM-yyyy"),
-      expirationDate: format(coupon.expirationDate, "dd-MM-yyyy"),
+      startDate: format(new Date(coupon.startDate), "dd-MM-yyyy"),
+      expirationDate: format(new Date(coupon.expirationDate), "dd-MM-yyyy"),
     }));
 
     res.status(200).json({ coupons: formattedCoupons });
@@ -75,6 +76,13 @@ export const getCouponById = async (req, res) => {
     if (!coupon) {
       return res.status(404).json({ message: "Coupon not found." });
     }
+    // Chuyển đổi ngày từ đối tượng Date sang DD-MM-YYYY
+    coupon.startDate = format(new Date(coupon.startDate), "dd-MM-yyyy");
+    coupon.expirationDate = format(
+      new Date(coupon.expirationDate),
+      "dd-MM-yyyy"
+    );
+
     res.status(200).json(coupon);
   } catch (error) {
     console.error(error);

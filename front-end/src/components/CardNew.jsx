@@ -37,7 +37,7 @@ const CardNew = ({ products }) => {
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
-
+  console.log(products);
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user?._id) return; // If userId is not available, exit early
@@ -276,9 +276,28 @@ const CardNew = ({ products }) => {
                           >
                             Giá:
                           </Text>
-                          <Badge rounded="full" px="3" fontSize="xl">
-                            {product.finalPrice.toLocaleString("vi-VN")}Đ
-                          </Badge>
+                          {product.finalPrice !== product.originalPrice && (
+                            <>
+                              <Badge
+                                rounded="full"
+                                px="3"
+                                fontSize="sm"
+                                textDecoration="line-through"
+                                color="gray.500"
+                              >
+                                {product.originalPrice.toLocaleString("vi-VN")}Đ
+                              </Badge>
+                              <Badge rounded="full" px="3" mx="1" fontSize="sm">
+                                {product.finalPrice.toLocaleString("vi-VN")}Đ
+                              </Badge>
+                            </>
+                          )}
+                          {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
+                          {product.finalPrice === product.originalPrice && (
+                            <Badge rounded="full" px="3" fontSize="sm">
+                              {product.originalPrice.toLocaleString("vi-VN")}Đ
+                            </Badge>
+                          )}
                         </Box>
                       </Box>
 

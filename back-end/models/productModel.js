@@ -7,6 +7,10 @@ const productSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  care: {
+    type: String,
+    required: true,
+  },
   productName: {
     type: String,
     required: true,

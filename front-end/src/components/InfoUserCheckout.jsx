@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Box,
   Button,
   Checkbox,
   FormControl,
@@ -14,19 +15,24 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
+const userData = localStorage.getItem("userCurrent");
+const userCurrent = userData ? JSON.parse(userData) : null;
+console.log(userCurrent);
+
 const InfoUserCheckout = () => {
   return (
     <VStack w="full" h="full" p={10} spacing={10} align="flex-start">
       <VStack spacing={2} align="flex-start">
-        <Heading>Your Details</Heading>
-        <Text>If you already have an account, click here to log in.</Text>
+        <Heading>Thông tin giao hàng!</Heading>
+        <Text>Thông tin của bạn</Text>
       </VStack>
       <SimpleGrid columns={2} columnGap={3} rowGap={4}>
         <GridItem colSpan={1}>
-          <FormControl>
-            <FormLabel>First Name</FormLabel>
-            <Input placeholder="Enter First Name " />
-          </FormControl>
+          <Box>
+            <Text fontSize="xl" color="blue.500">
+              Tên của bạn: {userCurrent?.username}
+            </Text>
+          </Box>
         </GridItem>
         <GridItem colSpan={1}>
           <FormControl>

@@ -14,6 +14,7 @@ const addProduct = async (req, res) => {
       discount = 0,
       size,
       quantity, // Thêm trường quantity
+      care, // Thêm trường care
     } = req.body;
 
     if (
@@ -22,7 +23,8 @@ const addProduct = async (req, res) => {
       !color ||
       !size ||
       !originalPrice ||
-      quantity === undefined
+      quantity === undefined ||
+      !care // Kiểm tra trường care
     ) {
       return res.status(400).json({ error: "Thiếu trường bắt buộc" });
     }
@@ -44,6 +46,7 @@ const addProduct = async (req, res) => {
       discount,
       size,
       quantity, // Thêm trường quantity
+      care, // Thêm trường care
       image: images,
     });
 
@@ -68,6 +71,7 @@ const updateProduct = async (req, res) => {
       discount = 0,
       size,
       quantity, // Thêm trường quantity
+      care, // Thêm trường care
     } = req.body;
 
     const { id } = req.params;
@@ -94,6 +98,7 @@ const updateProduct = async (req, res) => {
       discount: discount || existingProduct.discount,
       size: size || existingProduct.size,
       quantity: quantity !== undefined ? quantity : existingProduct.quantity, // Cập nhật quantity nếu có
+      care: care || existingProduct.care, // Cập nhật care nếu có
       updatedAt: Date.now(),
     };
 

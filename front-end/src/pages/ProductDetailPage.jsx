@@ -63,7 +63,7 @@ const ProductDetailPage = () => {
       <Flex justify="center" mt={8}>
         <Tabs variant="soft-rounded" colorScheme="green" maxW={"7xl"}>
           <TabList>
-            <Tab></Tab>
+            <Tab>21312</Tab>
             <Tab>Care Instructions</Tab>
           </TabList>
           <TabPanels>
