@@ -151,7 +151,6 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
       toast.error("Vui lòng điền đầy đủ thông tin trước khi lưu!");
       return;
     }
-
     try {
       // Tìm đối tượng để lấy tên
       const selectedCity = citys.find((city) => city.id === selectedCityId);
@@ -159,7 +158,6 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
         (district) => district.id === selectedDistrictId
       );
       const selectedWard = wards.find((ward) => ward.id === selectedWardId);
-
       // Tạo đối tượng người dùng cập nhật với tên
       const updatedUser = {
         username,
@@ -170,7 +168,6 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
         district: selectedDistrict ? selectedDistrict.full_name : "",
         ward: selectedWard ? selectedWard.full_name : "",
       };
-
       const response = await axios.put(
         "http://localhost:2000/api/user/updateUser",
         updatedUser,
@@ -182,7 +179,6 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
         }
       );
       toast.success("Cập nhật thành công!");
-
       setResetUserCurrent((prev) => {
         const updatedUserData = { ...prev, ...response.data.updatedUser };
         localStorage.setItem("userCurrent", JSON.stringify(updatedUserData));

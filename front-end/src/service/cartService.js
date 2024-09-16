@@ -27,6 +27,7 @@ export const removeFromCart = async (userId, productId) => {
         productId,
       }
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error.response.data;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -16,117 +16,112 @@ import {
   useColorModeValue,
   Link,
   Button,
-  Spinner, // Thêm Spinner để hiển thị khi loading
+  Spinner,
+  Checkbox, // Thêm Checkbox
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { NavLink } from "react-router-dom";
-//services
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import userAtom from "../Atom/userAtom";
 import {
   getCartById,
   updateItemQuantity,
   removeFromCart,
-} from "../service/cartService.js";
-//Atom
-import { useRecoilValue } from "recoil";
-import userAtom from "../Atom/userAtom.js";
+} from "../service/cartService";
 import { toast } from "react-toastify";
-import axios from "axios";
 
 const ItemCart = () => {
   const user = useRecoilValue(userAtom);
-  const userId = user?._id; // Sử dụng optional chaining để tránh lỗi khi user không tồn tại
-  const [cart, setCart] = useState(null); // State giỏ hàng
-  const [loading, setLoading] = useState(true); // State loading
+  const userId = user?._id;
+  const [cart, setCart] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedItems, setSelectedItems] = useState([]); // Thêm state để lưu các sản phẩm được chọn
 
+  const navigate = useNavigate();
   const boxBgColor = useColorModeValue("white", "gray.700");
   const boxBorderColor = useColorModeValue("gray.200", "gray.600");
 
-  // Hàm lấy giỏ hàng
   const fetchCart = async () => {
-    if (!userId) return; // Nếu không có userId, không thực hiện hàm fetchCart
-
+    if (!userId) return;
     try {
       const cartData = await getCartById(userId);
-      setCart(cartData); // Cập nhật giỏ hàng
-      setLoading(false); // Đặt loading về false khi dữ liệu đã được tải xong
-      console.log(cartData);
+      setCart(cartData);
+      setLoading(false);
     } catch (error) {
-      setLoading(false); // Dừng loading ngay cả khi xảy ra lỗi
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (userId) {
-      if (!cart || (cart && cart.items.length === 0)) {
-        fetchCart();
-      }
+    if (userId && (!cart || (cart && cart.items.length === 0))) {
+      fetchCart();
     }
   }, [userId, cart]);
 
+  // Thay đổi số lượng sản phẩm trong giỏ hàng
   const handleQuantityChange = async (productId, value) => {
-    if (!userId) {
-      toast.error("Bạn cần đăng nhập để thay đổi số lượng sản phẩm.");
-      return;
-    }
-
     const quantity = parseInt(value, 10);
-    if (isNaN(quantity) || quantity < 1) {
-      return;
-    }
-
-    // Kiểm tra sản phẩm có tồn tại trong giỏ hàng trước khi cập nhật số lượng
+    if (isNaN(quantity) || quantity < 1) return;
     const productInCart = cart.items.find(
       (item) => item.product._id === productId
     );
-
     if (!productInCart) {
       toast.error("Sản phẩm không tồn tại trong giỏ hàng.");
       return;
     }
-
     try {
       await updateItemQuantity(userId, productId, quantity);
-      fetchCart(); // Sau khi thay đổi số lượng, cập nhật lại giỏ hàng từ server
+      fetchCart();
     } catch (error) {
       console.log(`Lỗi khi cập nhật số lượng: ${error.message}`);
     }
   };
 
+  // Xóa sản phẩm khỏi giỏ hàng
   const handleRemoveFromCart = async (productId) => {
-    if (!userId) {
-      toast.error("Bạn cần đăng nhập để xóa sản phẩm khỏi giỏ hàng.");
-      return;
-    }
-
     try {
-      const response = await axios.post(
-        `http://localhost:2000/api/cart/deleteProductFromCart`,
-        {
-          userId,
-          productId,
-        }
-      );
+      const response = await removeFromCart(userId, productId);
 
-      if (response.status === 200) {
-        toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
-
-        // Cập nhật giỏ hàng ngay lập tức sau khi xóa sản phẩm
-        setCart((prevCart) => {
-          const updatedItems = prevCart.items.filter(
-            (item) => item.product._id !== productId // Sửa item.productId thành item.product._id
-          );
-          return { ...prevCart, items: updatedItems };
-        });
-      } else {
-        toast.error(`Lỗi khi xóa sản phẩm: ${response.data.message}`);
-      }
+      // Hiển thị thông báo thành công
+      toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
+      // Cập nhật trạng thái giỏ hàng ngay lập tức
+      setCart((prevCart) => ({
+        ...prevCart,
+        items: prevCart.items.filter((item) => item.product._id !== productId),
+      }));
     } catch (error) {
       toast.error(`Lỗi khi xóa sản phẩm: ${error.message}`);
     }
   };
 
-  // Nếu đang loading, hiển thị Spinner
+  // Chọn/bỏ chọn sản phẩm để thanh toán
+  const handleSelectItem = (productId) => {
+    setSelectedItems(
+      (prevSelected) =>
+        prevSelected.includes(productId)
+          ? prevSelected.filter((id) => id !== productId) // Bỏ chọn
+          : [...prevSelected, productId] // Chọn thêm
+    );
+  };
+
+  // Xử lý thanh toán
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      toast.error("Bạn chưa chọn sản phẩm nào để thanh toán.");
+      return;
+    }
+    const itemsToPay = cart.items.filter((item) =>
+      selectedItems.includes(item.product._id)
+    );
+    const totalPrice = itemsToPay.reduce(
+      (total, item) => total + item.totalPriceItemCart,
+      0
+    );
+    // Chuyển đến trang thanh toán và truyền các sản phẩm được chọn cùng tổng tiền
+    navigate("/checkout", { state: { items: itemsToPay, total: totalPrice } });
+  };
+
   if (loading) {
     return (
       <Flex justify="center" align="center" height="100vh">
@@ -152,11 +147,20 @@ const ItemCart = () => {
                 position="relative"
                 rounded="md"
               >
-                <Flex justifyContent="space-between">
+                <Flex
+                  justifyContent="space-between"
+                  alignItems="center" // Căn giữa theo chiều dọc
+                  p={4}
+                  w="100%" // Đảm bảo độ rộng full
+                >
+                  <Checkbox
+                    isChecked={selectedItems.includes(item.product._id)}
+                    onChange={() => handleSelectItem(item.product._id)} // Chọn/bỏ chọn sản phẩm
+                  />
                   <Flex
                     direction={{ base: "column", md: "row" }}
                     align="center"
-                    p={4}
+                    justifyContent="center" // Căn giữa nội dung hình ảnh và tên sản phẩm theo chiều ngang
                   >
                     <Image
                       rounded="full"
@@ -166,18 +170,17 @@ const ItemCart = () => {
                       fallbackSrc="https://via.placeholder.com/150"
                       src={`http://localhost:2000/images/${item?.product?.image[0]}`}
                     />
-                    <Stack
-                      spacing={2}
-                      pl={{ base: 0, md: 3 }}
-                      align="left"
-                      justify="center"
-                    >
-                      <Heading width={"100px"} align="left" fontSize={"sm"}>
+                    <Stack spacing={2} pl={{ base: 0, md: 3 }} align="center">
+                      <Heading
+                        width={"100px"}
+                        fontSize={"sm"}
+                        textAlign="center"
+                      >
                         {item?.product?.productName}
                       </Heading>
                     </Stack>
                   </Flex>
-                  <Stack spacing={2} pl={3} align="center" justify="center">
+                  <Stack spacing={2} align="center" justifyContent="center">
                     <Heading fontSize="sm">Số lượng</Heading>
                     <NumberInput
                       min={1}
@@ -196,38 +199,17 @@ const ItemCart = () => {
                       </NumberInputStepper>
                     </NumberInput>
                   </Stack>
-                  <Stack spacing={2} pl={3} align="center" justify="center">
-                    <Heading align="left" fontSize="sm">
-                      Giá
-                    </Heading>
-                    <Heading align="left" fontSize="sm">
-                      {item?.totalPriceItemCart.toLocaleString()} VNĐ
-                    </Heading>
+                  <Stack spacing={2} align="center" justifyContent="center">
+                    <Heading fontSize="sm">Giá</Heading>
+                    <Text>{item?.totalPriceItemCart.toLocaleString()} VNĐ</Text>
                   </Stack>
-                  <Stack spacing={2} pl={3} align="center" justify="center">
-                    <Flex
-                      justifyContent="space-between"
-                      alignItems="center"
-                      width="100%"
-                      p={4}
-                    >
-                      {/* <FontAwesomeIcon
-                        icon={faCartShopping}
-                        cursor={"pointer"}
-                        style={{
-                          color: "#B197FC",
-                          fontSize: "24px",
-                          marginRight: "16px",
-                        }}
-                      /> */}
-                      <FontAwesomeIcon
-                        onClick={() => handleRemoveFromCart(item?.product._id)}
-                        cursor={"pointer"}
-                        icon={faTrash}
-                        style={{ color: "#f01435", fontSize: "24px" }}
-                      />
-                    </Flex>
-                  </Stack>
+                  <FontAwesomeIcon
+                    mx="20px"
+                    onClick={() => handleRemoveFromCart(item?.product._id)}
+                    cursor="pointer"
+                    icon={faTrash}
+                    style={{ color: "#f01435", fontSize: "24px" }}
+                  />
                 </Flex>
               </Box>
             ))}
@@ -237,29 +219,36 @@ const ItemCart = () => {
             to="/shop"
             textDecoration="none"
             fontStyle="italic"
-            _hover={{
-              textDecoration: "underline",
-            }}
+            _hover={{ textDecoration: "underline" }}
             transition="color 0.2s"
           >
             Tiếp tục mua sắm
           </Link>
-          <Flex direction="column" align="flex-end" mt={4} p={4} rounded="md">
+          <Flex direction="column" align="flex-end" mt={4}>
             <Heading fontSize="lg">
               Tổng tiền:{" "}
               <Text as="span" color="red.500">
-                {cart?.totalPrice.toLocaleString()}
+                {selectedItems.length > 0
+                  ? cart.items
+                      .filter((item) =>
+                        selectedItems.includes(item.product._id)
+                      )
+                      .reduce(
+                        (total, item) => total + item.totalPriceItemCart,
+                        0
+                      )
+                      .toLocaleString()
+                  : 0}
               </Text>{" "}
               VNĐ
             </Heading>
-
-            <Button mt={2} width={"230px"} colorScheme="teal">
+            <Button mt={2} colorScheme="teal" onClick={handleCheckout}>
               Thanh toán
             </Button>
           </Flex>
         </>
       ) : (
-        <Flex direction="column" align="center" justify="center">
+        <Flex direction="column" align="center">
           <Heading fontSize="xl" color="red.500">
             Xin lỗi, giỏ hàng của bạn không có sản phẩm nào
           </Heading>
@@ -268,11 +257,7 @@ const ItemCart = () => {
             to="/"
             textDecoration="none"
             fontStyle="italic"
-            _hover={{
-              textDecoration: "underline",
-            }}
-            transition="color 0.2s"
-            mt={4}
+            _hover={{ textDecoration: "underline" }}
           >
             Quay lại cửa hàng
           </Link>

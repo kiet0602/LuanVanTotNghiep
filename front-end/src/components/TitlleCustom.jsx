@@ -16,8 +16,8 @@ const TitlleCustom = ({ title }) => {
 
   return (
     <Box
-      my={"2"}
-      bgImage={imgSenda}
+      my={2}
+      bgImg={imgSenda}
       bgSize="cover"
       bgPosition="center"
       width="100%"
@@ -49,20 +49,25 @@ const TitlleCustom = ({ title }) => {
           textAlign="center"
           mb={{ base: "4", md: "2" }}
           textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)"
-          color={textColor}
         >
           {title}
         </Heading>
-
+        <Text
+          fontWeight={"bold"}
+          fontStyle="italic" // Chữ nghiêng
+          textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)" // Đổ bóng chữ
+        ></Text>
         <Flex alignItems={{ base: "start", md: "center" }}>
           <svg
             viewBox="0 0 24 24"
             role="presentation"
             aria-hidden="true"
             focusable="false"
+            style={{ height: "24px", width: "24px" }}
           >
             {/* SVG Path */}
           </svg>
+          <Text pl={2} textAlign="left"></Text>
         </Flex>
       </Container>
     </Box>

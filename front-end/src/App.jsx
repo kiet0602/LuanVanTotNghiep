@@ -23,6 +23,7 @@ import Table1111 from "./pages/Table.jsx";
 import NewsPage from "./pages/NewsPage.jsx";
 import ProductsCategoryPage from "./pages/ProductsCategoryPage.jsx";
 import FavoritesPage from "./pages/FavoritesPage.jsx";
+import SearchPage from "./pages/SearchPage.jsx";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -78,6 +79,7 @@ function App() {
             path="/resetPassword"
             element={!user ? <ResetPasswordPage /> : <Navigate to={"/"} />}
           />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/table" element={<Table1111 />} />
           <Route path="/news" element={<NewsPage />} />
           <Route

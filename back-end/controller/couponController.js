@@ -173,3 +173,47 @@ export const updateCoupon = async (req, res) => {
     res.status(500).json({ message: "Error updating coupon.", error });
   }
 };
+
+export const applyCoupon = async (req, res) => {
+  const { couponCode, totalPrice } = req.body;
+
+  try {
+    // Tìm mã khuyến mãi
+    const coupon = await couponModel.findOne({ code: couponCode });
+
+    if (!coupon) {
+      return res.status(400).json({ message: "Mã khuyến mãi không hợp lệ" });
+    }
+
+    // Kiểm tra mã khuyến mãi có đang hoạt động không
+    if (!coupon.isActive) {
+      return res
+        .status(400)
+        .json({ message: "Mã khuyến mãi không còn hiệu lực" });
+    }
+
+    // Kiểm tra mã khuyến mãi có hết hạn không
+    if (new Date() > coupon.expirationDate) {
+      return res.status(400).json({ message: "Mã khuyến mãi đã hết hạn" });
+    }
+
+    // Kiểm tra tổng giá có đủ điều kiện áp dụng không
+    if (totalPrice < coupon.minimumPurchaseAmount) {
+      return res
+        .status(400)
+        .json({ message: "Tổng giá không đủ điều kiện áp dụng mã khuyến mãi" });
+    }
+
+    // Tính toán giảm giá
+    const discountAmount = (totalPrice * coupon.discountPercentage) / 100;
+    const finalPrice = totalPrice - discountAmount;
+
+    res.status(200).json({
+      discountAmount,
+      finalPrice,
+      message: "Mã khuyến mãi đã được áp dụng thành công",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi máy chủ", error });
+  }
+};

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  applyCoupon,
   createCoupon,
   deleteCoupon,
   getAllCoupons,
@@ -17,5 +18,6 @@ couponRouter.delete("/deleteCoupon", deleteCoupon);
 couponRouter.put("/updateCoupon/:id", updateCoupon);
 
 couponRouter.post("/send-coupon", sendVoucherEmail);
+couponRouter.post("/coupon-apply", applyCoupon);
 
 export default couponRouter;

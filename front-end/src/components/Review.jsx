@@ -45,7 +45,7 @@ const Review = ({ productId }) => {
 
     fetchComments();
   }, [productId]);
-  console.log(comments);
+
   const handleRatingChange = (newRating) => {
     setRating(newRating);
   };

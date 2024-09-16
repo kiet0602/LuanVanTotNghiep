@@ -60,7 +60,7 @@ const CartFavoritesProductsUser = () => {
         const favorites = await getAllFavoriteProducts(userId);
         setFavoriteProducts(favorites);
         setFavoriteProductofUser(favorites);
-        console.log(favorites);
+
         setFavoritesCount(favorites.length);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách yêu thích:", error);
@@ -101,19 +101,7 @@ const CartFavoritesProductsUser = () => {
 
   return (
     <>
-      <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
-        <Flex
-          fontSize="2xl"
-          fontWeight="bold"
-          justifyContent="center"
-          alignItems="center"
-          mb="5"
-        >
-          <Image height="30px" w="30px" src={imgSenda} mr="2" />{" "}
-          {/* Khoảng cách giữa ảnh và văn bản */}
-          <Text>Sản phẩm yêu thích của bạn</Text>
-        </Flex>
-
+      <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 8 }}>
         {favoriteProductofUser.length > 0 ? (
           <SimpleGrid columns={[1, 2, 3]} spacing="15px">
             {favoriteProductofUser.map((favoriteProduct) => (
@@ -240,6 +228,7 @@ const CartFavoritesProductsUser = () => {
                           {favoriteProduct?.productName}
                         </Box>
                       </Box>
+                      {/* Price centered */}
                       <Box display="flex" justifyContent="center">
                         <Box
                           fontWeight="semibold"
@@ -253,15 +242,46 @@ const CartFavoritesProductsUser = () => {
                             fontStyle="italic"
                             fontWeight="light"
                             mr="2"
+                            textColor
                           >
                             Giá:
                           </Text>
-                          <Badge rounded="full" px="3" fontSize="xl">
-                            {favoriteProduct.finalPrice.toLocaleString("vi-VN")}{" "}
-                            Đ
-                          </Badge>
+                          {favoriteProduct.finalPrice !==
+                            favoriteProduct.originalPrice && (
+                            <>
+                              <Badge
+                                rounded="full"
+                                px="3"
+                                fontSize="sm"
+                                textDecoration="line-through"
+                                color="gray.500"
+                              >
+                                {favoriteProduct.originalPrice.toLocaleString(
+                                  "vi-VN"
+                                )}
+                                Đ
+                              </Badge>
+                              <Badge rounded="full" px="3" mx="1" fontSize="sm">
+                                {favoriteProduct.finalPrice.toLocaleString(
+                                  "vi-VN"
+                                )}
+                                Đ
+                              </Badge>
+                            </>
+                          )}
+                          {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
+                          {favoriteProduct.finalPrice ===
+                            favoriteProduct.originalPrice && (
+                            <Badge rounded="full" px="3" fontSize="sm">
+                              {favoriteProduct.originalPrice.toLocaleString(
+                                "vi-VN"
+                              )}
+                              Đ
+                            </Badge>
+                          )}
                         </Box>
                       </Box>
+
                       <Box
                         display="flex"
                         justifyContent="flex-end"

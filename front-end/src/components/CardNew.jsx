@@ -14,13 +14,13 @@ import {
 import { FaHeart, FaEye, FaShoppingCart } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
-//services
-import { addToCart } from "../service/cartService.js";
+
 //Atom
 import userAtom from "../Atom/userAtom.js";
 import { useRecoilState, useRecoilValue } from "recoil";
-//service
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
+//service
+import { addToCart } from "../service/cartService.js";
 import {
   addFavoriteProduct,
   getAllFavoriteProducts,
@@ -37,11 +37,10 @@ const CardNew = ({ products }) => {
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
-  console.log(products);
+
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user?._id) return; // If userId is not available, exit early
-
       try {
         const userId = user._id;
         const favorites = await getAllFavoriteProducts(userId);

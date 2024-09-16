@@ -56,9 +56,11 @@ const Tiltel = ({ title, imageCategory, iconColor, descriptionCategory }) => {
           fontWeight={"bold"}
           fontStyle="italic" // Chữ nghiêng
           textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)" // Đổ bóng chữ
+          textAlign="center" // Căn giữa văn bản
         >
           {descriptionCategory}
         </Text>
+
         <Flex alignItems={{ base: "start", md: "center" }}>
           <svg
             viewBox="0 0 24 24"

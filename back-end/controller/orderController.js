@@ -6,18 +6,19 @@ import userModel from "../models/userModel.js";
 
 // Hàm xử lý checkout
 export const checkout = async (req, res) => {
-  const { userId, couponCode = null, shippingMethod, paymentMethod } = req.body;
+  const {
+    userId,
+    items, // Nhận items đã được truyền từ frontend
+    totalPrice,
+    shippingFee,
+    discountedTotal,
+    selectedShippingMethod,
+    selectedPaymentMethod,
+    couponCode = null,
+  } = req.body;
 
   try {
-    // 1. Lấy giỏ hàng của người dùng
-    const cart = await cartModel
-      .findOne({ user: userId })
-      .populate("items.product");
-    if (!cart) {
-      return res.status(404).json({ message: "Giỏ hàng không tồn tại" });
-    }
-
-    // 2. Lấy thông tin người dùng
+    // 1. Lấy thông tin người dùng
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
@@ -26,7 +27,7 @@ export const checkout = async (req, res) => {
     // Lấy địa chỉ từ người dùng
     const shippingAddress = `${user.ward}, ${user.district}, ${user.city}`;
 
-    // 3. Xử lý mã khuyến mãi (nếu có)
+    // 2. Xử lý mã khuyến mãi (nếu có)
     let discount = 0;
     if (couponCode) {
       const coupon = await couponModel.findOne({ code: couponCode });
@@ -42,14 +43,14 @@ export const checkout = async (req, res) => {
           return res.status(400).json({ message: "Mã giảm giá đã hết hạn" });
         }
 
-        if (cart.totalPrice < coupon.minimumPurchaseAmount) {
+        if (totalPrice < coupon.minimumPurchaseAmount) {
           return res
             .status(400)
             .json({ message: "Số tiền mua chưa đủ để sử dụng mã giảm giá" });
         }
 
         // Tính toán giảm giá
-        discount = (cart.totalPrice * coupon.discountPercentage) / 100;
+        discount = (totalPrice * coupon.discountPercentage) / 100;
 
         // Cập nhật số lần sử dụng của mã giảm giá
         coupon.usageCount += 1;
@@ -66,33 +67,37 @@ export const checkout = async (req, res) => {
       }
     }
 
-    // 4. Tạo đơn hàng
-    const finalPrice = cart.totalPrice + cart.shippingFee - discount;
+    // 3. Tạo đơn hàng
     const order = new orderModel({
       user: userId,
-      items: cart.items.map((item) => ({
-        product: item.product._id,
+      items: items.map((item) => ({
+        product: item.product, // Đã được truyền từ frontend
         quantity: item.quantity,
-        price: item.totalPriceItemCart / item.quantity, // Giá từng sản phẩm
+        price: item.totalPriceItemCart, // Giá từng sản phẩm đã được tính từ frontend
       })),
-      totalPrice: cart.totalPrice,
-      shippingFee: cart.shippingFee,
-      shippingMethod: shippingMethod, // Thêm phương thức vận chuyển
-      discount: discount,
-      finalPrice: finalPrice,
-      shippingAddress: shippingAddress,
-      paymentMethod: paymentMethod, // Ví dụ, thay đổi theo phương thức thanh toán thực tế
-      status: "Chờ xử lý",
+      totalPrice: totalPrice, // Tổng giá trước khi giảm giá
+      shippingFee: shippingFee, // Phí vận chuyển
+      shippingMethod: selectedShippingMethod, // Phương thức vận chuyển
+      discount: discount, // Số tiền giảm giá
+      finalPrice: discountedTotal, // Tổng giá sau khi giảm giá
+      shippingAddress: shippingAddress, // Địa chỉ giao hàng
+      paymentMethod: selectedPaymentMethod, // Phương thức thanh toán
+      status: "Chờ xử lý", // Trạng thái đơn hàng
     });
 
     await order.save();
 
-    // 5. Xóa giỏ hàng sau khi checkout
-    await cartModel.findOneAndDelete({ user: userId });
+    // 4. Xóa các mục đã được chọn trong giỏ hàng
+    for (const item of items) {
+      await cartModel.findOneAndUpdate(
+        { user: userId },
+        { $pull: { items: { product: item.product } } } // Xóa mục có product tương ứng
+      );
+    }
 
-    // 6. Cập nhật số lượng sản phẩm
-    for (const item of cart.items) {
-      await productModel.findByIdAndUpdate(item.product._id, {
+    // 5. Cập nhật số lượng sản phẩm sau khi đặt hàng
+    for (const item of items) {
+      await productModel.findByIdAndUpdate(item.product, {
         $inc: { quantity: -item.quantity, orderCount: item.quantity },
       });
     }
@@ -102,7 +107,6 @@ export const checkout = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const updateOrder = async (req, res) => {
   const { orderId } = req.params;
   const updates = req.body;
