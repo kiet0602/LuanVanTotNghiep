@@ -168,7 +168,7 @@ const InfoCartCheckout = ({ items, total }) => {
                   </Text>
                   <Heading size="sm">
                     {item.totalPriceItemCart.toLocaleString()}
-                    <span style={{ whiteSpace: "nowrap" }}> VNĐ</span>
+                    <span style={{ whiteSpace: "nowrap" }}> Đ</span>
                   </Heading>
                 </HStack>
               </Stack>
@@ -177,7 +177,7 @@ const InfoCartCheckout = ({ items, total }) => {
           <VStack spacing={4} alignItems="stretch" w="full">
             <HStack justifyContent="space-between">
               <Text color={textColor}>Tổng tiền sản phẩm: </Text>
-              <Heading size="sm">{total.toLocaleString()} VNĐ</Heading>
+              <Heading size="sm">{total.toLocaleString()} Đ</Heading>
             </HStack>
             <HStack justifyContent="space-between">
               <Text color={textColor}>Tiền ship: </Text>
@@ -185,13 +185,13 @@ const InfoCartCheckout = ({ items, total }) => {
                 {total > shippingFeeThreshold
                   ? "Miễn phí"
                   : selectedShippingMethod === "Giao hàng hỏa tốc"
-                  ? `${expressShippingFeeAmount.toLocaleString()} VNĐ`
-                  : `${standardShippingFeeAmount.toLocaleString()} VNĐ`}
+                  ? `${expressShippingFeeAmount.toLocaleString()} Đ`
+                  : `${standardShippingFeeAmount.toLocaleString()} Đ`}
               </Heading>
             </HStack>
             <HStack justifyContent="space-between">
               <Text color={textColor}>Thuế: </Text>
-              <Heading size="sm">{taxAmount.toLocaleString()} VNĐ</Heading>
+              <Heading size="sm">{taxAmount.toLocaleString()} Đ</Heading>
             </HStack>
           </VStack>
           <Divider />
@@ -211,7 +211,7 @@ const InfoCartCheckout = ({ items, total }) => {
           <Divider />
           <HStack justifyContent="space-between" w="full" py={"20px"}>
             <Text color={textColor}>Tổng tiền:</Text>
-            <Heading size="lg">{calculateTotal().toLocaleString()} VNĐ</Heading>
+            <Heading size="lg">{calculateTotal().toLocaleString()} Đ</Heading>
           </HStack>
 
           <Button

@@ -201,7 +201,7 @@ const ItemCart = () => {
                   </Stack>
                   <Stack spacing={2} align="center" justifyContent="center">
                     <Heading fontSize="sm">Giá</Heading>
-                    <Text>{item?.totalPriceItemCart.toLocaleString()} VNĐ</Text>
+                    <Text>{item?.totalPriceItemCart.toLocaleString()} Đ</Text>
                   </Stack>
                   <FontAwesomeIcon
                     mx="20px"
@@ -240,7 +240,7 @@ const ItemCart = () => {
                       .toLocaleString()
                   : 0}
               </Text>{" "}
-              VNĐ
+              Đ
             </Heading>
             <Button mt={2} colorScheme="teal" onClick={handleCheckout}>
               Thanh toán

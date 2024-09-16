@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Button,
   Drawer,
@@ -27,8 +27,7 @@ function Search() {
           <DrawerCloseButton />
           <DrawerHeader>Bạn muốn tìm kiếm?</DrawerHeader>
           <DrawerBody>
-            {" "}
-            <InputSearch />{" "}
+            <InputSearch onClose={onClose} /> {/* Truyền onClose */}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

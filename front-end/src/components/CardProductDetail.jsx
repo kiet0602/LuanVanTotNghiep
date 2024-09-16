@@ -147,7 +147,7 @@ const CardProductDetail = ({ product }) => {
                           fontSize="lg"
                           textDecoration="line-through"
                         >
-                          {product.originalPrice.toLocaleString("vi-VN")} VND
+                          {product.originalPrice.toLocaleString("vi-VN")} Đ
                         </Badge>
                         <Badge
                           rounded="full"
@@ -156,7 +156,7 @@ const CardProductDetail = ({ product }) => {
                           colorScheme="teal"
                           fontSize="lg"
                         >
-                          {product.finalPrice.toLocaleString("vi-VN")} VND
+                          {product.finalPrice.toLocaleString("vi-VN")} Đ
                         </Badge>
                       </>
                     ) : (
@@ -168,7 +168,7 @@ const CardProductDetail = ({ product }) => {
                         colorScheme="teal"
                         fontSize="lg"
                       >
-                        {product.originalPrice.toLocaleString("vi-VN")} VND
+                        {product.originalPrice.toLocaleString("vi-VN")} Đ
                       </Badge>
                     )}
                   </Flex>
@@ -259,7 +259,7 @@ const CardProductDetail = ({ product }) => {
                   <Box mx={5} display={"flex"}>
                     Tạm tính:
                     <Text color={"red"}>
-                      {totalPriceProduct.toLocaleString("vi-VN")} VNĐ
+                      {totalPriceProduct.toLocaleString("vi-VN")} Đ
                     </Text>
                   </Box>
                 </Flex>

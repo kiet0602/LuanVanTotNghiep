@@ -11,7 +11,7 @@ import {
   useColorModeValue,
   Flex,
 } from "@chakra-ui/react";
-import { FaHeart, FaEye, FaShoppingCart, FaTimes } from "react-icons/fa";
+import { FaEye, FaShoppingCart, FaTimes } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 // Services
@@ -33,10 +33,11 @@ const CartFavoritesProductsUser = () => {
   const borderColor = useColorModeValue("blue.500", "blue.300");
   // Atom
   const user = useRecoilValue(userAtom);
-  const [favoriteProductofUser, setFavoriteProductofUser] = useState([]);
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
+  //Dữ liệu lấy từ back-end
+  const [favoriteProductofUser, setFavoriteProductofUser] = useState([]);
   //Thêm giỏ hàng
   const handleAddToCart = async (productId) => {
     if (!user?._id) {
@@ -51,27 +52,7 @@ const CartFavoritesProductsUser = () => {
       toast.error("Lỗi thêm sản phẩm!");
     }
   };
-
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      if (!user?._id) return;
-      try {
-        const userId = user._id;
-        const favorites = await getAllFavoriteProducts(userId);
-        setFavoriteProducts(favorites);
-        setFavoriteProductofUser(favorites);
-
-        setFavoritesCount(favorites.length);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách yêu thích:", error);
-      }
-    };
-    fetchFavorites();
-  }, [user, setFavoriteProducts, setFavoritesCount]);
-
-  const isFavorite = (productId) =>
-    favoriteProductofUser.some((fav) => fav._id === productId);
-
+  //Xóa thích sản phẩm
   const handleRemoveFavorite = async (productId) => {
     if (!user?._id) {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
@@ -92,12 +73,31 @@ const CartFavoritesProductsUser = () => {
       toast.error(error);
     }
   };
-
   const handleFavoriteToggle = (productId) => {
     if (isFavorite(productId)) {
       handleRemoveFavorite(productId);
     }
   };
+
+  //Lấy sản phẩm từ back-end
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (!user?._id) return;
+      try {
+        const userId = user._id;
+        const favorites = await getAllFavoriteProducts(userId);
+        setFavoriteProducts(favorites);
+        setFavoriteProductofUser(favorites);
+        setFavoritesCount(favorites.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách yêu thích:", error);
+      }
+    };
+    fetchFavorites();
+  }, [user, setFavoriteProducts, setFavoritesCount]);
+
+  const isFavorite = (productId) =>
+    favoriteProductofUser.some((fav) => fav._id === productId);
 
   return (
     <>
