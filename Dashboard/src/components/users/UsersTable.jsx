@@ -42,18 +42,39 @@ const userData = [
 
 const UsersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState(userData);
+  const [sortConfig, setSortConfig] = useState({
+    key: "name",
+    direction: "asc",
+  });
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = userData.filter(
-      (user) =>
-        user.name.toLowerCase().includes(term) ||
-        user.email.toLowerCase().includes(term)
-    );
-    setFilteredUsers(filtered);
   };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedUsers = userData
+    .filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm)
+    )
+    .sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
 
   return (
     <motion.div
@@ -80,18 +101,26 @@ const UsersTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Role
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Status
-              </th>
+              {["Name", "Email", "Role", "Status"].map((column) => (
+                <th
+                  key={column}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort(column.toLowerCase())}
+                >
+                  {column}
+                  {sortConfig.key === column.toLowerCase() ? (
+                    <span
+                      className={`ml-2 ${
+                        sortConfig.direction === "asc"
+                          ? "text-blue-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {sortConfig.direction === "asc" ? "▲" : "▼"}
+                    </span>
+                  ) : null}
+                </th>
+              ))}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
@@ -99,7 +128,7 @@ const UsersTable = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-700">
-            {filteredUsers.map((user) => (
+            {sortedUsers.map((user) => (
               <motion.tr
                 key={user.id}
                 initial={{ opacity: 0 }}
@@ -120,7 +149,6 @@ const UsersTable = () => {
                     </div>
                   </div>
                 </td>
-
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-300">{user.email}</div>
                 </td>
@@ -129,7 +157,6 @@ const UsersTable = () => {
                     {user.role}
                   </span>
                 </td>
-
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -141,7 +168,6 @@ const UsersTable = () => {
                     {user.status}
                   </span>
                 </td>
-
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button className="text-indigo-400 hover:text-indigo-300 mr-2">
                     Edit
@@ -158,4 +184,5 @@ const UsersTable = () => {
     </motion.div>
   );
 };
+
 export default UsersTable;

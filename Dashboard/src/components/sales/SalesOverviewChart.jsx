@@ -21,6 +21,7 @@ const monthlySalesData = [
 ];
 
 const SalesOverviewChart = () => {
+  const strokeColor = "9CA3AF";
   const [selectedTimeRange, setSelectedTimeRange] = useState("This Month");
 
   return (
@@ -52,7 +53,8 @@ const SalesOverviewChart = () => {
           <AreaChart data={monthlySalesData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="month" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <YAxis stroke={strokeColor || "#9CA3AF"} />
+
             <Tooltip
               contentStyle={{
                 backgroundColor: "rgba(31, 41, 55, 0.8)",

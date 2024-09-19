@@ -23,15 +23,12 @@ export const checkout = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
-
     // Lấy địa chỉ từ người dùng
     const shippingAddress = `${user.ward}, ${user.district}, ${user.city}`;
-
     // 2. Xử lý mã khuyến mãi (nếu có)
     let discount = 0;
     if (couponCode) {
       const coupon = await couponModel.findOne({ code: couponCode });
-
       if (coupon) {
         // Kiểm tra tính hợp lệ của mã giảm giá
         if (!coupon.isActive) {
@@ -42,19 +39,16 @@ export const checkout = async (req, res) => {
         if (coupon.expirationDate <= Date.now()) {
           return res.status(400).json({ message: "Mã giảm giá đã hết hạn" });
         }
-
         if (totalPrice < coupon.minimumPurchaseAmount) {
           return res
             .status(400)
             .json({ message: "Số tiền mua chưa đủ để sử dụng mã giảm giá" });
         }
-
         // Tính toán giảm giá
         discount = (totalPrice * coupon.discountPercentage) / 100;
 
         // Cập nhật số lần sử dụng của mã giảm giá
         coupon.usageCount += 1;
-
         try {
           await coupon.save(); // Lưu thay đổi
         } catch (error) {
@@ -66,7 +60,6 @@ export const checkout = async (req, res) => {
         return res.status(400).json({ message: "Mã giảm giá không hợp lệ" });
       }
     }
-
     // 3. Tạo đơn hàng
     const order = new orderModel({
       user: userId,
@@ -84,9 +77,7 @@ export const checkout = async (req, res) => {
       paymentMethod: selectedPaymentMethod, // Phương thức thanh toán
       status: "Chờ xử lý", // Trạng thái đơn hàng
     });
-
     await order.save();
-
     // 4. Xóa các mục đã được chọn trong giỏ hàng
     for (const item of items) {
       await cartModel.findOneAndUpdate(
@@ -94,19 +85,18 @@ export const checkout = async (req, res) => {
         { $pull: { items: { product: item.product } } } // Xóa mục có product tương ứng
       );
     }
-
     // 5. Cập nhật số lượng sản phẩm sau khi đặt hàng
     for (const item of items) {
       await productModel.findByIdAndUpdate(item.product, {
         $inc: { quantity: -item.quantity, orderCount: item.quantity },
       });
     }
-
     res.status(201).json({ message: "Checkout thành công", order });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+//hàm thay đổi trạng thái đơn hàng
 export const updateOrder = async (req, res) => {
   const { orderId } = req.params;
   const updates = req.body;
@@ -147,7 +137,7 @@ export const updateOrder = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+//Hàm xóa đơn hàng
 export const deleteOrder = async (req, res) => {
   const { orderId } = req.params;
 
@@ -163,7 +153,6 @@ export const deleteOrder = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // Hàm lấy đơn hàng theo ID
 export const getOrderById = async (req, res) => {
   const { orderId } = req.params;
@@ -181,7 +170,6 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // Hàm lấy danh sách đơn hàng của người dùng
 export const getOrders = async (req, res) => {
   const { userId } = req.params;
@@ -199,7 +187,7 @@ export const getOrders = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+//hàm lấy tất cả đơn hàng
 export const getAllOrders = async (req, res) => {
   try {
     // Lấy tất cả các đơn hàng và populate thông tin người dùng và sản phẩm
@@ -210,6 +198,122 @@ export const getAllOrders = async (req, res) => {
     }
 
     res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// hàm lấy danh thu
+export const getRevenue = async (req, res) => {
+  try {
+    // Lấy tất cả các đơn hàng và populate thông tin người dùng
+    const orders = await orderModel.find().populate("user"); // Populate thông tin người dùng
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "Không có đơn hàng nào" });
+    }
+    // Tính tổng doanh thu bằng cách cộng dồn tất cả các giá trị đơn hàng
+    const totalRevenue = orders.reduce(
+      (acc, order) => acc + order.finalPrice,
+      0
+    );
+    res.status(200).json({ totalRevenue });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+//hàm lấy doanh thu mỗi tháng
+export const getMonthlyRevenue = async (req, res) => {
+  try {
+    const revenueByMonth = await orderModel.aggregate([
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" }, // Nhóm theo tháng
+            year: { $year: "$createdAt" }, // Nhóm theo năm (nếu cần)
+          },
+          totalRevenue: { $sum: "$totalPrice" }, // Tính tổng doanh thu mỗi tháng
+        },
+      },
+      {
+        $sort: { "_id.year": 1, "_id.month": 1 }, // Sắp xếp theo năm và tháng tăng dần
+      },
+    ]);
+
+    // Chuyển đổi dữ liệu thành định dạng mong muốn
+    const salesData = revenueByMonth.map((item) => {
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+
+      return {
+        name: monthNames[item._id.month - 1], // Đổi số tháng thành tên tháng
+        sales: item.totalRevenue,
+      };
+    });
+
+    res.status(200).json(salesData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+//Hàm lấy số lượng sản phẩm bán theo loại
+export const getSoldProductCountByCategory = async (req, res) => {
+  try {
+    const result = await orderModel.aggregate([
+      {
+        $unwind: "$items", // Tách từng sản phẩm trong items
+      },
+      {
+        $lookup: {
+          from: "products", // Liên kết với collection product
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      {
+        $unwind: "$productDetails", // Tách từng sản phẩm đã liên kết
+      },
+      {
+        $group: {
+          _id: "$productDetails.category", // Nhóm theo thể loại sản phẩm
+          totalQuantity: { $sum: "$items.quantity" }, // Tổng số lượng sản phẩm bán ra
+        },
+      },
+      {
+        $lookup: {
+          from: "categories", // Liên kết với collection category
+          localField: "_id",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
+      },
+      {
+        $unwind: "$categoryDetails", // Tách từng thể loại đã liên kết
+      },
+      {
+        $project: {
+          _id: 0,
+          categoryName: "$categoryDetails.categoryName", // Hiển thị tên thể loại
+          totalQuantity: 1,
+        },
+      },
+      {
+        $sort: { totalQuantity: -1 }, // Sắp xếp theo số lượng giảm dần
+      },
+    ]);
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,16 +1,42 @@
 import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import SalesOverviewChart from "../components/overview/SalesOverviewChart";
 import CategoryDistributionChart from "../components/overview/CategoryDistributionChart";
 import SalesChannelChart from "../components/overview/SalesChannelChart";
+import { getRevenue } from "../service/orderService.js";
+import { useEffect, useState } from "react";
 
 const OverviewPage = () => {
+  const [totalRevenue, setTotalRevenue] = useState(0);
+
+  const fetchRevenue = async () => {
+    try {
+      const { totalRevenue } = await getRevenue();
+      setTotalRevenue(totalRevenue);
+      console.log(totalRevenue);
+    } catch (error) {
+      console.error("Failed to fetch orders and revenue", error);
+    }
+  };
+  const fetchDataUsers = async () => {
+    try {
+      const { totalRevenue } = await getRevenue();
+      setTotalRevenue(totalRevenue);
+      console.log(totalRevenue);
+    } catch (error) {
+      console.error("Failed to fetch orders and revenue", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRevenue();
+  }, []);
+
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Overview" />
+      <Header title="Tổng quan" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -21,29 +47,29 @@ const OverviewPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Sales"
+            name="Doanh thu tổng cộng"
             icon={Zap}
-            value="$12,345"
-            color="#6366F1"
+            value={`${totalRevenue.toLocaleString()} Đ`} // Định dạng giá trị với dấu phân cách hàng nghìn và ký tự "Đ"
+            color="#6366F1" // Màu sắc cho StatCard
           />
           <StatCard
-            name="New Users"
+            name="Người dùng mới"
             icon={Users}
             value="1,234"
             color="#8B5CF6"
           />
           <StatCard
-            name="Total Products"
+            name="Sản phẩm tổng cộng"
             icon={ShoppingBag}
             value="567"
             color="#EC4899"
           />
-          <StatCard
-            name="Conversion Rate"
+          {/* <StatCard
+            name="Tỷ lệ chuyển đổi"
             icon={BarChart2}
             value="12.5%"
             color="#10B981"
-          />
+          /> */}
         </motion.div>
 
         {/* CHARTS */}

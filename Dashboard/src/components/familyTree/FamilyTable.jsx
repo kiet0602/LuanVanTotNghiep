@@ -6,8 +6,6 @@ const PRODUCT_DATA = [
   {
     id: 1,
     name: "Wireless Earbuds",
-    category: "Electronics",
-    price: 59.99,
     stock: 143,
     sales: 1200,
   },
@@ -45,7 +43,7 @@ const PRODUCT_DATA = [
   },
 ];
 
-const ProductsTable = () => {
+const FamilyTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState(PRODUCT_DATA);
   const [sortConfig, setSortConfig] = useState({
@@ -86,7 +84,9 @@ const ProductsTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">Product List</h2>
+        <h2 className="text-xl font-semibold text-gray-100">
+          Danh sách thể loại
+        </h2>
         <div className="relative">
           <input
             type="text"
@@ -103,7 +103,7 @@ const ProductsTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {["name", "category", "price", "stock", "sales"].map((key) => (
+              {["name", "Classification", "quantity"].map((key) => (
                 <th
                   key={key}
                   onClick={() => handleSort(key)}
@@ -145,14 +145,9 @@ const ProductsTable = () => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  ${product.price.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {product.stock}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {product.sales}
-                </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button className="text-indigo-400 hover:text-indigo-300 mr-2">
                     <Edit size={18} />
@@ -169,4 +164,4 @@ const ProductsTable = () => {
     </motion.div>
   );
 };
-export default ProductsTable;
+export default FamilyTable;

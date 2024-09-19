@@ -3,22 +3,14 @@ import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 
-import {
-  AlertTriangle,
-  DollarSign,
-  Package,
-  Plus,
-  TrendingUp,
-} from "lucide-react";
-import CategoryDistributionChart from "../components/overview/CategoryDistributionChart";
-import SalesTrendChart from "../components/products/SalesTrendChart";
-import ProductsTable from "../components/products/ProductsTable";
-import { useState } from "react";
+import { AlertTriangle, DollarSign, Package, TrendingUp } from "lucide-react";
 
-const ProductsPage = () => {
+import FamilyTable from "../components/familyTree/FamilyTable";
+
+const FamilyPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Sản phẩm" />
+      <Header title="Thể loại" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -29,7 +21,7 @@ const ProductsPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Products"
+            name="Tổng số thể loại"
             icon={Package}
             value={1234}
             color="#6366F1"
@@ -55,14 +47,10 @@ const ProductsPage = () => {
         </motion.div>
         {/* Button to open modal */}
 
-        <ProductsTable />
+        <FamilyTable />
         {/* CHARTS */}
-        <div className="grid grid-col-1 lg:grid-cols-2 gap-8">
-          <SalesTrendChart />
-          <CategoryDistributionChart />
-        </div>
       </main>
     </div>
   );
 };
-export default ProductsPage;
+export default FamilyPage;
