@@ -1,79 +1,107 @@
 import { motion } from "framer-motion";
-import { Edit, Search, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Edit, Search, Trash2, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const PRODUCT_DATA = [
-  {
-    id: 1,
-    name: "Wireless Earbuds",
-    stock: 143,
-    sales: 1200,
-  },
-  {
-    id: 2,
-    name: "Leather Wallet",
-    category: "Accessories",
-    price: 39.99,
-    stock: 89,
-    sales: 800,
-  },
-  {
-    id: 3,
-    name: "Smart Watch",
-    category: "Electronics",
-    price: 199.99,
-    stock: 56,
-    sales: 650,
-  },
-  {
-    id: 4,
-    name: "Yoga Mat",
-    category: "Fitness",
-    price: 29.99,
-    stock: 210,
-    sales: 950,
-  },
-  {
-    id: 5,
-    name: "Coffee Maker",
-    category: "Home",
-    price: 79.99,
-    stock: 78,
-    sales: 720,
-  },
-];
+import Pagination from "../pagination/Pagination.jsx";
+import AddFamilyModal from "../add/AddFamilyModal.jsx";
+
+import {
+  getClassifications,
+  createClassification,
+  updateClassification,
+  deleteClassification,
+} from "../../service/classificationService.js";
+import UpdateClassificationModal from "../update/UpdateClassificationModal.jsx";
+
+const PRODUCTS_PER_PAGE = 5;
 
 const FamilyTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(PRODUCT_DATA);
   const [sortConfig, setSortConfig] = useState({
     key: "name",
     direction: "asc",
   });
+  const [currentPage, setCurrentPage] = useState(0);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenUpdate, setIsOpenUpdate] = useState(false);
+  const [classifications, setClassifications] = useState([]);
+  const [filteredClassifications, setFilteredClassifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedClassification, setSelectedClassification] = useState(null);
+
+  // lấy tất cả họ cây
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await getClassifications();
+        setClassifications(data);
+        setFilteredClassifications(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+  // tìm kiếm
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = PRODUCT_DATA.filter(
-      (product) =>
-        product.name.toLowerCase().includes(term) ||
-        product.category.toLowerCase().includes(term)
+    const filtered = classifications.filter((classification) =>
+      classification.classificationName.toLowerCase().includes(term)
     );
-    setFilteredProducts(filtered);
+    setFilteredClassifications(filtered);
+    setCurrentPage(0);
   };
-
+  // sắp xếp
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
-    const sorted = [...filteredProducts].sort((a, b) => {
+    const sorted = [...filteredClassifications].sort((a, b) => {
       if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
       if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
       return 0;
     });
-    setFilteredProducts(sorted);
+    setFilteredClassifications(sorted);
+  };
+  //phân trang
+  const offset = currentPage * PRODUCTS_PER_PAGE;
+  const currentProducts = filteredClassifications.slice(
+    offset,
+    offset + PRODUCTS_PER_PAGE
+  );
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+  // xóa
+  const handleDeleteClassification = async (classificationId) => {
+    try {
+      await deleteClassification(classificationId);
+      setClassifications((prev) =>
+        prev.filter((item) => item._id !== classificationId)
+      );
+      setFilteredClassifications((prev) =>
+        prev.filter((item) => item._id !== classificationId)
+      );
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
+  };
+  //Thêm
+  const handleAddClassification = async (newClassification) => {
+    try {
+      setClassifications((prev) => [...prev, newClassification]);
+      setFilteredClassifications((prev) => [...prev, newClassification]);
+    } catch (error) {
+      console.error("Failed to add classification:", error);
+    }
   };
 
   return (
@@ -84,9 +112,17 @@ const FamilyTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">
-          Danh sách thể loại
-        </h2>
+        <div>
+          <h2 className="text-xl font-semibold text-gray-100 mb-4">
+            Danh sách họ cây
+          </h2>
+          <button
+            className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+            onClick={() => setIsOpen(true)}
+          >
+            <Plus size={18} />
+          </button>
+        </div>
         <div className="relative">
           <input
             type="text"
@@ -98,61 +134,67 @@ const FamilyTable = () => {
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {["name", "Classification", "quantity"].map((key) => (
+              {["classificationName"].map((key) => (
                 <th
                   key={key}
                   onClick={() => handleSort(key)}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  style={{ textAlign: "left" }}
                 >
                   {key.charAt(0).toUpperCase() + key.slice(1)}
-                  {sortConfig.key === key
-                    ? sortConfig.direction === "asc"
-                      ? " ▲"
-                      : " ▼"
-                    : ""}
+                  {sortConfig.key === key && (
+                    <span
+                      className={`ml-2 ${
+                        sortConfig.direction === "asc"
+                          ? "text-blue-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {sortConfig.direction === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th
+                className="px-6 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider text-right"
+                style={{ textAlign: "right" }}
+              >
                 Actions
               </th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-700">
-            {filteredProducts.map((product) => (
+            {currentProducts.map((classification) => (
               <motion.tr
-                key={product.id}
+                key={classification._id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
-                  <img
-                    src="https://images.unsplash.com/photo-1627989580309-bfaf3e58af6f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8d2lyZWxlc3MlMjBlYXJidWRzfGVufDB8fDB8fHww"
-                    alt="Product img"
-                    className="size-10 rounded-full"
-                  />
-                  {product.name}
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 text-left">
+                  {classification.classificationName}
                 </td>
-
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {product.category}
-                </td>
-
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {product.stock}
-                </td>
-
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <button className="text-indigo-400 hover:text-indigo-300 mr-2">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 text-right">
+                  <button
+                    className="text-indigo-400 hover:text-indigo-300 mr-2"
+                    onClick={() => {
+                      setSelectedClassification(classification);
+                      setIsOpenUpdate(true);
+                    }}
+                  >
                     <Edit size={18} />
                   </button>
-                  <button className="text-red-400 hover:text-red-300">
+                  <button
+                    className="text-red-400 hover:text-red-300"
+                    onClick={() =>
+                      handleDeleteClassification(classification._id)
+                    }
+                  >
                     <Trash2 size={18} />
                   </button>
                 </td>
@@ -161,7 +203,26 @@ const FamilyTable = () => {
           </tbody>
         </table>
       </div>
+      <div className="mt-4 flex justify-end">
+        <Pagination
+          pageCount={Math.ceil(
+            filteredClassifications.length / PRODUCTS_PER_PAGE
+          )}
+          onPageChange={handlePageChange}
+        />
+      </div>
+      <AddFamilyModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        onAdd={handleAddClassification}
+      />
+      <UpdateClassificationModal
+        isOpenUpdate={isOpenUpdate}
+        setIsOpenUpdate={setIsOpenUpdate}
+        classification={selectedClassification}
+      />
     </motion.div>
   );
 };
+
 export default FamilyTable;

@@ -29,17 +29,27 @@ export const createEnvironment = async (req, res) => {
   try {
     const { nameEnviroment } = req.body;
 
-    // Kiểm tra xem tên đã tồn tại chưa
+    // Loại bỏ khoảng trắng dư thừa và chuẩn hóa khoảng trắng
+    const formattedEnvironmentName = nameEnviroment.trim().replace(/\s+/g, " ");
+
+    // Sử dụng regex để kiểm tra không phân biệt hoa thường và khoảng trắng
     const existingEnvironment = await EnvironmentModel.findOne({
-      nameEnviroment,
+      nameEnviroment: {
+        $regex: `^${formattedEnvironmentName}$`,
+        $options: "i",
+      },
     });
+
     if (existingEnvironment) {
-      return res
-        .status(400)
-        .json({ message: "Environment name already exists" });
+      return res.status(400).json({ message: "Môi trường sống đã tồn tại" });
     }
 
-    const newEnvironment = new EnvironmentModel(req.body);
+    // Tạo môi trường mới với tên đã được định dạng
+    const newEnvironment = new EnvironmentModel({
+      ...req.body,
+      nameEnviroment: formattedEnvironmentName,
+    });
+
     const savedEnvironment = await newEnvironment.save();
     res.status(201).json(savedEnvironment);
   } catch (error) {

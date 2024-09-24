@@ -4,8 +4,30 @@ import ClassificationModel from "../models/Classification.js"; // Adjust the pat
 export const createClassification = async (req, res) => {
   try {
     const { classificationName } = req.body;
-    const newClassification = new ClassificationModel({ classificationName });
+
+    // Loại bỏ khoảng trắng dư thừa ở đầu và cuối, đồng thời tạo regex để kiểm tra không phân biệt hoa thường và khoảng trắng
+    const formattedClassificationName = classificationName
+      .trim()
+      .replace(/\s+/g, " ");
+
+    // Sử dụng regex để tìm tên phân loại không phân biệt hoa thường và khoảng trắng
+    const existingClassification = await ClassificationModel.findOne({
+      classificationName: {
+        $regex: `^${formattedClassificationName}$`,
+        $options: "i",
+      },
+    });
+
+    if (existingClassification) {
+      return res.status(400).json({ message: "Tên họ cây đã tồn tại." });
+    }
+
+    // Tạo phân loại mới với tên đã được định dạng
+    const newClassification = new ClassificationModel({
+      classificationName: formattedClassificationName,
+    });
     await newClassification.save();
+
     res.status(201).json(newClassification);
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi tạo phân loại", error });
@@ -41,14 +63,38 @@ export const updateClassification = async (req, res) => {
   try {
     const { id } = req.params;
     const { classificationName } = req.body;
+
+    // Chuẩn hóa tên phân loại bằng cách loại bỏ khoảng trắng thừa
+    const formattedClassificationName = classificationName
+      .trim()
+      .replace(/\s+/g, " ");
+
+    // Kiểm tra xem tên phân loại đã tồn tại không phân biệt hoa thường và khoảng trắng
+    const existingClassification = await ClassificationModel.findOne({
+      classificationName: {
+        $regex: `^${formattedClassificationName}$`,
+        $options: "i",
+      },
+    });
+
+    if (existingClassification) {
+      return res.status(400).json({ message: "Tên phân loại đã tồn tại" });
+    }
+
+    // Cập nhật tên phân loại
     const updatedClassification = await ClassificationModel.findByIdAndUpdate(
       id,
-      { classificationName, updatedAt: Date.now() },
+      {
+        classificationName: formattedClassificationName,
+        updatedAt: Date.now(),
+      },
       { new: true, runValidators: true }
     );
+
     if (!updatedClassification) {
       return res.status(404).json({ message: "Phân loại không tìm thấy" });
     }
+
     res.status(200).json(updatedClassification);
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi cập nhật phân loại", error });

@@ -10,7 +10,7 @@ import FamilyTable from "../components/familyTree/FamilyTable";
 const FamilyPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Thể loại" />
+      <Header title="Họ cây" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -20,7 +20,7 @@ const FamilyPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <StatCard
+          {/* <StatCard
             name="Tổng số thể loại"
             icon={Package}
             value={1234}
@@ -43,7 +43,7 @@ const FamilyPage = () => {
             icon={DollarSign}
             value={"$543,210"}
             color="#EF4444"
-          />
+          /> */}
         </motion.div>
         {/* Button to open modal */}
 

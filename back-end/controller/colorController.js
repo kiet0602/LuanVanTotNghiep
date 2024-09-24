@@ -25,16 +25,27 @@ export const getColorById = async (req, res) => {
 export const createColor = async (req, res) => {
   try {
     const { nameColor } = req.body;
-    const existingColor = await ColorModel.findOne({ nameColor });
+
+    // Loại bỏ khoảng trắng dư thừa và chuẩn hóa khoảng trắng
+    const formattedColorName = nameColor.trim().replace(/\s+/g, " ");
+
+    // Sử dụng regex để kiểm tra không phân biệt hoa thường và khoảng trắng
+    const existingColor = await ColorModel.findOne({
+      nameColor: { $regex: `^${formattedColorName}$`, $options: "i" },
+    });
+
     if (existingColor) {
-      return res.status(400).json({ msg: "Color already exists" });
+      return res.status(400).json({ msg: "Màu này đã tồn tại" });
     }
 
-    const newColor = new ColorModel(req.body);
+    // Tạo màu mới với tên đã được định dạng
+    const newColor = new ColorModel({
+      ...req.body,
+      nameColor: formattedColorName,
+    });
     await newColor.save();
-    res
-      .status(201)
-      .json({ msg: "Color created successfully", color: newColor });
+
+    res.status(201).json(newColor);
   } catch (error) {
     res.status(500).json({ msg: "Server error", error: error.message });
   }
@@ -47,10 +58,16 @@ export const updateColorById = async (req, res) => {
 
     const existingColor = await ColorModel.findById(id);
     if (!existingColor) {
-      return res.status(404).json({ msg: "Color not found" });
+      return res.status(404).json({ msg: "Màu sắc không tồn tại" });
     }
 
-    // Cập nhật các trường có giá trị trong req.body, giữ nguyên các trường không có giá trị
+    // Kiểm tra xem có màu sắc nào khác có cùng giá trị với updateData hay không
+    const duplicateColor = await ColorModel.findOne({
+      name: updateData.name, // Giả sử bạn có trường 'name' trong model
+      _id: { $ne: id }, // Loại trừ màu sắc hiện tại
+    });
+
+    // Cập nhật các trường có giá trị trong req.body
     const updatedColor = await ColorModel.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
@@ -58,9 +75,9 @@ export const updateColorById = async (req, res) => {
 
     res
       .status(200)
-      .json({ msg: "Color updated successfully", color: updatedColor });
+      .json({ msg: "Cập nhật màu sắc thành công", color: updatedColor });
   } catch (error) {
-    res.status(500).json({ msg: "Server error", error: error.message });
+    res.status(500).json({ msg: "Lỗi máy chủ", error: error.message });
   }
 };
 

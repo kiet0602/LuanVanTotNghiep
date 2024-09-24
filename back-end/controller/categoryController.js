@@ -1,4 +1,5 @@
 import categoryModel from "../models/categoryModel.js";
+import classificationModel from "../models/Classification.js";
 
 // Thêm một danh mục mới
 const addCategory = async (req, res) => {
@@ -18,6 +19,17 @@ const addCategory = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Tên danh mục, mô tả và phân loại không được để trống!",
+      });
+    }
+
+    // Kiểm tra sự tồn tại của classification
+    const classificationExists = await classificationModel.findById(
+      classification
+    );
+    if (!classificationExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Phân loại này không tồn tại!",
       });
     }
 
@@ -44,7 +56,7 @@ const addCategory = async (req, res) => {
     await newCategory.save();
 
     // Trả về phản hồi thành công
-    res.status(201).json({ success: true, category: newCategory });
+    res.status(201).json(newCategory);
   } catch (error) {
     // Xử lý lỗi
     res.status(500).json({
@@ -142,6 +154,7 @@ const updateCategory = async (req, res) => {
       .json({ error: "Lỗi khi cập nhật danh mục", message: error.message });
   }
 };
+
 const getCategoriesByClassification = async (req, res) => {
   try {
     const { id } = req.params;

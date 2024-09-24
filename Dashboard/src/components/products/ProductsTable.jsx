@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Edit, Search, Trash2 } from "lucide-react";
+import { Edit, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
+import AddProduct from "../add/AddProduct";
 
 const PRODUCT_DATA = [
   {
@@ -53,6 +54,8 @@ const ProductsTable = () => {
     direction: "asc",
   });
 
+  const [isOpen, setIsOpen] = useState(false); // Trạng thái mở/đóng modal
+
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -86,7 +89,17 @@ const ProductsTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">Product List</h2>
+        <div className="">
+          <h2 className="text-xl font-semibold text-gray-100 mb-4">
+            Danh sách sản phẩm
+          </h2>
+          <button
+            className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+            onClick={() => setIsOpen(true)}
+          >
+            <Plus size={18} /> {/* Icon cộng */}
+          </button>
+        </div>
         <div className="relative">
           <input
             type="text"
@@ -110,11 +123,17 @@ const ProductsTable = () => {
                   className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
                 >
                   {key.charAt(0).toUpperCase() + key.slice(1)}
-                  {sortConfig.key === key
-                    ? sortConfig.direction === "asc"
-                      ? " ▲"
-                      : " ▼"
-                    : ""}
+                  {sortConfig.key === key && (
+                    <span
+                      className={`ml-2 ${
+                        sortConfig.direction === "asc"
+                          ? "text-blue-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {sortConfig.direction === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
                 </th>
               ))}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -166,6 +185,7 @@ const ProductsTable = () => {
           </tbody>
         </table>
       </div>
+      <AddProduct isOpen={isOpen} setIsOpen={setIsOpen} />
     </motion.div>
   );
 };

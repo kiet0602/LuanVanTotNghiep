@@ -16,7 +16,7 @@ import ColorTable from "../components/colors/ColorTable";
 const ColorsPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Thể loại" />
+      <Header title="Màu sắc" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -26,7 +26,7 @@ const ColorsPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <StatCard
+          {/* <StatCard
             name="Tổng số thể loại"
             icon={Package}
             value={1234}
@@ -49,7 +49,7 @@ const ColorsPage = () => {
             icon={DollarSign}
             value={"$543,210"}
             color="#EF4444"
-          />
+          /> */}
         </motion.div>
         {/* Button to open modal */}
 

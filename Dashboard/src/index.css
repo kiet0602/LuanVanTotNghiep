@@ -23,3 +23,11 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
 }
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thumb-rounded-full::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+}
