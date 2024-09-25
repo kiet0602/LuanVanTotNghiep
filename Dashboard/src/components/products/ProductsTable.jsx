@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { Edit, Plus, Search, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddProduct from "../add/AddProduct";
+import { deleteProduct, getProducts } from "../../service/productService";
+import Pagination from "../pagination/Pagination";
 
 const PRODUCT_DATA = [
   {
@@ -45,26 +47,33 @@ const PRODUCT_DATA = [
     sales: 720,
   },
 ];
+const PRODUCTS_PER_PAGE = 5;
 
 const ProductsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(PRODUCT_DATA);
   const [sortConfig, setSortConfig] = useState({
     key: "name",
     direction: "asc",
   });
-
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [isOpen, setIsOpen] = useState(false); // Trạng thái mở/đóng modal
+  const [loading, setLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = PRODUCT_DATA.filter(
+    const filtered = products.filter(
       (product) =>
-        product.name.toLowerCase().includes(term) ||
-        product.category.toLowerCase().includes(term)
+        product.productName.toLowerCase().includes(term) ||
+        product.category.categoryName.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term)
     );
     setFilteredProducts(filtered);
+    setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
   };
 
   const handleSort = (key) => {
@@ -80,6 +89,52 @@ const ProductsTable = () => {
     });
     setFilteredProducts(sorted);
   };
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+      setFilteredProducts(data); // Cập nhật filteredCategories sau khi fetch
+    } catch (error) {
+      console.error("Failed to fetch classifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const offset = currentPage * PRODUCTS_PER_PAGE;
+  const currentProducts = filteredProducts.slice(
+    offset,
+    offset + PRODUCTS_PER_PAGE
+  );
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const handleAddProduct = async (newProduct) => {
+    try {
+      setProducts((prevProducts) => [...prevProducts, newProduct]);
+      setFilteredProducts((prevProducts) => [...prevProducts, newProduct]);
+    } catch (error) {
+      console.error("Failed to add category:", error);
+    }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await deleteProduct(productId);
+      setFilteredProducts((prev) =>
+        prev.filter((item) => item._id !== productId)
+      );
+      setProducts((prev) => prev.filter((item) => item._id !== productId));
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   return (
     <motion.div
@@ -116,7 +171,13 @@ const ProductsTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {["name", "category", "price", "stock", "sales"].map((key) => (
+              {[
+                "productName",
+                "category",
+                "finalPrice",
+                "quantity",
+                "orderCount",
+              ].map((key) => (
                 <th
                   key={key}
                   onClick={() => handleSort(key)}
@@ -143,41 +204,44 @@ const ProductsTable = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-700">
-            {filteredProducts.map((product) => (
+            {currentProducts.map((product) => (
               <motion.tr
-                key={product.id}
+                key={product._id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
                   <img
-                    src="https://images.unsplash.com/photo-1627989580309-bfaf3e58af6f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8d2lyZWxlc3MlMjBlYXJidWRzfGVufDB8fDB8fHww"
+                    src={`http://localhost:2000/images/${product.image[0]}`}
                     alt="Product img"
                     className="size-10 rounded-full"
                   />
-                  {product.name}
+                  {product.productName}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {product.category}
+                  {product?.category?.categoryName}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  ${product.price.toFixed(2)}
+                  {product?.finalPrice?.toLocaleString("vi-VN")} Đ
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {product.stock}
+                  {product?.quantity}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {product.sales}
+                  {product?.orderCount}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button className="text-indigo-400 hover:text-indigo-300 mr-2">
                     <Edit size={18} />
                   </button>
                   <button className="text-red-400 hover:text-red-300">
-                    <Trash2 size={18} />
+                    <Trash2
+                      size={18}
+                      onClick={() => handleDeleteProduct(product._id)}
+                    />
                   </button>
                 </td>
               </motion.tr>
@@ -185,7 +249,18 @@ const ProductsTable = () => {
           </tbody>
         </table>
       </div>
-      <AddProduct isOpen={isOpen} setIsOpen={setIsOpen} />
+
+      <div className="mt-4 flex justify-end">
+        <Pagination
+          pageCount={Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)}
+          onPageChange={handlePageChange}
+        />
+      </div>
+      <AddProduct
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        onAdd={handleAddProduct}
+      />
     </motion.div>
   );
 };

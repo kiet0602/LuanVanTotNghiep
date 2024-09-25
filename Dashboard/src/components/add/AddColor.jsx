@@ -74,7 +74,6 @@ export default function AddColor({ isOpen, setIsOpen, onAdd }) {
                     <div className="mt-2">
                       <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                         <input
-                          id="username"
                           name="username"
                           type="text"
                           placeholder="Màu sắc"

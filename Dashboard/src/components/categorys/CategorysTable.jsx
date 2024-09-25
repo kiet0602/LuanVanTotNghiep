@@ -13,12 +13,14 @@ const PRODUCTS_PER_PAGE = 5;
 
 const CategorysTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [filteredCategories, setFilteredCategories] = useState([]);
   const [sortConfig, setSortConfig] = useState({
     key: "name",
     direction: "asc",
   });
+
+  const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
   const [isOpen, setIsOpen] = useState(false); // Trạng thái mở/đóng modal
   const [loading, setLoading] = useState(false);
@@ -56,7 +58,6 @@ const CategorysTable = () => {
       direction = "desc";
     }
     setSortConfig({ key, direction });
-
     const sorted = [...filteredCategories].sort((a, b) => {
       const aValue =
         key === "classification"
@@ -66,12 +67,10 @@ const CategorysTable = () => {
         key === "classification"
           ? b.classification?.classificationName
           : b[key];
-
       if (aValue < bValue) return direction === "asc" ? -1 : 1;
       if (aValue > bValue) return direction === "asc" ? 1 : -1;
       return 0;
     });
-
     setFilteredCategories(sorted);
   };
 
@@ -97,6 +96,7 @@ const CategorysTable = () => {
       console.error("Failed to add category:", error);
     }
   };
+
   const handleDeleteCategory = async (categoryId) => {
     try {
       await deleteCategory(categoryId);

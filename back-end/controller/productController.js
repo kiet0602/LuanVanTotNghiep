@@ -17,16 +17,23 @@ const addProduct = async (req, res) => {
       care, // Thêm trường care
     } = req.body;
 
-    if (
-      !category ||
-      !environment ||
-      !color ||
-      !size ||
-      !originalPrice ||
-      quantity === undefined ||
-      !care // Kiểm tra trường care
-    ) {
-      return res.status(400).json({ error: "Thiếu trường bắt buộc" });
+    // Tạo mảng để lưu trữ các trường thiếu
+    const missingFields = [];
+
+    // Kiểm tra từng trường bắt buộc
+    if (!category) missingFields.push("category");
+    if (!environment) missingFields.push("environment");
+    if (!color) missingFields.push("color");
+    if (!size) missingFields.push("size");
+    if (!originalPrice) missingFields.push("originalPrice");
+    if (quantity === undefined) missingFields.push("quantity");
+    if (!care) missingFields.push("care");
+
+    // Nếu có trường thiếu, trả về thông báo lỗi cụ thể
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: "Thiếu trường bắt buộc: " + missingFields.join(", "),
+      });
     }
 
     const existingProduct = await productModel.findOne({ productName });
