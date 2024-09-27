@@ -4,49 +4,8 @@ import { useEffect, useState } from "react";
 import AddProduct from "../add/AddProduct";
 import { deleteProduct, getProducts } from "../../service/productService";
 import Pagination from "../pagination/Pagination";
+import UpdateProductModal from "../update/UpdateProductModal";
 
-const PRODUCT_DATA = [
-  {
-    id: 1,
-    name: "Wireless Earbuds",
-    category: "Electronics",
-    price: 59.99,
-    stock: 143,
-    sales: 1200,
-  },
-  {
-    id: 2,
-    name: "Leather Wallet",
-    category: "Accessories",
-    price: 39.99,
-    stock: 89,
-    sales: 800,
-  },
-  {
-    id: 3,
-    name: "Smart Watch",
-    category: "Electronics",
-    price: 199.99,
-    stock: 56,
-    sales: 650,
-  },
-  {
-    id: 4,
-    name: "Yoga Mat",
-    category: "Fitness",
-    price: 29.99,
-    stock: 210,
-    sales: 950,
-  },
-  {
-    id: 5,
-    name: "Coffee Maker",
-    category: "Home",
-    price: 79.99,
-    stock: 78,
-    sales: 720,
-  },
-];
 const PRODUCTS_PER_PAGE = 5;
 
 const ProductsTable = () => {
@@ -58,11 +17,13 @@ const ProductsTable = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isOpen, setIsOpen] = useState(false); // Trạng thái mở/đóng modal
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false); // Trạng thái mở/đóng modal
+
   const [loading, setLoading] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
   const [selectedProduct, setSelectedProduct] = useState(null);
-
+  // tìm kiếm
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -75,7 +36,7 @@ const ProductsTable = () => {
     setFilteredProducts(filtered);
     setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
   };
-
+  // sắp xếp
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -89,7 +50,7 @@ const ProductsTable = () => {
     });
     setFilteredProducts(sorted);
   };
-
+  // Lấy dữ liệu tất cả sản phẩm
   const fetchProducts = async () => {
     try {
       const data = await getProducts();
@@ -101,7 +62,7 @@ const ProductsTable = () => {
       setLoading(false);
     }
   };
-
+  // phân trang
   const offset = currentPage * PRODUCTS_PER_PAGE;
   const currentProducts = filteredProducts.slice(
     offset,
@@ -110,7 +71,7 @@ const ProductsTable = () => {
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
-
+  // cập nhật lại danh sách sản phẩm khi đã thực hiện thêm
   const handleAddProduct = async (newProduct) => {
     try {
       setProducts((prevProducts) => [...prevProducts, newProduct]);
@@ -119,22 +80,39 @@ const ProductsTable = () => {
       console.error("Failed to add category:", error);
     }
   };
-
+  // xóa sản phẩm
   const handleDeleteProduct = async (productId) => {
+    // Tìm sản phẩm theo ID trước khi xóa
+    const productToDelete = products.find((item) => item._id === productId);
+
+    if (!productToDelete) {
+      toast.error("Không tìm thấy sản phẩm.");
+      return;
+    }
+
+    // Xác nhận việc xóa
+    const confirmDelete = window.confirm(
+      `Bạn có chắc chắn muốn xóa sản phẩm: ${productToDelete.productName}?`
+    );
+    if (!confirmDelete) {
+      return;
+    }
     try {
       await deleteProduct(productId);
       setFilteredProducts((prev) =>
         prev.filter((item) => item._id !== productId)
       );
       setProducts((prev) => prev.filter((item) => item._id !== productId));
+      toast.success(`Sản phẩm "${productToDelete.productName}" đã được xóa.`);
     } catch (error) {
       console.error("Delete failed:", error);
+      toast.error("Xóa sản phẩm thất bại. Vui lòng thử lại.");
     }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [products.length]);
 
   return (
     <motion.div
@@ -172,18 +150,20 @@ const ProductsTable = () => {
           <thead>
             <tr>
               {[
-                "productName",
-                "category",
-                "finalPrice",
-                "quantity",
-                "orderCount",
-              ].map((key) => (
+                { label: "Tên sản phẩm", key: "productName" },
+                { label: "Thể loại", key: "category" },
+                { label: "Giá gốc", key: "originalPrice" },
+                { label: "Giá cuối", key: "finalPrice" },
+                { label: "Số lượng", key: "quantity" },
+                { label: "Số đơn hàng", key: "orderCount" },
+                { label: "Giảm giá", key: "discount" },
+              ].map(({ label, key }) => (
                 <th
                   key={key}
                   onClick={() => handleSort(key)}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
                 >
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                  {label}
                   {sortConfig.key === key && (
                     <span
                       className={`ml-2 ${
@@ -198,7 +178,7 @@ const ProductsTable = () => {
                 </th>
               ))}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Actions
+                Hành động
               </th>
             </tr>
           </thead>
@@ -217,7 +197,7 @@ const ProductsTable = () => {
                     alt="Product img"
                     className="size-10 rounded-full"
                   />
-                  {product.productName}
+                  {product?.productName}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -225,17 +205,44 @@ const ProductsTable = () => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {product?.originalPrice?.toLocaleString("vi-VN")} Đ
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {product?.finalPrice?.toLocaleString("vi-VN")} Đ
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {product?.quantity}
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {product?.orderCount}
                 </td>
+
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span
+                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      product?.discount !== 0
+                        ? "bg-green-800 text-green-100"
+                        : "bg-red-800 text-red-100"
+                    }`}
+                  >
+                    {product?.discount ? product?.discount : 0}%
+                  </span>
+                </td>
+
+                {/* Nếu không có discount thì hiển thị 0 */}
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button className="text-indigo-400 hover:text-indigo-300 mr-2">
-                    <Edit size={18} />
+                    <Edit
+                      size={18}
+                      onClick={() => {
+                        setSelectedProduct(product);
+                        setIsUpdateOpen(true);
+                      }}
+                    />
                   </button>
                   <button className="text-red-400 hover:text-red-300">
                     <Trash2
@@ -260,6 +267,12 @@ const ProductsTable = () => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         onAdd={handleAddProduct}
+      />
+      <UpdateProductModal
+        fetchProducts={fetchProducts}
+        isUpdateOpen={isUpdateOpen}
+        setIsUpdateOpen={setIsUpdateOpen}
+        product={selectedProduct}
       />
     </motion.div>
   );

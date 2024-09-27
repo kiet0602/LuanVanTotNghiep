@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { CloudSunRain, Rainbow } from "lucide-react";
+import { CloudSunRain } from "lucide-react";
 
 import { updateEnvironmentById } from "../../service/eviomentService.js";
 
 export default function UpdateEvironmentModal({
+  fetchDataEnvironment,
   isOpenUpdate,
   setIsOpenUpdate,
   environment,
@@ -20,16 +21,25 @@ export default function UpdateEvironmentModal({
 
   const handleUpdateEnviroment = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra xem tên môi trường có bị trống không
+    if (!environmentName.trim()) {
+      toast.error("Tên môi trường không được để trống!");
+      return; // Ngừng thực hiện nếu trống
+    }
     try {
-      const updatedEnvironment = await updateEnvironmentById(environment._id, {
+      await updateEnvironmentById(environment._id, {
         nameEnviroment: environmentName,
       });
-
-      setIsOpenUpdate(false);
+      fetchDataEnvironment(); // Cập nhật lại danh sách môi trường
+      setIsOpenUpdate(false); // Đóng modal sau khi cập nhật thành công
+      toast.success("Cập nhật thành công!");
     } catch (error) {
       console.error("Update failed:", error);
+      toast.error("Cập nhật thất bại!");
     }
   };
+
   const handleInputChange = (e) => {
     const input = e.target.value;
     const regex = /^[^\d]*$/; // Không cho phép nhập số

@@ -4,30 +4,30 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 import { LeafyGreen } from "lucide-react";
 import { getClassifications } from "../../service/classificationService";
 import { addCategory } from "../../service/categoryService";
+import { toast } from "react-toastify";
 
-export default function AddCategory({ isOpen, setIsOpen, onAdd }) {
+export default function AddCategory({ isOpen, setIsOpen, onAdd, categories }) {
   const fileInputRef = useRef(null);
   const [classifications, setClassifications] = useState([]);
+
   const [loading, setLoading] = useState(true);
+  const [classification, setClassification] = useState("");
+
   const [categoryName, setCategoryName] = useState("");
   const [descriptionCategory, setDescriptionCategory] = useState("");
-  const [classification, setClassification] = useState("");
   const [imageCategory, setImageCategory] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  useEffect(() => {
-    const fetchClassifications = async () => {
-      try {
-        const data = await getClassifications();
-        setClassifications(data);
-      } catch (error) {
-        console.error("Failed to fetch classifications:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchClassifications();
-  }, []);
+  const fetchClassifications = async () => {
+    try {
+      const data = await getClassifications();
+      setClassifications(data);
+    } catch (error) {
+      console.error("Failed to fetch classifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectChange = (e) => {
     const selectedId = e.target.value;
@@ -56,14 +56,31 @@ export default function AddCategory({ isOpen, setIsOpen, onAdd }) {
       alert("Vui lòng upload ảnh trước khi thêm thể loại."); // Thông báo nếu chưa upload ảnh
       return; // Dừng hàm nếu chưa có ảnh
     }
+    // Kiểm tra xem tên thể loại đã tồn tại chưa
+    const isCategoryNameExists = categories.some(
+      (category) =>
+        category.categoryName.trim().toLowerCase() ===
+          categoryName.trim().toLowerCase() &&
+        category.classification._id === classification // Kiểm tra phân loại
+    );
+
+    if (isCategoryNameExists) {
+      toast.error(
+        "Tên thể loại đã tồn tại trong phân loại này. Vui lòng nhập tên khác."
+      ); // Thông báo nếu trùng tên trong cùng phân loại
+      return; // Dừng hàm nếu tên đã tồn tại
+    }
+
     const categoryData = {
       categoryName,
       descriptionCategory,
       classification,
       imageCategory,
     };
+
     try {
       const newCategory = await addCategory(categoryData);
+      toast.success("Thêm thể loại thành công.");
       onAdd(newCategory);
       setIsOpen(false);
       // Reset các trường sau khi thêm thể loại thành công
@@ -76,6 +93,10 @@ export default function AddCategory({ isOpen, setIsOpen, onAdd }) {
       console.error("Failed to add category:", error);
     }
   };
+
+  useEffect(() => {
+    fetchClassifications();
+  }, []);
 
   return (
     <Dialog
@@ -115,7 +136,7 @@ export default function AddCategory({ isOpen, setIsOpen, onAdd }) {
                         <input
                           name="username"
                           type="text"
-                          placeholder="Màu sắc"
+                          placeholder="Thể loại"
                           value={categoryName}
                           onChange={(e) => setCategoryName(e.target.value)}
                           autoComplete="username"
@@ -133,7 +154,7 @@ export default function AddCategory({ isOpen, setIsOpen, onAdd }) {
                       <select
                         id="category-select"
                         onChange={handleSelectChange}
-                        className="block w-full rounded-md border-0 bg-transparent py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 bg-transparent py-2 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       >
                         <option value="">Chọn một họ cây</option>
                         {loading ? (
@@ -232,7 +253,7 @@ export default function AddCategory({ isOpen, setIsOpen, onAdd }) {
                 className="text-sm font-semibold leading-6 text-gray-900"
                 onClick={() => setIsOpen(false)}
               >
-                Hủy
+                Hủy bỏ
               </button>
               <button
                 type="submit"

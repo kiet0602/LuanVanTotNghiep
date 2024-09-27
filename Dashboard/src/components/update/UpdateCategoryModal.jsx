@@ -4,21 +4,27 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 import { LeafyGreen } from "lucide-react";
 import { getClassifications } from "../../service/classificationService";
 import { updateCategory } from "../../service/categoryService";
+import { toast } from "react-toastify";
 
 export default function UpdateCategoryModal({
+  categories,
+  fetchCategories,
   isOpenUpdate,
   setIsOpenUpdate,
   category,
 }) {
   const fileInputRef = useRef(null);
+
   const [classifications, setClassifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+
   const [categoryName, setCategoryName] = useState("");
   const [descriptionCategory, setDescriptionCategory] = useState("");
   const [classification, setClassification] = useState("");
   const [imageCategory, setImageCategory] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
+  const [loading, setLoading] = useState(true);
+  // lấy giá trị của họ cây
   useEffect(() => {
     const fetchClassifications = async () => {
       try {
@@ -32,7 +38,7 @@ export default function UpdateCategoryModal({
     };
     fetchClassifications();
   }, []);
-
+  // lấy giá trị của 1 category để cập nhật
   useEffect(() => {
     if (category) {
       setCategoryName(category.categoryName);
@@ -41,12 +47,12 @@ export default function UpdateCategoryModal({
       setImageCategory(category.imageCategory);
     }
   }, [category]);
-
+  // lưu giá trị id của họ cây
   const handleSelectChange = (e) => {
     const selectedId = e.target.value;
     setClassification(selectedId); // Cập nhật state classification với ID đã chọn
   };
-
+  // xem ảnh trước
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageCategory(file); // Lưu trữ tệp hình ảnh
@@ -57,15 +63,47 @@ export default function UpdateCategoryModal({
       setImagePreview(null); // Reset nếu không có file
     }
   };
-
+  // Thay đổi ảnh
   const handleChangeImage = () => {
     setImageCategory(null); // Reset imageCategory
     setImagePreview(null); // Reset imagePreview
     document.getElementById("file-upload").value = ""; // Clear file input
   };
-
+  // cập nhật
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra các trường dữ liệu
+    if (!categoryName.trim()) {
+      toast.error("Tên thể loại không được để trống.");
+      return; // Dừng nếu không có tên
+    }
+
+    if (!descriptionCategory.trim()) {
+      toast.error("Mô tả thể loại không được để trống.");
+      return; // Dừng nếu không có mô tả
+    }
+
+    if (!classification) {
+      toast.error("Họ cây không được để trống.");
+      return; // Dừng nếu không có phân loại
+    }
+
+    // Kiểm tra xem tên danh mục đã tồn tại trong cùng một phân loại chưa
+    const isCategoryNameExists = categories.some(
+      (cat) =>
+        cat.categoryName.trim().toLowerCase() ===
+          categoryName.trim().toLowerCase() &&
+        cat.classification._id === classification && // Kiểm tra phân loại
+        cat._id !== category._id // Đảm bảo không so sánh với chính nó
+    );
+
+    if (isCategoryNameExists) {
+      toast.error(
+        "Tên danh mục đã tồn tại trong phân loại này. Vui lòng nhập tên khác."
+      );
+      return; // Dừng hàm nếu tên đã tồn tại
+    }
 
     const categoryData = {
       categoryName,
@@ -75,11 +113,13 @@ export default function UpdateCategoryModal({
     };
 
     try {
-      const updatedCategory = await updateCategory(category._id, categoryData);
+      await updateCategory(category._id, categoryData);
+      fetchCategories();
       setIsOpenUpdate(false); // Đóng modal sau khi cập nhật thành công
-      // Xử lý logic sau khi cập nhật thành công
+      toast.success("Cập nhật danh mục thành công.");
     } catch (error) {
       console.error("Failed to update category:", error);
+      toast.error("Cập nhật danh mục không thành công. Vui lòng thử lại.");
     }
   };
 
@@ -255,13 +295,13 @@ export default function UpdateCategoryModal({
                 className="text-sm font-semibold leading-6 text-gray-900"
                 onClick={() => setIsOpenUpdate(false)}
               >
-                Hủy
+                Hủy bỏ
               </button>
               <button
                 type="submit"
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Thêm
+                Lưu
               </button>
             </div>
           </form>

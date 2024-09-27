@@ -6,6 +6,7 @@ import { getAllCategories } from "../../service/categoryService";
 import { getAllEnvironments } from "../../service/eviomentService";
 import { getAllColors } from "../../service/colorService";
 import { addProduct } from "../../service/productService";
+import { toast } from "react-toastify";
 
 export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
   const [categories, setCategories] = useState([]);
@@ -24,66 +25,82 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [quantity, setQuantity] = useState("");
   const [care, setCare] = useState("");
-  const [discount, setDiscount] = useState("");
-
+  const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const fetchCategories = async () => {
+  // Hàm để lấy danh sách danh mục, môi trường và màu sắc
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const data = await getAllCategories();
-      setCategories(data);
+      const [categoryData, environmentData, colorData] = await Promise.all([
+        getAllCategories(),
+        getAllEnvironments(),
+        getAllColors(),
+      ]);
+      setCategories(categoryData);
+      setEnvironments(environmentData);
+      setColors(colorData);
     } catch (error) {
-      console.error("Failed to fetch Categories:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const fetchEnvironments = async () => {
-    try {
-      const data = await getAllEnvironments();
-      setEnvironments(data);
-    } catch (error) {
-      console.error("Failed to fetch Environments:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const fetchColors = async () => {
-    try {
-      const data = await getAllColors();
-      setColors(data);
-    } catch (error) {
-      console.error("Failed to fetch Colors:", error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories();
-    fetchEnvironments();
-    fetchColors();
+    fetchData();
   }, []);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const imageUrls = files.map((file) => URL.createObjectURL(file));
     setImagePreviews((prevImages) => [...prevImages, ...imageUrls]);
-    setImages((prevImages) => [...prevImages, ...files]); // Lưu trữ đối tượng file cho FormData
+    setImages((prevImages) => [...prevImages, ...files]);
   };
 
   const removeImage = (index) => {
-    setImagePreviews((prevImages) => {
-      if (!Array.isArray(prevImages)) return []; // Đảm bảo là mảng
-      return prevImages.filter((_, i) => i !== index);
-    });
-    setImages((prevImages) => {
-      if (!Array.isArray(prevImages)) return []; // Đảm bảo là mảng
-      return prevImages.filter((_, i) => i !== index); // Xóa khỏi mảng images
-    });
+    setImagePreviews((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
+  const handleInputChangeCheckDiscount = (e) => {
+    const value = e.target.value;
+    if (value > 100) {
+      setDiscount(100);
+    } else {
+      setDiscount(value);
+    }
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Kiểm tra các trường bắt buộc
+    if (!nameProduct) {
+      toast.error("Vui lòng nhập tên sản phẩm.");
+      return;
+    }
+
+    if (!selectedCategory) {
+      toast.error("Vui lòng chọn danh mục sản phẩm.");
+      return;
+    }
+
+    if (!originalPrice) {
+      toast.error("Vui lòng nhập giá gốc cho sản phẩm.");
+      return;
+    }
+
+    if (!quantity) {
+      toast.error("Vui lòng nhập số lượng sản phẩm.");
+      return;
+    }
+
+    if (images.length === 0) {
+      toast.error("Vui lòng thêm ít nhất một hình ảnh.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("productName", nameProduct);
     formData.append("category", selectedCategory);
@@ -97,20 +114,30 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
     formData.append("care", care);
 
     images.forEach((image) => {
-      formData.append("image", image); // Thay đổi thành "image" nếu multer định nghĩa như vậy
+      formData.append("image", image);
     });
 
     try {
-      const newProduct = await addProduct(formData); // Call your API function to add the product
+      const newProduct = await addProduct(formData);
+      toast.success("Sản phẩm đã được thêm thành công!");
       onAdd(newProduct);
+      // Reset trạng thái
       setImages([]);
       setImagePreviews([]);
       setSelectedCategory("");
       setSelectedEnvironment("");
       setSelectedColor("");
-      setIsOpen(false); // Close the modal
+      setProductName("");
+      setDescription("");
+      setOriginalPrice("");
+      setQuantity("");
+      setCare("");
+      setDiscount("");
+      // Đóng modal nếu cần
+      setIsOpen(false);
     } catch (error) {
       console.error("Failed to add product:", error);
+      toast.error("Đã có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
     }
   };
 
@@ -164,6 +191,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       </div>
                     </div>
                   </div>
+                  {/* Số lượng */}
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="username"
@@ -184,7 +212,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       </div>
                     </div>
                   </div>
-
+                  {/* Mô tả */}
                   <div className="col-span-full">
                     <label
                       htmlFor="about"
@@ -204,7 +232,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       />
                     </div>
                   </div>
-
+                  {/* Ảnh */}
                   <div className="col-span-full">
                     <label
                       htmlFor="cover-photo"
@@ -243,6 +271,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                   </div>
                 </div>
               </div>
+              {/* Xem Ảnh */}
               <div className="mt-4 flex gap-4 flex-wrap">
                 {imagePreviews.map((image, index) => (
                   <div key={index} className="relative inline-block">
@@ -260,8 +289,10 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                   </div>
                 ))}
               </div>
+
               <div className="border-b border-gray-900/10 pb-12">
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  {/* Thể loại */}
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="category"
@@ -275,7 +306,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                         name="category"
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
                         <option value="">Chọn thể loại</option>
                         {categories.map((category) => (
@@ -286,7 +317,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       </select>
                     </div>
                   </div>
-
+                  {/* Môi trường sống */}
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="environment"
@@ -300,7 +331,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                         name="environment"
                         value={selectedEnvironment}
                         onChange={(e) => setSelectedEnvironment(e.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
                         <option value="">Chọn môi trường</option>
                         {environments.map((environment) => (
@@ -311,7 +342,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       </select>
                     </div>
                   </div>
-
+                  {/* Màu sắc */}
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="color"
@@ -325,7 +356,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                         name="color"
                         value={selectedColor}
                         onChange={(e) => setSelectedColor(e.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
                         <option value="">Chọn màu sắc</option>
                         {colors.map((color) => (
@@ -336,42 +367,57 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       </select>
                     </div>
                   </div>
-
+                  {/* Mức độ chăm sóc */}
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="email"
+                      htmlFor="care-level"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Mức độ chăm sóc
                     </label>
                     <div className="mt-2">
-                      <input
+                      <select
+                        id="care-level"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        defaultValue=""
                         onChange={(e) => setCare(e.target.value)}
-                        placeholder="Mức độ chăm sóc"
-                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                      >
+                        <option value="" disabled hidden>
+                          Chọn mức độ chăm sóc
+                        </option>
+                        <option value="Dễ">Dễ</option>
+                        <option value="Trung bình">Trung bình</option>
+                        <option value="Khó">Khó</option>
+                        <option value="Rất khó">Rất khó</option>
+                      </select>
                     </div>
                   </div>
-
+                  {/* Kích cỡ */}
                   <div className="sm:col-span-2 sm:col-start-1">
                     <label
-                      htmlFor="city"
+                      htmlFor="size"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Kích cỡ
                     </label>
                     <div className="mt-2">
-                      <input
-                        placeholder="Kích cỡ cây"
-                        id="city"
-                        name="city"
-                        type="text"
+                      <select
+                        id="size"
+                        name="size"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        defaultValue=""
                         onChange={(e) => setSize(e.target.value)}
-                        autoComplete="address-level2"
-                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                      >
+                        <option value="" disabled hidden>
+                          Chọn kích cỡ
+                        </option>
+                        <option value="Nhỏ">Nhỏ</option>
+                        <option value="Vừa">Vừa</option>
+                        <option value="Lớn">Lớn</option>
+                      </select>
                     </div>
                   </div>
+                  {/* Giá sản phẩm */}
                   <div className="sm:col-span-2">
                     <label
                       htmlFor="region"
@@ -391,7 +437,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       />
                     </div>
                   </div>
-
+                  {/* Khuyến mãi */}
                   <div className="sm:col-span-2">
                     <label
                       htmlFor="postal-code"
@@ -405,7 +451,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                         id="postal-code"
                         name="postal-code"
                         type="number"
-                        onChange={(e) => setDiscount(e.target.value)}
+                        onChange={handleInputChangeCheckDiscount}
                         autoComplete="postal-code"
                         className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />

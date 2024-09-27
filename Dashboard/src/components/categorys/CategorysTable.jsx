@@ -8,6 +8,7 @@ import {
   getAllCategories,
 } from "../../service/categoryService.js";
 import UpdateCategoryModal from "../update/UpdateCategoryModal.jsx";
+import { toast } from "react-toastify";
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -26,22 +27,7 @@ const CategorysTable = () => {
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getAllCategories();
-        setCategories(data);
-        setFilteredCategories(data); // Cập nhật filteredCategories sau khi fetch
-      } catch (error) {
-        console.error("Failed to fetch classifications:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategories();
-  }, []);
-
+  //Tìm kiếm
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -51,7 +37,7 @@ const CategorysTable = () => {
     setFilteredCategories(filtered);
     setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
   };
-
+  //Sắp xếp
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -73,18 +59,17 @@ const CategorysTable = () => {
     });
     setFilteredCategories(sorted);
   };
-
-  // Xác định các sản phẩm hiển thị trên trang hiện tại
+  // Xác định các sản phẩm hiển thị trên trang hiện tại(Phân trang)
   const offset = currentPage * PRODUCTS_PER_PAGE;
   const currentCategories = filteredCategories.slice(
     offset,
     offset + PRODUCTS_PER_PAGE
   );
-
+  //Chọn họ cây
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
-
+  //Thêm Category
   const handleAddCategory = async (newCategory) => {
     try {
       setCategories((prevCategories) => [...prevCategories, newCategory]);
@@ -96,18 +81,51 @@ const CategorysTable = () => {
       console.error("Failed to add category:", error);
     }
   };
-
+  //Xóa category
   const handleDeleteCategory = async (categoryId) => {
     try {
-      await deleteCategory(categoryId);
-      setFilteredCategories((prev) =>
-        prev.filter((item) => item._id !== categoryId)
+      // Tìm thể loại bằng ID
+      const categoryToDelete = categories.find(
+        (item) => item._id === categoryId
       );
-      setCategories((prev) => prev.filter((item) => item._id !== categoryId));
+
+      // Kiểm tra nếu tìm thấy thể loại
+      if (categoryToDelete) {
+        await deleteCategory(categoryId);
+        toast.success(
+          `Đã xóa thành công thể loại: ${categoryToDelete.categoryName}`
+        );
+
+        // Cập nhật danh sách thể loại
+        setFilteredCategories((prev) =>
+          prev.filter((item) => item._id !== categoryId)
+        );
+        setCategories((prev) => prev.filter((item) => item._id !== categoryId));
+      } else {
+        toast.error("Không tìm thấy thể loại để xóa.");
+      }
     } catch (error) {
       console.error("Delete failed:", error);
+      toast.error("Xóa không thành công. Vui lòng thử lại.");
     }
   };
+
+  //Lấy tất cả Categories
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories();
+      setCategories(data);
+      setFilteredCategories(data); // Cập nhật filteredCategories sau khi fetch
+    } catch (error) {
+      console.error("Failed to fetch classifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [categories.length]);
 
   return (
     <motion.div
@@ -221,11 +239,14 @@ const CategorysTable = () => {
         />
       </div>
       <AddCategory
+        categories={categories}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         onAdd={handleAddCategory}
       />
       <UpdateCategoryModal
+        categories={categories}
+        fetchCategories={fetchCategories}
         isOpenUpdate={isOpenUpdate}
         setIsOpenUpdate={setIsOpenUpdate}
         category={selectedCategory}

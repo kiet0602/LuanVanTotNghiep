@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Rainbow } from "lucide-react";
 import { updateColorById } from "../../service/colorService.js";
+import { toast } from "react-toastify";
 
 export default function UpdateColorModal({
+  fetchDataColor,
   isOpenUpdate,
   setIsOpenUpdate,
   color,
@@ -19,16 +21,23 @@ export default function UpdateColorModal({
 
   const handleUpdateColor = async (e) => {
     e.preventDefault();
+    if (!colorName.trim()) {
+      toast.error("Màu sắc không được để trống!");
+      return; // Ngừng thực hiện nếu trống
+    }
     try {
-      const updatedColor = await updateColorById(color._id, {
+      await updateColorById(color._id, {
         nameColor: colorName,
       });
       setIsOpenUpdate(false);
+      toast.success("Đã cập nhật thành công màu sắc");
+      fetchDataColor();
     } catch (error) {
       console.error("Update failed:", error);
+      toast.error("Cập nhật thất bại:", error);
     }
   };
-
+  // validate màu
   const handleInputChange = (e) => {
     const input = e.target.value;
     const regex = /^[^\d]*$/; // Không cho phép nhập số

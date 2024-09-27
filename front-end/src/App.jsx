@@ -25,6 +25,8 @@ import ProductsCategoryPage from "./pages/ProductsCategoryPage.jsx";
 import FavoritesPage from "./pages/FavoritesPage.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
+import NotPage from "./pages/NotPage.jsx";
+import SuccessOrderPage from "./pages/SuccessOrderPage.jsx";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -84,6 +86,8 @@ function App() {
           <Route path="/table" element={<Table1111 />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/success" element={<SuccessOrderPage />} />
+          <Route path="*" element={<NotPage />} />
 
           <Route
             path="/category/:categoryId"

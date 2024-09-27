@@ -2,34 +2,24 @@ import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { createClassification } from "../../service/classificationService";
 import { NotebookTabs } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function AddFamilyModal({ isOpen, setIsOpen, onAdd }) {
   const [classificationName, setClassificationName] = useState(""); // Trạng thái cho tên phân loại
-  const [error, setError] = useState("");
 
   const handleAddClassification = async () => {
     if (!classificationName) {
-      setError("Tên họ cây không được để trống.");
+      toast.error("Tên họ cây không được để trống.");
       return; // Không đóng modal nếu tên họ cây trống
     }
     try {
       const newClassification = await createClassification(classificationName);
+      toast.success("Thêm thành công họ cây.");
       onAdd(newClassification); // Gọi hàm callback với đối số là phân loại mới
       setClassificationName(""); // Reset input
       setIsOpen(false); // Đóng modal chỉ khi thêm thành công
-      setError(""); // Reset lỗi nếu có
     } catch (error) {
-      setError("Lỗi khi thêm họ cây: " + (error.message || error));
-    }
-  };
-  const handleInputChange = (e) => {
-    const input = e.target.value;
-    const regex = /^[^\d]*$/; // Không cho phép nhập số
-    if (regex.test(input)) {
-      setClassificationName(input); // Cập nhật trạng thái nếu input hợp lệ
-      setError(""); // Xóa lỗi nếu có
-    } else {
-      setError("Chỉ cho phép nhập chữ cái, dấu tiếng Việt và khoảng trắng.");
+      toast.error("Lỗi khi thêm họ cây: " + (error.message || error));
     }
   };
 
@@ -78,16 +68,13 @@ export default function AddFamilyModal({ isOpen, setIsOpen, onAdd }) {
                           type="text"
                           placeholder="Tên họ cây"
                           autoComplete="classificationName"
-                          value={classificationName}
-                          onChange={handleInputChange} // Cập nhật trạng thái
+                          onChange={(e) =>
+                            setClassificationName(e.target.value)
+                          } // Cập nhật trạng thái
                           className="block flex-1 border-0 bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                         />
                       </div>
                     </div>
-                    {error && (
-                      <p className="mt-2 text-sm text-red-600">{error}</p>
-                    )}{" "}
-                    {/* Hiển thị lỗi nếu có */}
                   </div>
                 </div>
               </div>
@@ -104,7 +91,7 @@ export default function AddFamilyModal({ isOpen, setIsOpen, onAdd }) {
                 onClick={handleAddClassification}
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Lưu
+                Thêm
               </button>
             </div>
           </div>

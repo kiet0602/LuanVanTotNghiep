@@ -44,45 +44,27 @@ const InfoUserCheckout = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const userId = userCurrent?._id;
-  const bgColor = useColorModeValue("gray.50", "whiteAlpha.50");
+
   const textColor = useColorModeValue("gray.600", "whiteAlpha.600");
 
-  useEffect(() => {
+  const fetchUser = async () => {
     if (!userId) return;
-
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:2000/api/user/getUser/${userId}`
-        );
-        setUser(response.data);
-      } catch (error) {
-        console.log(error.message);
-        // toast.error("Không thể lấy dữ liệu người dùng."); // Uncomment if you have a toast function
-      }
-    };
-
-    fetchUser();
-  }, [userId]);
+    try {
+      const response = await axios.get(
+        `http://localhost:2000/api/user/getUser/${userId}`
+      );
+      setUser(response.data);
+    } catch (error) {
+      console.log(error.message);
+      // toast.error("Không thể lấy dữ liệu người dùng."); // Uncomment if you have a toast function
+    }
+  };
 
   useEffect(() => {
     // Fetch payment and shipping methods (replace with actual API calls if available)
     setPaymentMethods(["Thanh toán khi nhận hàng", "PayPal"]);
     setShippingMethods(["Giao hàng bình thường", "Giao hàng hỏa tốc"]);
   }, []);
-
-  const handleUpdate = async (updatedUser) => {
-    try {
-      const response = await axios.put(
-        `http://localhost:2000/api/user/updateUser/${userId}`,
-        updatedUser
-      );
-      setUser(response.data); // Update the user state with the new data
-    } catch (error) {
-      console.log(error.message);
-      // toast.error("Cập nhật dữ liệu không thành công."); // Uncomment if you have a toast function
-    }
-  };
 
   const handlePaymentMethodChange = (event) => {
     setSelectedPaymentMethod(event.target.value);
@@ -97,6 +79,10 @@ const InfoUserCheckout = () => {
   const isCashOnDeliveryDisabled =
     selectedPaymentMethod !== "Thanh toán khi nhận hàng";
   const isPaypalDisabled = selectedPaymentMethod !== "PayPal";
+
+  useEffect(() => {
+    fetchUser();
+  }, [userId]);
 
   return (
     <Box>
@@ -195,32 +181,12 @@ const InfoUserCheckout = () => {
             </FormControl>
           </GridItem>
 
-          {/* <GridItem colSpan={2}>
-            <Stack spacing={4} w="full">
-              <Button
-                color={"white"}
-                bg={"blue"}
-                w="full"
-                isDisabled={isCashOnDeliveryDisabled} // Nút "Thanh toán khi nhận hàng" chỉ có thể nhấn khi phương thức này được chọn
-              >
-                Thanh toán khi nhận hàng
-              </Button>
-              <Button
-                color={"white"}
-                bg={"blue"}
-                w="full"
-                isDisabled={isPaypalDisabled} // Nút "Thanh toán Paypal" chỉ có thể nhấn khi PayPal được chọn
-              >
-                Thanh toán Paypal
-              </Button>
-            </Stack>
-          </GridItem> */}
           <GridItem colSpan={1}>
             <ModalInfoUser
               user={user}
               isOpen={isOpen}
               onClose={onClose}
-              onUpdate={handleUpdate} // Pass the update handler to the modal
+              // onUpdate={handleUpdate} // Pass the update handler to the modal
             />
           </GridItem>
         </SimpleGrid>

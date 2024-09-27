@@ -1,44 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
+import Pagination from "../pagination/Pagination";
+import { getAllUsers } from "../../service/userService";
 
-const userData = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Customer",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    role: "Customer",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    name: "Alice Brown",
-    email: "alice@example.com",
-    role: "Customer",
-    status: "Active",
-  },
-  {
-    id: 5,
-    name: "Charlie Wilson",
-    email: "charlie@example.com",
-    role: "Moderator",
-    status: "Active",
-  },
-];
+const PRODUCTS_PER_PAGE = 5;
 
 const UsersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,10 +12,45 @@ const UsersTable = () => {
     key: "name",
     direction: "asc",
   });
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
 
+  const fetchUsers = async () => {
+    try {
+      const usersData = await getAllUsers();
+      setUsers(usersData); // Lưu danh sách người dùng vào state
+      setFilteredUsers(usersData);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách người dùng:", error);
+    }
+  };
+  console.log(users);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [users.length]);
+
+  const offset = currentPage * PRODUCTS_PER_PAGE;
+  const currentUsers = filteredUsers.slice(offset, offset + PRODUCTS_PER_PAGE);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+  console.log(currentUsers);
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
+    const filtered = users.filter(
+      (user) =>
+        user.username.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term) ||
+        user.numberPhone.toLowerCase().includes(term) ||
+        user.ward.toLowerCase().includes(term) ||
+        user.district.toLowerCase().includes(term) ||
+        user.city.toLowerCase().includes(term)
+    );
+    setFilteredUsers(filtered);
+    setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
   };
 
   const handleSort = (key) => {
@@ -58,23 +59,13 @@ const UsersTable = () => {
       direction = "desc";
     }
     setSortConfig({ key, direction });
-  };
-
-  const sortedUsers = userData
-    .filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm) ||
-        user.email.toLowerCase().includes(searchTerm)
-    )
-    .sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
+    const sorted = [...filteredUsers].sort((a, b) => {
+      if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
+      if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
       return 0;
     });
+    setFilteredUsers(sorted);
+  };
 
   return (
     <motion.div
@@ -84,7 +75,7 @@ const UsersTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">Users</h2>
+        <h2 className="text-xl font-semibold text-gray-100">Người dùng</h2>
         <div className="relative">
           <input
             type="text"
@@ -101,14 +92,24 @@ const UsersTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {["Name", "Email", "Role", "Status"].map((column) => (
+              {[
+                { label: "Tên người dùng", key: "username" },
+                { label: "Email", key: "email" },
+                { label: "Vai trò", key: "role" },
+                { label: "Số điện thoại", key: "numberPhone" },
+                { label: "Tiền đã chi", key: "totalAmountSpent" },
+                {
+                  label: "Đã mua",
+                  key: "totalProductsPurchased",
+                },
+              ].map(({ label, key }) => (
                 <th
-                  key={column}
+                  key={key}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort(column.toLowerCase())}
+                  onClick={() => handleSort(key)}
                 >
-                  {column}
-                  {sortConfig.key === column.toLowerCase() ? (
+                  {label}
+                  {sortConfig.key === key ? (
                     <span
                       className={`ml-2 ${
                         sortConfig.direction === "asc"
@@ -122,50 +123,60 @@ const UsersTable = () => {
                 </th>
               ))}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Actions
+                Hành động
               </th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-700">
-            {sortedUsers.map((user) => (
+            {currentUsers.map((user) => (
               <motion.tr
                 key={user.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold">
-                        {user.name.charAt(0)}
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-100">
-                        {user.name}
-                      </div>
-                    </div>
-                  </div>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
+                  <img
+                    src={
+                      user?.avatar
+                        ? `http://localhost:2000/avatar/${user.avatar}`
+                        : "https://via.placeholder.com/40"
+                    }
+                    alt="Avatar"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  {user?.username}
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">{user.email}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-800 text-blue-100">
-                    {user.role}
-                  </span>
+                  <div className="text-sm text-gray-300">{user?.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.status === "Active"
-                        ? "bg-green-800 text-green-100"
-                        : "bg-red-800 text-red-100"
+                      user?.role
+                        ? "bg-red-800 text-red-100"
+                        : "bg-blue-800 text-blue-100"
                     }`}
                   >
-                    {user.status}
+                    {user?.role ? "Admin" : "Khách hàng"}{" "}
+                  </span>
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-300">
+                    {user?.numberPhone}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-800 text-blue-100">
+                    {user?.totalAmountSpent.toLocaleString("vi-VN")} Đ
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-800 text-blue-100">
+                    {user?.totalProductsPurchased}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -180,6 +191,12 @@ const UsersTable = () => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="mt-4 flex justify-end">
+        <Pagination
+          pageCount={Math.ceil(setFilteredUsers.length / PRODUCTS_PER_PAGE)}
+          onPageChange={handlePageChange}
+        />
       </div>
     </motion.div>
   );

@@ -19,6 +19,8 @@ import {
   selectedShippingMethodState,
 } from "../Atom/methoShipAtom";
 import { useRecoilValue } from "recoil";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const InfoCartCheckout = ({ items, total }) => {
   const userData = localStorage.getItem("userCurrent");
@@ -29,10 +31,10 @@ const InfoCartCheckout = ({ items, total }) => {
   const bgColor = useColorModeValue("gray.50", "whiteAlpha.50");
   const textColor = useColorModeValue("gray.600", "whiteAlpha.600");
 
+  const navigate = useNavigate(); // Khởi tạo hook navigate
   const [couponCode, setCouponCode] = useState("");
   const [discountedTotal, setDiscountedTotal] = useState(total);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // Thông báo thành công
 
   const taxAmount = 20000; // Thuế
   const shippingFeeThreshold = 300000; // Ngưỡng miễn phí vận chuyển
@@ -95,7 +97,7 @@ const InfoCartCheckout = ({ items, total }) => {
       setDiscountedTotal(response.data.finalPrice);
       setError(""); // Xóa lỗi nếu áp dụng thành công
     } catch (error) {
-      setError(
+      toast.error(
         error.response.data.message || "Có lỗi xảy ra khi áp dụng mã khuyến mãi"
       );
     }
@@ -114,14 +116,14 @@ const InfoCartCheckout = ({ items, total }) => {
         selectedPaymentMethod, // Phương thức thanh toán
         couponCode, // Mã khuyến mãi (nếu có)
       };
-
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:2000/api/checkout/checkOut", // Gửi dữ liệu đến API checkout
         orderData
       );
-      setSuccess("Đơn hàng đã được tạo thành công!"); // Hiển thị thông báo thành công
+      navigate("/success");
+      toast.success("Đơn hàng đã được tạo thành công!"); // Hiển thị thông báo thành công
     } catch (err) {
-      setError("Có lỗi xảy ra khi thanh toán. Vui lòng kiểm tra lại.");
+      toast.error(err.response.data.message);
       console.error(err);
     }
   };
@@ -204,8 +206,7 @@ const InfoCartCheckout = ({ items, total }) => {
               />
               <Button onClick={applyCoupon}>Áp dụng</Button>
             </HStack>
-            {error && <Text color="red.500">{error}</Text>}
-            {success && <Text color="green.500">{success}</Text>}{" "}
+
             {/* Hiển thị thành công */}
           </Stack>
           <Divider />

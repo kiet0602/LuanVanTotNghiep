@@ -25,6 +25,11 @@ export const checkout = async (req, res) => {
     }
     // Lấy địa chỉ từ người dùng
     const shippingAddress = `${user.ward}, ${user.district}, ${user.city}`;
+    if (!user.ward || !user.district || !user.city) {
+      return res
+        .status(400)
+        .json({ message: "Vui lòng cung cấp địa chỉ giao hàng" });
+    }
     // 2. Xử lý mã khuyến mãi (nếu có)
     let discount = 0;
     if (couponCode) {
@@ -132,6 +137,27 @@ export const updateOrder = async (req, res) => {
       return res.status(404).json({ message: "Đơn hàng không tồn tại" });
     }
 
+    // Nếu trạng thái là "Đã nhận hàng", cập nhật thông tin người dùng
+    if (updates.status === "Đã nhận hàng") {
+      const totalAmount = order.finalPrice;
+      const totalProducts = order.items.reduce(
+        (acc, item) => acc + item.quantity,
+        0
+      );
+
+      // Cập nhật số tiền và số sản phẩm đã mua cho người dùng
+      await userModel.findByIdAndUpdate(
+        order.user,
+        {
+          $inc: {
+            totalAmountSpent: totalAmount, // Cộng thêm tổng tiền của đơn hàng
+            totalProductsPurchased: totalProducts, // Cộng thêm số sản phẩm đã mua
+          },
+        },
+        { new: true } // Trả về document đã được cập nhật
+      );
+    }
+
     res.status(200).json({ message: "Cập nhật đơn hàng thành công", order });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -170,6 +196,23 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+//hàm lấy tất cả đơn hàng
+export const getAllOrders = async (req, res) => {
+  try {
+    // Lấy tất cả các đơn hàng và populate thông tin người dùng và sản phẩm
+    const orders = await orderModel.find().populate("user"); // Populate thông tin người dùng
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "Không có đơn hàng nào" });
+    }
+
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//Service
 // Hàm lấy danh sách đơn hàng của người dùng
 export const getOrders = async (req, res) => {
   const { userId } = req.params;
@@ -180,21 +223,6 @@ export const getOrders = async (req, res) => {
 
     if (orders.length === 0) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng nào" });
-    }
-
-    res.status(200).json(orders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-//hàm lấy tất cả đơn hàng
-export const getAllOrders = async (req, res) => {
-  try {
-    // Lấy tất cả các đơn hàng và populate thông tin người dùng và sản phẩm
-    const orders = await orderModel.find().populate("user"); // Populate thông tin người dùng
-
-    if (orders.length === 0) {
-      return res.status(404).json({ message: "Không có đơn hàng nào" });
     }
 
     res.status(200).json(orders);

@@ -36,3 +36,56 @@ export const getQuantitySalesByCategory = async () => {
     throw error; // Ném lỗi nếu có vấn đề
   }
 };
+
+// Hàm cập nhật đơn hàng
+export const updateOrder = async (orderId, updates) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:2000/api/checkout/updateCheckOut/${orderId}`,
+      updates
+    );
+    return response.data; // Đơn hàng sau khi được cập nhật
+  } catch (error) {
+    throw new Error(error.response.data.message || "Lỗi cập nhật đơn hàng");
+  }
+};
+
+// Hàm xóa đơn hàng
+export const deleteOrder = async (orderId) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:2000/api/checkout/deleteCheckOut/${orderId}`
+    );
+    return response.data; // Thông báo xóa thành công
+  } catch (error) {
+    throw new Error(error.response.data.message || "Lỗi xóa đơn hàng");
+  }
+};
+
+// Hàm lấy đơn hàng theo ID
+export const getOrderById = async (orderId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:2000/api/checkout/checkOutByIdOrder/${orderId}`
+    );
+    return response.data; // Thông tin chi tiết đơn hàng
+  } catch (error) {
+    throw new Error(
+      error.response.data.message || "Lỗi lấy thông tin đơn hàng"
+    );
+  }
+};
+
+// Hàm lấy tất cả đơn hàng
+export const getAllOrders = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:2000/api/checkout/getAllOrders`
+    );
+    return response.data; // Danh sách tất cả đơn hàng
+  } catch (error) {
+    throw new Error(
+      error.response.data.message || "Lỗi lấy danh sách đơn hàng"
+    );
+  }
+};

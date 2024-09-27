@@ -3,14 +3,15 @@ import { Dialog } from "@headlessui/react";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { updateClassification } from "../../service/classificationService.js";
 import { NotebookTabs } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function UpdateClassificationModal({
+  fetchClassifications,
   isOpenUpdate,
   setIsOpenUpdate,
   classification,
 }) {
   const [classificationName, setClassificationName] = useState("");
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (classification) {
@@ -18,25 +19,20 @@ export default function UpdateClassificationModal({
     }
   }, [classification]);
 
-  const handleUpdateClassification = async () => {
+  const handleUpdateClassification = async (e) => {
+    e.preventDefault();
+    if (!classificationName.trim()) {
+      toast.error("Tên họ cây không được để trống.");
+      return; // Dừng nếu không có tên
+    }
     try {
-      const updatedClassification = await updateClassification(
-        classification._id,
-        classificationName
-      );
+      await updateClassification(classification._id, classificationName);
+      toast.success("Cập nhật thành công họ cây.");
+      fetchClassifications();
       setIsOpenUpdate(false);
     } catch (error) {
       console.error("Update failed:", error);
-    }
-  };
-  const handleInputChange = (e) => {
-    const input = e.target.value;
-    const regex = /^[^\d]*$/; // Không cho phép nhập số
-    if (regex.test(input)) {
-      setClassificationName(input); // Cập nhật trạng thái nếu input hợp lệ
-      setError(""); // Xóa lỗi nếu có
-    } else {
-      setError("Chỉ cho phép nhập chữ cái, dấu tiếng Việt và khoảng trắng.");
+      toast.error("Cập nhật không thành công. Vui lòng thử lại.");
     }
   };
 
@@ -83,16 +79,15 @@ export default function UpdateClassificationModal({
                           name="username"
                           type="text"
                           value={classificationName} // Sử dụng classificationName để quản lý giá trị
-                          onChange={handleInputChange}
+                          onChange={(e) =>
+                            setClassificationName(e.target.value)
+                          }
                           placeholder="Tên họ cây"
                           autoComplete="username"
                           className="block flex-1 border-0 bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                         />
                       </div>
                     </div>
-                    {error && (
-                      <p className="mt-2 text-sm text-red-600">{error}</p>
-                    )}{" "}
                   </div>
                 </div>
               </div>

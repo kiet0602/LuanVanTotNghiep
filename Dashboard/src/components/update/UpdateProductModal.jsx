@@ -1,13 +1,155 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ShoppingBag } from "lucide-react";
+import { getAllCategories } from "../../service/categoryService";
+import { getAllEnvironments } from "../../service/eviomentService";
+import { getAllColors } from "../../service/colorService";
+import { updateProduct } from "../../service/productService";
+import { toast } from "react-toastify";
 
-export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
+export default function UpdateProductModal({
+  fetchProducts,
+  isUpdateOpen,
+  setIsUpdateOpen,
+  product,
+}) {
+  const [categories, setCategories] = useState([]);
+  const [environments, setEnvironments] = useState([]);
+  const [colors, setColors] = useState([]);
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedEnvironment, setSelectedEnvironment] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+
+  const [nameProduct, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+  const [originalPrice, setOriginalPrice] = useState("");
+  const [size, setSize] = useState("");
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [quantity, setQuantity] = useState("");
+  const [care, setCare] = useState("");
+  const [discount, setDiscount] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [categoryData, environmentData, colorData] = await Promise.all([
+        getAllCategories(),
+        getAllEnvironments(),
+        getAllColors(),
+      ]);
+      setCategories(categoryData);
+      setEnvironments(environmentData);
+      setColors(colorData);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (product) {
+      setProductName(product.productName);
+      setDescription(product.description);
+      setOriginalPrice(product.originalPrice);
+      setQuantity(product.quantity);
+      setCare(product.care);
+      setDiscount(product.discount);
+      setSize(product.size);
+
+      const imageUrls = product.image.map(
+        (img) => `http://localhost:2000/images/${img}`
+      );
+      setImages(imageUrls); // Giữ lại tên tệp để gửi đi
+      setImagePreviews(imageUrls); // Thiết lập để xem trước
+
+      setSelectedCategory(product.category._id);
+      setSelectedEnvironment(product.environment._id);
+      setSelectedColor(product.color._id);
+    }
+  }, [product]);
+
+  console.log(images);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const imageUrls = files.map((file) => URL.createObjectURL(file));
+    // Cập nhật hình ảnh xem trước
+    setImagePreviews((prevImages) => [...prevImages, ...imageUrls]);
+    // Cập nhật mảng ảnh cho việc gửi đi
+    setImages((prevImages) => [...prevImages, ...files]);
+  };
+
+  const removeImage = (index) => {
+    setImagePreviews((prevImages) => {
+      if (!Array.isArray(prevImages)) return []; // Đảm bảo là mảng
+      return prevImages.filter((_, i) => i !== index);
+    });
+    setImages((prevImages) => {
+      if (!Array.isArray(prevImages)) return []; // Đảm bảo là mảng
+      return prevImages.filter((_, i) => i !== index); // Xóa khỏi mảng images
+    });
+  };
+
+  const handleInputChangeCheckDiscount = (e) => {
+    const value = e.target.value;
+    if (value > 100) {
+      setDiscount(100); // Giới hạn giá trị không vượt quá 100
+    } else {
+      setDiscount(value);
+    }
+  };
+
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const productData = {
+        productName: nameProduct,
+        description,
+        originalPrice,
+        quantity,
+        care,
+        discount,
+        size,
+        category: selectedCategory,
+        environment: selectedEnvironment,
+        color: selectedColor,
+      };
+
+      // Gọi hàm updateProduct từ service
+      const updatedProduct = await updateProduct(
+        product._id,
+        productData,
+        images
+      );
+      setIsUpdateOpen(false);
+
+      console.log("Sản phẩm đã được cập nhật:", updatedProduct);
+      fetchProducts();
+      toast.success("Cập nhật sản phẩm thành công!");
+    } catch (error) {
+      console.error("Cập nhật sản phẩm thất bại:", error);
+      // Hiển thị thông báo lỗi
+      toast.error("Cập nhật sản phẩm thất bại. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog
       open={isUpdateOpen}
-      onClose={() => setIsOpenUpdate(false)}
+      onClose={() => setIsUpdateOpen(false)}
       className="relative z-50"
     >
       {/* Overlay */}
@@ -47,6 +189,8 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                           name="username"
                           type="text"
                           placeholder="Tên sản phẩm"
+                          value={nameProduct}
+                          onChange={(e) => setProductName(e.target.value)}
                           autoComplete="username"
                           className="block flex-1 border-0 bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                         />
@@ -66,6 +210,8 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                           name="username"
                           type="number"
                           placeholder="Số lượng sản phẩm"
+                          value={quantity}
+                          onChange={(e) => setQuantity(e.target.value)}
                           autoComplete="username"
                           className="block flex-1 border-0 bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                         />
@@ -86,8 +232,9 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                         id="about"
                         name="about"
                         rows={3}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        defaultValue={""}
                       />
                     </div>
                   </div>
@@ -115,7 +262,9 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                               id="file-upload"
                               name="file-upload"
                               type="file"
+                              onChange={handleImageChange} // Sử dụng onChange thay vì onClick
                               className="sr-only"
+                              multiple
                             />
                           </label>
                           <p className="pl-1">tối đa 4 ảnh</p>
@@ -127,103 +276,154 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                     </div>
                   </div>
                 </div>
+
+                <div className="mt-4 flex gap-4 flex-wrap">
+                  {imagePreviews.map((image, index) => (
+                    <div key={index} className="relative inline-block">
+                      <img
+                        src={image}
+                        alt={`Preview ${index}`}
+                        className="h-20 w-20 object-cover rounded-md"
+                      />
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="border-b border-gray-900/10 pb-12">
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  {/* Thể loại */}
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="country"
+                      htmlFor="category"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Thể loại
                     </label>
                     <div className="mt-2">
                       <select
-                        name="country"
-                        autoComplete="country-name"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        name="category"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
-                        <option>United States</option>
-                        <option>Canada</option>
-                        <option>Mexico</option>
+                        <option value="">Chọn thể loại</option>
+                        {categories.map((category) => (
+                          <option key={category._id} value={category._id}>
+                            {category.categoryName}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
+                  {/* Môi trường */}
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="country"
+                      htmlFor="environment"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Môi trường sống
                     </label>
                     <div className="mt-2">
                       <select
-                        name="country"
-                        autoComplete="country-name"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        value={selectedEnvironment}
+                        onChange={(e) => setSelectedEnvironment(e.target.value)}
+                        name="environment"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
-                        <option>United States</option>
-                        <option>Canada</option>
-                        <option>Mexico</option>
+                        <option value="">Chọn môi trường</option>
+                        {environments.map((environment) => (
+                          <option key={environment._id} value={environment._id}>
+                            {environment.nameEnviroment}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
+                  {/* Màu sắc */}
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="country"
+                      htmlFor="color"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Màu sắc
                     </label>
                     <div className="mt-2">
                       <select
-                        name="country"
-                        autoComplete="country-name"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        value={selectedColor}
+                        onChange={(e) => setSelectedColor(e.target.value)}
+                        name="color"
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
-                        <option>United States</option>
-                        <option>Canada</option>
-                        <option>Mexico</option>
+                        <option value="">Chọn màu sắc</option>
+                        {colors.map((color) => (
+                          <option key={color._id} value={color._id}>
+                            {color.nameColor}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
+                  {/* Mức độ chăm sóc */}
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="email"
+                      htmlFor="care-level"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Mức độ chăm sóc
                     </label>
                     <div className="mt-2">
-                      <input
-                        placeholder="Mức độ chăm sóc"
-                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                      <select
+                        id="care-level"
+                        value={care}
+                        onChange={(e) => setCare(e.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      >
+                        <option value="" disabled hidden>
+                          Chọn mức độ chăm sóc
+                        </option>
+                        <option value="Dễ">Dễ</option>
+                        <option value="Trung bình">Trung bình</option>
+                        <option value="Khó">Khó</option>
+                        <option value="Rất khó">Rất khó</option>
+                      </select>
                     </div>
                   </div>
-
+                  {/* Kích cỡ */}
                   <div className="sm:col-span-2 sm:col-start-1">
                     <label
-                      htmlFor="city"
+                      htmlFor="size"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Kích cỡ
                     </label>
                     <div className="mt-2">
-                      <input
-                        placeholder="Kích cỡ cây"
-                        id="city"
-                        name="city"
-                        type="text"
-                        autoComplete="address-level2"
-                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                      <select
+                        id="size"
+                        name="size"
+                        value={size}
+                        onChange={(e) => setSize(e.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      >
+                        <option value="" disabled hidden>
+                          Chọn kích cỡ
+                        </option>
+                        <option value="Nhỏ">Nhỏ</option>
+                        <option value="Vừa">Vừa</option>
+                        <option value="Lớn">Lớn</option>
+                      </select>
                     </div>
                   </div>
+                  {/* Giá sản phẩm */}
                   <div className="sm:col-span-2">
                     <label
-                      htmlFor="region"
+                      htmlFor="originalPrice"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Giá sản phẩm
@@ -231,18 +431,19 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                     <div className="mt-2">
                       <input
                         placeholder="Giá sản phẩm"
-                        id="region"
-                        name="region"
+                        id="originalPrice"
+                        name="originalPrice"
                         type="number"
-                        autoComplete="address-level1"
+                        value={originalPrice}
+                        onChange={(e) => setOriginalPrice(e.target.value)}
                         className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                     </div>
                   </div>
-
+                  {/* Khuyến mãi */}
                   <div className="sm:col-span-2">
                     <label
-                      htmlFor="postal-code"
+                      htmlFor="discount"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Khuyến mãi
@@ -250,10 +451,12 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
                     <div className="mt-2">
                       <input
                         placeholder="Phần trăm giảm giá"
-                        id="postal-code"
-                        name="postal-code"
+                        id="discount"
+                        name="discount"
                         type="number"
-                        autoComplete="postal-code"
+                        autoComplete="off"
+                        value={discount}
+                        onChange={handleInputChangeCheckDiscount}
                         className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                     </div>
@@ -265,15 +468,16 @@ export default function UpdateProductModal({ isUpdateOpen, setIsOpenUpdate }) {
               <button
                 type="button"
                 className="text-sm font-semibold leading-6 text-gray-900"
-                onClick={() => setIsOpenUpdate(false)} // Đóng modal khi nhấn Cancel
+                onClick={() => setIsUpdateOpen(false)} // Đóng modal khi nhấn Cancel
               >
-                Cancel
+                Hủy bỏ
               </button>
               <button
+                onClick={handleUpdateProduct}
                 type="submit"
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Save
+                Lưu
               </button>
             </div>
           </form>

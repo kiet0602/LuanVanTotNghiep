@@ -154,8 +154,8 @@ const ItemCart = () => {
                   w="100%" // Đảm bảo độ rộng full
                 >
                   <Checkbox
-                    isChecked={selectedItems.includes(item.product._id)}
-                    onChange={() => handleSelectItem(item.product._id)} // Chọn/bỏ chọn sản phẩm
+                    isChecked={selectedItems.includes(item?.product?._id)}
+                    onChange={() => handleSelectItem(item?.product?._id)} // Chọn/bỏ chọn sản phẩm
                   />
                   <Flex
                     direction={{ base: "column", md: "row" }}

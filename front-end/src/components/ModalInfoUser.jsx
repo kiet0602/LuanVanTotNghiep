@@ -185,6 +185,7 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
         return updatedUserData;
       });
       onClose();
+      window.location.reload();
     } catch (error) {
       toast.error(
         "Có lỗi xảy ra: " + (error.response?.data.error || error.message)

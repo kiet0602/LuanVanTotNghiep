@@ -5,6 +5,7 @@ import Pagination from "../pagination/Pagination.jsx";
 import AddColor from "../add/AddColor.jsx";
 import { deleteColorById, getAllColors } from "../../service/colorService.js";
 import UpdateColorModal from "../update/UpdateColorModal.jsx";
+import { toast } from "react-toastify";
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -22,19 +23,6 @@ const ColorTable = () => {
   const [filteredColors, setFilteredColors] = useState([]);
 
   const [selectedColor, setSelectedColor] = useState(null);
-
-  useEffect(() => {
-    const fetchDataColor = async () => {
-      try {
-        const data = await getAllColors();
-        setColors(data);
-        setFilteredColors(data);
-      } catch (err) {
-        console.error(err); // In lỗi nếu có
-      }
-    };
-    fetchDataColor();
-  }, []);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -69,7 +57,7 @@ const ColorTable = () => {
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
-
+  //Cập nhật danh sách khi thêm
   const handleAddColor = async (newColor) => {
     try {
       console.log("New color added:", newColor); // Kiểm tra dữ liệu mới
@@ -79,20 +67,49 @@ const ColorTable = () => {
       console.error("Failed to add color:", error);
     }
   };
+  // Cập nhật danh sách khi xóa
 
   const handleDeleteColor = async (classificationId) => {
     try {
+      // Tìm tên màu trước khi xóa
+      const colorToDelete = colors.find(
+        (item) => item._id === classificationId
+      );
+
+      if (!colorToDelete) {
+        toast.error("Không tìm thấy màu để xóa!");
+        return;
+      }
+
       await deleteColorById(classificationId);
+
+      // Cập nhật danh sách gốc và danh sách đã lọc
+      setColors((prev) => prev.filter((item) => item._id !== classificationId));
       setFilteredColors((prev) =>
         prev.filter((item) => item._id !== classificationId)
       );
-      setFilteredColors((prev) =>
-        prev.filter((item) => item._id !== classificationId)
-      );
+
+      // Thông báo tên màu đã xóa
+      toast.success(`Xóa thành công '${colorToDelete.nameColor}'!`);
     } catch (error) {
       console.error("Delete failed:", error);
+      toast.error("Xóa màu sắc thất bại!");
     }
   };
+
+  const fetchDataColor = async () => {
+    try {
+      const data = await getAllColors();
+      setColors(data);
+      setFilteredColors(data);
+    } catch (err) {
+      console.error(err); // In lỗi nếu có
+    }
+  };
+
+  useEffect(() => {
+    fetchDataColor();
+  }, [colors.length]);
 
   return (
     <motion.div
@@ -198,7 +215,9 @@ const ColorTable = () => {
         />
       </div>
       <AddColor isOpen={isOpen} setIsOpen={setIsOpen} onAdd={handleAddColor} />
+
       <UpdateColorModal
+        fetchDataColor={fetchDataColor}
         isOpenUpdate={isOpenUpdate}
         setIsOpenUpdate={setIsOpenUpdate}
         color={selectedColor}

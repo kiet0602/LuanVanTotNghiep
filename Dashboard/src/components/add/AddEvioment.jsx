@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
+import { toast } from "react-toastify";
 
 import { CloudSunRain } from "lucide-react";
 import { createEnvironment } from "../../service/eviomentService";
@@ -15,12 +16,14 @@ export default function AddEvioment({ isOpen, setIsOpen, onAdd }) {
     }
     try {
       const newEnvironment = await createEnvironment(environmentName);
+
       onAdd(newEnvironment); // Gọi hàm callback với đối số là phân loại mới
+      toast.success("Thêm môi trường sống thành công");
       setEnvironmentName(""); // Reset input
       setIsOpen(false); // Đóng modal chỉ khi thêm thành công
       setError(""); // Reset lỗi nếu có
     } catch (error) {
-      setError("Lỗi khi thêm môi trường sống: " + (error.message || error));
+      toast.error("Lỗi khi thêm môi trường sống: " + (error.message || error));
     }
   };
 
@@ -105,7 +108,7 @@ export default function AddEvioment({ isOpen, setIsOpen, onAdd }) {
                 onClick={handleAddEnvironment}
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Lưu
+                Thêm
               </button>
             </div>
           </div>

@@ -25,18 +25,15 @@ const EviomentsTable = () => {
   const [filteredEnvironments, setFilteredEnvironments] = useState([]);
   const [selectedEnvironment, setSelectedEnvironment] = useState(null);
 
-  useEffect(() => {
-    const fetchDataEnvironment = async () => {
-      try {
-        const data = await getAllEnvironments();
-        setEnvironments(data);
-        setFilteredEnvironments(data);
-      } catch (err) {
-        console.error(err); // In lỗi nếu có
-      }
-    };
-    fetchDataEnvironment();
-  }, []);
+  const fetchDataEnvironment = async () => {
+    try {
+      const data = await getAllEnvironments();
+      setEnvironments(data);
+      setFilteredEnvironments(data);
+    } catch (err) {
+      console.error(err); // In lỗi nếu có
+    }
+  };
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -93,6 +90,10 @@ const EviomentsTable = () => {
       console.error("Delete failed:", error);
     }
   };
+
+  useEffect(() => {
+    fetchDataEnvironment();
+  }, []);
 
   return (
     <motion.div
@@ -203,6 +204,7 @@ const EviomentsTable = () => {
         onAdd={handleAddEnviroment}
       />
       <UpdateEvironmentModal
+        fetchDataEnvironment={fetchDataEnvironment}
         isOpenUpdate={isOpenUpdate}
         setIsOpenUpdate={setIsOpenUpdate}
         environment={selectedEnvironment}

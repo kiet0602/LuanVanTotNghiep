@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Rainbow } from "lucide-react";
+import { toast } from "react-toastify";
 
 import { createColor } from "../../service/colorService";
 
@@ -15,12 +16,12 @@ export default function AddColor({ isOpen, setIsOpen, onAdd }) {
     }
     try {
       const newColor = await createColor(colorName);
+      toast.success("Đã thêm màu sắc thành công");
       onAdd(newColor); // Gọi hàm callback với đối số là phân loại mới
       setColorName(""); // Reset input
       setIsOpen(false); // Đóng modal chỉ khi thêm thành công
-      setError(""); // Reset lỗi nếu có
     } catch (error) {
-      setError("Lỗi khi thêm họ cây: " + (error.message || error));
+      toast.error("Lỗi khi thêm họ cây: " + (error.message || error));
     }
   };
 
@@ -105,7 +106,7 @@ export default function AddColor({ isOpen, setIsOpen, onAdd }) {
                 onClick={handleAddColor}
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Lưu
+                Thêm
               </button>
             </div>
           </div>

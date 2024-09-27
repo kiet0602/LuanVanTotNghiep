@@ -7,11 +7,10 @@ import AddFamilyModal from "../add/AddFamilyModal.jsx";
 
 import {
   getClassifications,
-  createClassification,
-  updateClassification,
   deleteClassification,
 } from "../../service/classificationService.js";
 import UpdateClassificationModal from "../update/UpdateClassificationModal.jsx";
+import { toast } from "react-toastify";
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -31,22 +30,6 @@ const FamilyTable = () => {
   const [error, setError] = useState("");
   const [selectedClassification, setSelectedClassification] = useState(null);
 
-  // lấy tất cả họ cây
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await getClassifications();
-        setClassifications(data);
-        setFilteredClassifications(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
   // tìm kiếm
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -83,17 +66,32 @@ const FamilyTable = () => {
   // xóa
   const handleDeleteClassification = async (classificationId) => {
     try {
+      // Tìm phân loại cần xóa
+      const classificationToDelete = classifications.find(
+        (item) => item._id === classificationId
+      );
+      // Xóa phân loại
       await deleteClassification(classificationId);
+      // Cập nhật trạng thái
       setClassifications((prev) =>
         prev.filter((item) => item._id !== classificationId)
       );
       setFilteredClassifications((prev) =>
         prev.filter((item) => item._id !== classificationId)
       );
+
+      // Hiển thị thông báo thành công
+      if (classificationToDelete) {
+        toast.success(
+          `Đã xóa thành công: ${classificationToDelete.classificationName}`
+        );
+      }
     } catch (error) {
       console.error("Delete failed:", error);
+      toast.error("Xóa không thành công. Vui lòng thử lại.");
     }
   };
+
   //Thêm
   const handleAddClassification = async (newClassification) => {
     try {
@@ -103,6 +101,23 @@ const FamilyTable = () => {
       console.error("Failed to add classification:", error);
     }
   };
+  // lấy tất cả họ cây
+  const fetchClassifications = async () => {
+    try {
+      setLoading(true);
+      const data = await getClassifications();
+      setClassifications(data);
+      setFilteredClassifications(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClassifications();
+  }, [classifications.length]);
 
   return (
     <motion.div
@@ -217,6 +232,7 @@ const FamilyTable = () => {
         onAdd={handleAddClassification}
       />
       <UpdateClassificationModal
+        fetchClassifications={fetchClassifications}
         isOpenUpdate={isOpenUpdate}
         setIsOpenUpdate={setIsOpenUpdate}
         classification={selectedClassification}
