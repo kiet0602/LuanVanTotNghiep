@@ -108,7 +108,10 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
     formData.append("color", selectedColor);
     formData.append("description", description);
     formData.append("originalPrice", originalPrice);
-    formData.append("discount", discount);
+
+    // Gán giá trị mặc định cho discount
+    formData.append("discount", discount || 0);
+
     formData.append("size", size);
     formData.append("quantity", quantity);
     formData.append("care", care);
