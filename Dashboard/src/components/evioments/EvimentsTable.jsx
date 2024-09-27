@@ -130,31 +130,33 @@ const EviomentsTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {["nameEnviroment"].map((key) => (
-                <th
-                  key={key}
-                  onClick={() => handleSort(key)}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                >
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                  {sortConfig.key === key && (
-                    <span
-                      className={`ml-2 ${
-                        sortConfig.direction === "asc"
-                          ? "text-blue-400"
-                          : "text-red-400"
-                      }`}
-                    >
-                      {sortConfig.direction === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-              ))}
+              {[{ key: "nameEnviroment", label: "Môi trường sống" }].map(
+                ({ key, label }) => (
+                  <th
+                    key={key}
+                    onClick={() => handleSort(key)}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  >
+                    {label}
+                    {sortConfig.key === key && (
+                      <span
+                        className={`ml-2 ${
+                          sortConfig.direction === "asc"
+                            ? "text-blue-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {sortConfig.direction === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </th>
+                )
+              )}
               <th
-                className="px-6 py-3  text-xs font-medium text-gray-400 uppercase tracking-wider text-right"
+                className="px-6 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider text-right"
                 style={{ textAlign: "right" }}
               >
-                Actions
+                Hành động
               </th>
             </tr>
           </thead>

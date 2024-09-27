@@ -162,13 +162,16 @@ const CategorysTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {["categoryName", "classification"].map((key) => (
+              {[
+                { key: "categoryName", label: "Tên thể loại" },
+                { key: "classification", label: "Họ cây" },
+              ].map(({ key, label }) => (
                 <th
                   key={key}
                   onClick={() => handleSort(key)}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
                 >
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                  {label}
                   {sortConfig.key === key && (
                     <span
                       className={`ml-2 ${
@@ -183,7 +186,7 @@ const CategorysTable = () => {
                 </th>
               ))}
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Actions
+                Hành động
               </th>
             </tr>
           </thead>
