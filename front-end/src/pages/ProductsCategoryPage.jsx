@@ -27,6 +27,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import CardNew from "../components/CardNew";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
+import { AiOutlineClose } from "react-icons/ai"; // Icon từ react-icons
 
 const ProductsCategory = () => {
   const [products, setProducts] = useState([]); // Dữ liệu sản phẩm hiện tại
@@ -101,7 +102,6 @@ const ProductsCategory = () => {
   const handleFilter = () => {
     setLoading(true);
     setError(null);
-
     try {
       // Lọc sản phẩm theo từ khóa tìm kiếm
       const filteredByQuery = originalProducts.filter((product) =>
@@ -156,6 +156,14 @@ const ProductsCategory = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetFilters = () => {
+    setQuery("");
+    setPriceRange([0, 1000000]);
+    setSortBy("");
+    setSelectedColor("");
+    setProducts(originalProducts);
   };
 
   useEffect(() => {
@@ -249,6 +257,21 @@ const ProductsCategory = () => {
                   </Flex>
                 </RadioGroup>
               </FormControl>
+              <Flex justifyContent="flex-end" mb={4}>
+                {(query ||
+                  selectedColor ||
+                  sortBy ||
+                  priceRange[0] !== 0 ||
+                  priceRange[1] !== 1000000) && (
+                  <Button
+                    colorScheme="red"
+                    onClick={resetFilters}
+                    leftIcon={<AiOutlineClose />}
+                  >
+                    Xóa lọc
+                  </Button>
+                )}
+              </Flex>
             </Flex>
           </Box>
           {loading ? (

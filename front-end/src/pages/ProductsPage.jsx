@@ -25,6 +25,7 @@ import axios from "axios";
 import CardProduct from "../components/CardProduct";
 import TitlleCustom from "../components/TitlleCustom";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
+import { AiOutlineClose } from "react-icons/ai";
 
 const ProductsPage = () => {
   const [query, setQuery] = useState(""); // Tìm kiếm theo tên sản phẩm
@@ -132,6 +133,15 @@ const ProductsPage = () => {
     }
   };
 
+  const resetFilters = () => {
+    setQuery("");
+    setPriceRange([0, 1000000]);
+    setSortBy("");
+    setSelectedColor("");
+    setSelectedCategory("");
+    setProducts(originalProducts);
+  };
+
   useEffect(() => {
     if (query === "") {
       setProducts(originalProducts);
@@ -156,6 +166,7 @@ const ProductsPage = () => {
     };
     fetchColors();
   }, []);
+
   useEffect(() => {
     const fetchCategoris = async () => {
       try {
@@ -258,7 +269,7 @@ const ProductsPage = () => {
                 </FormControl>
 
                 {/* Lọc theo Màu Sắc */}
-                <FormControl mb={4}>
+                <FormControl>
                   <FormLabel>Chọn màu sắc</FormLabel>
                   <RadioGroup onChange={setSelectedColor} value={selectedColor}>
                     <Flex wrap="wrap">
@@ -270,6 +281,22 @@ const ProductsPage = () => {
                     </Flex>
                   </RadioGroup>
                 </FormControl>
+                <Flex justifyContent="flex-end">
+                  {(query ||
+                    selectedColor ||
+                    selectedCategory ||
+                    sortBy ||
+                    priceRange[0] !== 0 ||
+                    priceRange[1] !== 1000000) && (
+                    <Button
+                      colorScheme="red"
+                      onClick={resetFilters}
+                      leftIcon={<AiOutlineClose />}
+                    >
+                      Xóa lọc
+                    </Button>
+                  )}
+                </Flex>
               </Flex>
             </Box>
 
