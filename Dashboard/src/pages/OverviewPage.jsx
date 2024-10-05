@@ -7,32 +7,44 @@ import CategoryDistributionChart from "../components/overview/CategoryDistributi
 import SalesChannelChart from "../components/overview/SalesChannelChart";
 import { getRevenue } from "../service/orderService.js";
 import { useEffect, useState } from "react";
+import { getAllUsers } from "../service/userService.js";
+import { getProducts } from "../service/productService.js";
 
 const OverviewPage = () => {
   const [totalRevenue, setTotalRevenue] = useState(0);
+  const [lengthUsers, setLengthUsers] = useState(0);
+  const [lengthProducts, setLengthProducts] = useState(0);
 
   const fetchRevenue = async () => {
     try {
       const { totalRevenue } = await getRevenue();
       setTotalRevenue(totalRevenue);
-      console.log(totalRevenue);
     } catch (error) {
       console.error("Failed to fetch orders and revenue", error);
     }
   };
   const fetchDataUsers = async () => {
     try {
-      const { totalRevenue } = await getRevenue();
-      setTotalRevenue(totalRevenue);
-      console.log(totalRevenue);
+      const userData = await getAllUsers(); // Gọi API để lấy danh sách người dùng
+      setLengthUsers(userData.length);
     } catch (error) {
-      console.error("Failed to fetch orders and revenue", error);
+      console.error("Lỗi lấy dữ liệu người dùng", error);
+    }
+  };
+  const fetchDataProducts = async () => {
+    try {
+      const productsData = await getProducts(); // Gọi API để lấy danh sách người dùng
+      setLengthProducts(productsData.length);
+    } catch (error) {
+      console.error("Lỗi lấy products", error);
     }
   };
 
   useEffect(() => {
     fetchRevenue();
-  }, []);
+    fetchDataUsers();
+    fetchDataProducts();
+  }, [totalRevenue, lengthUsers, lengthProducts]);
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -49,19 +61,19 @@ const OverviewPage = () => {
           <StatCard
             name="Doanh thu tổng cộng"
             icon={Zap}
-            value={`${totalRevenue.toLocaleString()} Đ`} // Định dạng giá trị với dấu phân cách hàng nghìn và ký tự "Đ"
-            color="#6366F1" // Màu sắc cho StatCard
+            value={`${totalRevenue.toLocaleString()} Đ`}
+            color="#6366F1"
           />
           <StatCard
-            name="Người dùng mới"
+            name="Người dùng"
             icon={Users}
-            value="1,234"
+            value={lengthUsers}
             color="#8B5CF6"
           />
           <StatCard
             name="Sản phẩm tổng cộng"
             icon={ShoppingBag}
-            value="567"
+            value={lengthProducts}
             color="#EC4899"
           />
           {/* <StatCard

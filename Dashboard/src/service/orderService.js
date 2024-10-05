@@ -11,7 +11,6 @@ export const getRevenue = async () => {
     throw error; // Ném lỗi nếu có vấn đề
   }
 };
-
 // Hàm để gọi API lấy doanh thu theo tháng
 export const getMonthlyRevenue = async () => {
   try {
@@ -25,6 +24,7 @@ export const getMonthlyRevenue = async () => {
     throw error; // Ném lỗi nếu có vấn đề
   }
 };
+//Hàm tính số lượng % bán theo loại
 export const getQuantitySalesByCategory = async () => {
   try {
     const response = await axios.get(
@@ -36,7 +36,6 @@ export const getQuantitySalesByCategory = async () => {
     throw error; // Ném lỗi nếu có vấn đề
   }
 };
-
 // Hàm cập nhật đơn hàng
 export const updateOrder = async (orderId, updates) => {
   try {
@@ -49,7 +48,6 @@ export const updateOrder = async (orderId, updates) => {
     throw new Error(error.response.data.message || "Lỗi cập nhật đơn hàng");
   }
 };
-
 // Hàm xóa đơn hàng
 export const deleteOrder = async (orderId) => {
   try {
@@ -61,7 +59,6 @@ export const deleteOrder = async (orderId) => {
     throw new Error(error.response.data.message || "Lỗi xóa đơn hàng");
   }
 };
-
 // Hàm lấy đơn hàng theo ID
 export const getOrderById = async (orderId) => {
   try {
@@ -75,7 +72,6 @@ export const getOrderById = async (orderId) => {
     );
   }
 };
-
 // Hàm lấy tất cả đơn hàng
 export const getAllOrders = async () => {
   try {
@@ -86,6 +82,45 @@ export const getAllOrders = async () => {
   } catch (error) {
     throw new Error(
       error.response.data.message || "Lỗi lấy danh sách đơn hàng"
+    );
+  }
+};
+//Hàm lấy các đơn hàng đang xử lý
+export const getAllOrdersByPending = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/checkout/getPending"
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response.data.message || "Lỗi lấy danh sách đơn hàng đang chờ xử lý"
+    );
+  }
+};
+//Hàm lấy các đơn hàng đã xử lý xong
+export const getAllOrdersByCompleted = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/checkout/getCompleted"
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response.data.message || "Lỗi lấy danh sách đơn hàng đã xử lý xong"
+    );
+  }
+};
+//hàm lấy số lượng đơn hàng của các trạng thái
+export const getOrderCountByStatus = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/checkout/getOrderCountByStatus"
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response.data.message || "Lỗi lấy đơn hàng theo status"
     );
   }
 };

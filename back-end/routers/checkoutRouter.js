@@ -4,9 +4,12 @@ import {
   checkout,
   deleteOrder,
   getAllOrders,
+  getCompleted,
   getMonthlyRevenue,
   getOrderById,
+  getOrderCountByStatus,
   getOrders,
+  getPending,
   getRevenue,
   getSoldProductCountByCategory,
   updateOrder,
@@ -29,5 +32,8 @@ checkoutRouter.get(
   "/getQuantitySalesByCategory",
   getSoldProductCountByCategory
 );
+checkoutRouter.get("/getCompleted", getCompleted);
+checkoutRouter.get("/getPending", getPending);
+checkoutRouter.get("/getOrderCountByStatus", getOrderCountByStatus);
 
 export default checkoutRouter;

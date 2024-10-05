@@ -346,3 +346,71 @@ export const getSoldProductCountByCategory = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+//Lấy doanh số đơn hàng đang chờ xử lý
+export const getPending = async (req, res) => {
+  try {
+    // Các trạng thái cần lấy: Pending và Completed
+    const statusList = ["Chờ xử lý", "Đang xử lý", "Đang giao hàng"];
+    // Tìm đơn hàng có trạng thái thuộc danh sách trên và populate thông tin người dùng
+    const orders = await orderModel
+      .find({ status: { $in: statusList } })
+      .populate("user"); // Populate thông tin người dùng
+
+    if (orders.length === 0) {
+      return res.status(404).json({
+        message:
+          "Không có đơn hàng nào với trạng thái 'Pending' hoặc 'Completed'",
+      });
+    }
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+//Lấy doanh số đơn hàng Đã hoàn thành
+export const getCompleted = async (req, res) => {
+  try {
+    // Các trạng thái cần lấy: Pending và Completed
+    const statusList = ["Đã nhận hàng"];
+    // Tìm đơn hàng có trạng thái thuộc danh sách trên và populate thông tin người dùng
+    const orders = await orderModel
+      .find({ status: { $in: statusList } })
+      .populate("user"); // Populate thông tin người dùng
+
+    if (orders.length === 0) {
+      return res.status(404).json({
+        message:
+          "Không có đơn hàng nào với trạng thái 'Pending' hoặc 'Completed'",
+      });
+    }
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+//hàm lấy số lượng đơn hàng của các trạng thái
+export const getOrderCountByStatus = async (req, res) => {
+  try {
+    // Danh sách các trạng thái đơn hàng cần đếm
+    const statusList = [
+      "Chờ xử lý",
+      "Đang xử lý",
+      "Đang giao hàng",
+      "Đã nhận hàng",
+      "Đã hủy",
+    ];
+
+    // Tạo danh sách các promise để đếm số lượng đơn hàng theo từng trạng thái
+    const orderCounts = await Promise.all(
+      statusList.map(async (status) => {
+        const count = await orderModel.countDocuments({ status: status });
+        return { status, count };
+      })
+    );
+
+    // Trả về kết quả
+    res.status(200).json(orderCounts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

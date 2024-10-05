@@ -6,15 +6,60 @@ import StatCard from "../components/common/StatCard";
 import DailyOrders from "../components/orders/DailyOrders";
 import OrderDistribution from "../components/orders/OrderDistribution";
 import OrdersTable from "../components/orders/OrdersTable";
-
-const orderStats = {
-  totalOrders: "1,234",
-  pendingOrders: "56",
-  completedOrders: "1,178",
-  totalRevenue: "$98,765",
-};
+import { useEffect, useState } from "react";
+import {
+  getAllOrders,
+  getAllOrdersByCompleted,
+  getAllOrdersByPending,
+  getRevenue,
+} from "../service/orderService";
 
 const OrdersPage = () => {
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [orders, setOrders] = useState(0);
+  const [ordersPending, setOrdersPending] = useState(0);
+  const [ordersCompleted, setOrdersCompleted] = useState(0);
+
+  const fetchRevenue = async () => {
+    try {
+      const { totalRevenue } = await getRevenue();
+      setTotalRevenue(totalRevenue);
+    } catch (error) {
+      console.error("Failed to fetch orders and revenue", error);
+    }
+  };
+  const fetchOrders = async () => {
+    try {
+      const Orders = await getAllOrders();
+      setOrders(Orders.length);
+    } catch (error) {
+      console.error("Failed to fetch orders", error);
+    }
+  };
+  const fetchOrdersPending = async () => {
+    try {
+      const OrdersPending = await getAllOrdersByPending();
+      setOrdersPending(OrdersPending.length);
+    } catch (error) {
+      console.error("Failed to fetch orders pending", error);
+    }
+  };
+  const fetchOrdersCompleted = async () => {
+    try {
+      const OrdersCompleted = await getAllOrdersByCompleted();
+      setOrdersCompleted(OrdersCompleted.length);
+    } catch (error) {
+      console.error("Failed to fetch orders completed", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRevenue();
+    fetchOrders();
+    fetchOrdersPending();
+    fetchOrdersCompleted();
+  }, [totalRevenue, orders, ordersPending, ordersCompleted]);
+
   return (
     <div className="flex-1 relative z-10 overflow-auto">
       <Header title={"Đơn hàng"} />
@@ -27,27 +72,27 @@ const OrdersPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Orders"
+            name="Tổng đơn hàng"
             icon={ShoppingBag}
-            value={orderStats.totalOrders}
+            value={orders}
             color="#6366F1"
           />
           <StatCard
-            name="Pending Orders"
+            name=" Đơn hàng đang xử lý"
             icon={Clock}
-            value={orderStats.pendingOrders}
+            value={ordersPending}
             color="#F59E0B"
           />
           <StatCard
-            name="Completed Orders"
+            name="Đơn hàng hoàn thành"
             icon={CheckCircle}
-            value={orderStats.completedOrders}
+            value={ordersCompleted}
             color="#10B981"
           />
           <StatCard
-            name="Total Revenue"
+            name="Tổng doanh thu"
             icon={DollarSign}
-            value={orderStats.totalRevenue}
+            value={`${totalRevenue.toLocaleString()} Đ`}
             color="#EF4444"
           />
         </motion.div>

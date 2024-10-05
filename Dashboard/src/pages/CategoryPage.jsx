@@ -19,7 +19,7 @@ const CategoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <StatCard
+          {/* <StatCard
             name="Tổng số thể loại"
             icon={Package}
             value={1234}
@@ -42,7 +42,7 @@ const CategoryPage = () => {
             icon={DollarSign}
             value={"$543,210"}
             color="#EF4444"
-          />
+          /> */}
         </motion.div>
         {/* Button to open modal */}
 
