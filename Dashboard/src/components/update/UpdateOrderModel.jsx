@@ -73,7 +73,7 @@ export default function UpdateOrderModal({
                 >
                   <option value="Chờ xử lý">Chờ xử lý</option>
                   <option value="Đang xử lý">Đang xử lý</option>
-                  <option value="Đã giao hàng">Đã giao hàng</option>
+                  <option value="Đang giao hàng">Đang giao hàng</option>
                   <option value="Đã nhận hàng">Đã nhận hàng</option>
                   <option value="Đã hủy">Đã hủy</option>
                 </select>

@@ -26,7 +26,7 @@ const orderSchema = new mongoose.Schema(
       enum: [
         "Chờ xử lý",
         "Đang xử lý",
-        "Đã giao hàng",
+        "Đang giao hàng",
         "Đã nhận hàng",
         "Đã hủy",
       ],

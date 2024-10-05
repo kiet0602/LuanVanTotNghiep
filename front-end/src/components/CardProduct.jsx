@@ -64,8 +64,14 @@ const CardProduct = ({ products }) => {
     }
 
     try {
+      const product = products.find((prod) => prod._id === productId);
+      if (!product || product.quantity <= 0) {
+        toast.error("Sản phẩm này đã hết hàng!");
+        return;
+      }
+
       const quantity = 1;
-      const response = await addToCart(user._id, productId, quantity);
+      await addToCart(user._id, productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
     } catch (error) {
       toast.error("Lỗi thêm sản phẩm!");

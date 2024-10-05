@@ -117,7 +117,7 @@ export const updateOrder = async (req, res) => {
       const validStatuses = [
         "Chờ xử lý",
         "Đang xử lý",
-        "Đã giao hàng",
+        "Đang giao hàng",
         "Đã nhận hàng",
         "Đã hủy",
       ];

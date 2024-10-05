@@ -140,7 +140,7 @@ const UsersTable = () => {
                   <img
                     src={
                       user?.avatar
-                        ? `http://localhost:2000/avatar/${user.avatar}`
+                        ? `http://localhost:2000/images/${user.avatar}`
                         : "https://via.placeholder.com/40"
                     }
                     alt="Avatar"

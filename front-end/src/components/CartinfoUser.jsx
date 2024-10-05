@@ -144,7 +144,7 @@ const CartinfoUser = () => {
                 <Text>Số điện thoại : {user?.numberPhone}</Text>
               </Text>
               <Text
-                color={useColorModeValue("gray.700", "gray.400")}
+                //   color={useColorModeValue("gray.700", "gray.400")}
                 fontSize="0.875rem"
                 fontWeight="300"
                 textAlign="left"
@@ -176,7 +176,7 @@ const CartinfoUser = () => {
                   : "Không có dữ liệu"}
               </Text>
               <Text
-                color={useColorModeValue("gray.700", "gray.400")}
+                // color={useColorModeValue("gray.700", "gray.400")}
                 fontSize="0.875rem"
                 fontWeight="300"
                 textAlign="left"
@@ -206,7 +206,7 @@ const CartinfoUser = () => {
                 Vai trò của bạn : {getRole(user?.role) || "Chưa có dữ liệu"}
               </Text>
               <Text
-                color={useColorModeValue("gray.700", "gray.400")}
+                //     color={useColorModeValue("gray.700", "gray.400")}
                 fontSize="0.875rem"
                 fontWeight="300"
                 textAlign="left"

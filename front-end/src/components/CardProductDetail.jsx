@@ -217,7 +217,7 @@ const CardProductDetail = ({ product }) => {
                   </Flex>
                   <Flex width="100%" justify="space-between" mb={2}>
                     <Box width="40%" as="i">
-                      Chiều cao:
+                      Kích cỡ:
                     </Box>
                     <Box width="60%" textAlign="end" fontWeight="bold">
                       {product?.size}
@@ -228,9 +228,15 @@ const CardProductDetail = ({ product }) => {
                     <Box width="40%" as="i">
                       Số lượng còn lại:
                     </Box>
-                    <Box width="60%" textAlign="end" fontWeight="bold">
-                      {product?.quantity}
-                    </Box>
+                    {product?.quantity === 0 ? (
+                      <Box width="60%" textAlign="end" fontWeight="bold">
+                        <Text color={"red.400"}> Đã hết hàng</Text>
+                      </Box>
+                    ) : (
+                      <Box width="60%" textAlign="end" fontWeight="bold">
+                        {product?.quantity}
+                      </Box>
+                    )}
                   </Flex>
                 </VStack>
               </Stack>
