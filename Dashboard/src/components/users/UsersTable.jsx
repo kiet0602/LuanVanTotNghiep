@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import Pagination from "../pagination/Pagination";
 import { getAllUsers } from "../../service/userService";
+import SendVoucher from "../Send/SendVoucher";
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -15,6 +16,8 @@ const UsersTable = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
+  const [isOpenSendVoucher, setIsOpenSendVoucher] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -25,18 +28,13 @@ const UsersTable = () => {
       console.error("Lỗi khi lấy danh sách người dùng:", error);
     }
   };
-  console.log(users);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [users.length]);
 
   const offset = currentPage * PRODUCTS_PER_PAGE;
   const currentUsers = filteredUsers.slice(offset, offset + PRODUCTS_PER_PAGE);
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
-  console.log(currentUsers);
+
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -66,7 +64,9 @@ const UsersTable = () => {
     });
     setFilteredUsers(sorted);
   };
-
+  useEffect(() => {
+    fetchUsers();
+  }, [users.length]);
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
@@ -180,11 +180,14 @@ const UsersTable = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <button className="text-indigo-400 hover:text-indigo-300 mr-2">
-                    Edit
-                  </button>
-                  <button className="text-red-400 hover:text-red-300">
-                    Delete
+                  <button
+                    className="text-red-400 font-bold hover:text-indigo-300 mr-2 bg-slate-200 rounded-lg text-xs p-1"
+                    onClick={() => {
+                      setIsOpenSendVoucher(true);
+                      setSelectedUser(user);
+                    }}
+                  >
+                    Tặng khuyến mãi
                   </button>
                 </td>
               </motion.tr>
@@ -198,6 +201,11 @@ const UsersTable = () => {
           onPageChange={handlePageChange}
         />
       </div>
+      <SendVoucher
+        isOpenSendVoucher={isOpenSendVoucher}
+        setIsOpenSendVoucher={setIsOpenSendVoucher}
+        user={selectedUser}
+      />
     </motion.div>
   );
 };

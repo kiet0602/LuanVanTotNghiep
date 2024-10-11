@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import Pagination from "../pagination/Pagination";
-import { getAllOrders } from "../../service/orderService";
+import { deleteOrder, getAllOrders } from "../../service/orderService";
 import { format } from "date-fns";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import UpdateOrderModal from "../update/UpdateOrderModel";
+import { toast } from "react-toastify";
+import CheckBill from "../watch/CheckBill";
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -18,9 +20,10 @@ const OrdersTable = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
+  const [isOpenSeeBill, setIsOpenSeeBill] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
+
   const fetchOrders = async () => {
     try {
       const OrderData = await getAllOrders();
@@ -50,10 +53,11 @@ const OrdersTable = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [orders.length]);
+  }, []);
 
   const offset = currentPage * PRODUCTS_PER_PAGE;
   const currentOrder = filteredOrders.slice(offset, offset + PRODUCTS_PER_PAGE);
+
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -84,6 +88,26 @@ const OrdersTable = () => {
       return 0;
     });
     setFilteredOrders(sorted);
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    const orderToDelete = orders.find((item) => item._id === orderId);
+    if (!orderToDelete) {
+      toast.error("Không tìm thấy đơn hàng muốn xóa!");
+    }
+    const confirmed = window.confirm(
+      `Bạn có chắc chắn muốn xóa ${orderToDelete._id} ?`
+    );
+    if (!confirmed) return; // Nếu người dùng không xác nhận, dừng lại
+    try {
+      await deleteOrder(orderId);
+      // Có thể cập nhật lại trạng thái để loại bỏ đơn hàng đã xóa khỏi giao diện
+      setOrders(orders.filter((order) => order._id !== orderId));
+      setFilteredOrders(orders.filter((order) => order._id !== orderId));
+    } catch (error) {
+      console.log(error.message);
+      // Có thể hiển thị thông báo lỗi cho người dùng
+    }
   };
 
   return (
@@ -198,8 +222,20 @@ const OrdersTable = () => {
                   >
                     <Edit size={18} />
                   </button>
-                  <button className="text-red-400 hover:text-red-300">
+                  <button
+                    className="text-red-400 hover:text-red-300 mr-2"
+                    onClick={() => handleDeleteOrder(order._id)} // Sửa ở đây
+                  >
                     <Trash2 size={18} />
+                  </button>
+                  <button className="text-green-400 hover:text-green-300">
+                    <Eye
+                      size={18}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setIsOpenSeeBill(true);
+                      }}
+                    />
                   </button>
                 </td>
               </motion.tr>
@@ -209,7 +245,7 @@ const OrdersTable = () => {
       </div>
       <div className="mt-4 flex justify-end">
         <Pagination
-          pageCount={Math.ceil(setFilteredOrders.length / PRODUCTS_PER_PAGE)}
+          pageCount={Math.ceil(filteredOrders.length / PRODUCTS_PER_PAGE)}
           onPageChange={handlePageChange}
         />
       </div>
@@ -218,6 +254,11 @@ const OrdersTable = () => {
         isOpenUpdate={isOpenUpdate}
         setIsOpenUpdate={setIsOpenUpdate}
         order={selectedOrder}
+      />
+      <CheckBill
+        order={selectedOrder}
+        isOpenSeeBill={isOpenSeeBill}
+        setIsOpenSeeBill={setIsOpenSeeBill}
       />
     </motion.div>
   );

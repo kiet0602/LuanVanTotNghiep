@@ -231,6 +231,28 @@ const getProductsByCategoryId = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+//Lấy các sản phẩm bán chạy
+const getTopSellingProducts = async (req, res) => {
+  try {
+    const topProducts = await productModel
+      .find()
+      .populate("category", "categoryName imageCategory descriptionCategory")
+      .populate("environment", "nameEnviroment")
+      .populate("color", "nameColor")
+      .sort({ orderCount: -1 }) // Sắp xếp theo số lượng đơn hàng giảm dần
+      .limit(10); // Lấy 5 sản phẩm bán chạy nhất
+
+    // Chuyển đổi để bao gồm giá cuối
+    const productsWithFinalPrice = topProducts.map((product) => ({
+      ...product.toObject(),
+      finalPrice: product.finalPrice, // Sử dụng phương thức ảo để tính giá cuối
+    }));
+
+    res.status(200).json(productsWithFinalPrice);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export {
   addProduct,
@@ -239,4 +261,5 @@ export {
   getProductById,
   deleteProduct,
   getProductsByCategoryId,
+  getTopSellingProducts,
 };

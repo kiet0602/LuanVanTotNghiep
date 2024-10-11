@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Schema cho bình luận
 const commentSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,16 +18,28 @@ const commentSchema = new mongoose.Schema({
   },
   rating: {
     type: Number,
-    min: 1, // Điểm đánh giá thấp nhất là 1
-    max: 5, // Điểm đánh giá cao nhất là 5
-    required: true, // Bạn có thể thay đổi trường này thành không bắt buộc nếu cần
+    required: function () {
+      return this.parentId == null; // Chỉ bắt buộc nếu không có parentId (là bình luận gốc)
+    },
   },
+  parentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Comment", // Tham chiếu đến comment gốc để hỗ trợ bình luận lồng nhau
+    default: null,
+  },
+  replies: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment", // Tham chiếu đến chính nó để tạo bình luận lồng nhau
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
+// Tạo model cho bình luận
 const commentModel = mongoose.model("Comment", commentSchema);
 
 export default commentModel;

@@ -19,7 +19,7 @@ import Test from "./pages/Test";
 import EnterEmailPage from "./pages/EnterEmailPage";
 import SubmitCodeOTPPage from "./pages/SubmitCodeOTPPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Table1111 from "./pages/Table.jsx";
+
 import NewsPage from "./pages/NewsPage.jsx";
 import ProductsCategoryPage from "./pages/ProductsCategoryPage.jsx";
 import FavoritesPage from "./pages/FavoritesPage.jsx";
@@ -83,7 +83,7 @@ function App() {
             element={!user ? <ResetPasswordPage /> : <Navigate to={"/"} />}
           />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/table" element={<Table1111 />} />
+
           <Route path="/news" element={<NewsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/success" element={<SuccessOrderPage />} />

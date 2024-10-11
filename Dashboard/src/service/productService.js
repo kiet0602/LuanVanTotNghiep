@@ -92,3 +92,15 @@ export const getProductById = async (productId) => {
     throw error;
   }
 };
+
+export const getProductsSaleHigh = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:2000/api/product/getTopSellingProducts`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+};

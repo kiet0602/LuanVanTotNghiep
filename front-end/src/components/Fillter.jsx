@@ -77,7 +77,7 @@ function Filter() {
 
   return (
     <>
-      <Text cursor={"pointer"} onClick={handleMouseEnter}>
+      <Text cursor={"pointer"} fontWeight="semibold" onClick={handleMouseEnter}>
         Loại
       </Text>
       <Drawer placement={"top"} onClose={onClose} isOpen={isOpen} size={"lg"}>

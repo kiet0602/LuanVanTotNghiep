@@ -1,4 +1,4 @@
-import { parse, format, parseISO } from "date-fns";
+import { parse, format, parseISO, isValid } from "date-fns";
 import couponModel from "../models/couponModel.js";
 
 export const createCoupon = async (req, res) => {
@@ -13,38 +13,53 @@ export const createCoupon = async (req, res) => {
   } = req.body;
 
   try {
-    // Chuyển đổi ngày từ DD-MM-YYYY sang ISO 8601
-    const isoStartDate = format(
-      parse(startDate, "dd-MM-yyyy", new Date()),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-    );
-    const isoExpirationDate = format(
-      parse(expirationDate, "dd-MM-yyyy", new Date()),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+    // Chuyển đổi ngày từ DD-MM-YYYY sang Date object
+    const parsedStartDate = parse(startDate, "dd-MM-yyyy", new Date());
+    const parsedExpirationDate = parse(
+      expirationDate,
+      "dd-MM-yyyy",
+      new Date()
     );
 
+    // Kiểm tra tính hợp lệ của ngày
+    if (!isValid(parsedStartDate)) {
+      return res.status(400).json({ message: "Ngày bắt đầu không hợp lệ." });
+    }
+    if (!isValid(parsedExpirationDate)) {
+      return res.status(400).json({ message: "Ngày hết hạn không hợp lệ." });
+    }
+
     // Kiểm tra ngày kết thúc không được trước ngày bắt đầu
-    if (new Date(isoExpirationDate) < new Date(isoStartDate)) {
+    if (parsedExpirationDate < parsedStartDate) {
       return res
         .status(400)
         .json({ message: "Ngày kết thúc phải sau ngày bắt đầu!" });
     }
 
+    // Tạo mã khuyến mãi mới
     const newCoupon = new couponModel({
       code,
       discountPercentage,
-      startDate: isoStartDate,
-      expirationDate: isoExpirationDate,
+      startDate: parsedStartDate, // Lưu đối tượng Date
+      expirationDate: parsedExpirationDate, // Lưu đối tượng Date
       minimumPurchaseAmount,
       isActive,
       maxUsage,
       usedBy: [], // Khởi tạo mảng danh sách người dùng đã sử dụng
     });
 
+    // Lưu mã khuyến mãi vào database
     const savedCoupon = await newCoupon.save();
-    res
-      .status(201)
-      .json({ message: "Coupon created successfully.", coupon: savedCoupon });
+
+    // Format lại ngày trước khi trả về
+    const formattedCoupon = {
+      ...savedCoupon._doc,
+      startDate: format(savedCoupon.startDate, "dd-MM-yyyy"),
+      expirationDate: format(savedCoupon.expirationDate, "dd-MM-yyyy"),
+    };
+
+    // Trả về phản hồi với mã khuyến mãi đã tạo và ngày tháng đã được định dạng
+    res.status(201).json(formattedCoupon);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error creating coupon.", error });
@@ -53,7 +68,9 @@ export const createCoupon = async (req, res) => {
 // Lấy tất cả mã khuyến mãi
 export const getAllCoupons = async (req, res) => {
   try {
-    const coupons = await couponModel.find();
+    // Lấy các coupon chưa có useBy
+    const coupons = await couponModel.find({ usedBy: [] });
+
     // Chuyển đổi ngày từ đối tượng Date sang DD-MM-YYYY
     const formattedCoupons = coupons.map((coupon) => ({
       ...coupon._doc,
@@ -61,7 +78,7 @@ export const getAllCoupons = async (req, res) => {
       expirationDate: format(new Date(coupon.expirationDate), "dd-MM-yyyy"),
     }));
 
-    res.status(200).json({ coupons: formattedCoupons });
+    res.status(200).json(formattedCoupons);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching coupons.", error });
@@ -118,20 +135,6 @@ export const updateCoupon = async (req, res) => {
     maxUsage,
   } = req.body;
 
-  // Chuyển đổi ngày từ DD-MM-YYYY sang ISO 8601 nếu có
-  const isoStartDate = startDate
-    ? format(
-        parse(startDate, "dd-MM-yyyy", new Date()),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-      )
-    : undefined;
-  const isoExpirationDate = expirationDate
-    ? format(
-        parse(expirationDate, "dd-MM-yyyy", new Date()),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-      )
-    : undefined;
-
   try {
     // Lấy mã khuyến mãi hiện tại để kiểm tra ngày
     const existingCoupon = await couponModel.findById(id);
@@ -140,24 +143,38 @@ export const updateCoupon = async (req, res) => {
       return res.status(404).json({ message: "Coupon not found." });
     }
 
-    // Kiểm tra ngày kết thúc không được trước ngày bắt đầu
-    if (
-      isoStartDate &&
-      isoExpirationDate &&
-      new Date(isoExpirationDate) < new Date(isoStartDate)
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Expiration date must be after the start date." });
+    // Chuyển đổi ngày từ DD-MM-YYYY sang Date object nếu có
+    const parsedStartDate = startDate
+      ? new Date(startDate) // Chuyển đổi từ 'YYYY-MM-DD' sang Date object
+      : existingCoupon.startDate;
+
+    const parsedExpirationDate = expirationDate
+      ? new Date(expirationDate) // Chuyển đổi từ 'YYYY-MM-DD' sang Date object
+      : existingCoupon.expirationDate;
+
+    // Kiểm tra tính hợp lệ của ngày
+    if (startDate && !isValid(parsedStartDate)) {
+      return res.status(400).json({ message: "Ngày bắt đầu không hợp lệ." });
+    }
+    if (expirationDate && !isValid(parsedExpirationDate)) {
+      return res.status(400).json({ message: "Ngày hết hạn không hợp lệ." });
     }
 
+    // Kiểm tra ngày kết thúc không được trước ngày bắt đầu
+    if (parsedExpirationDate < parsedStartDate) {
+      return res
+        .status(400)
+        .json({ message: "Ngày kết thúc phải sau ngày bắt đầu!" });
+    }
+
+    // Cập nhật mã khuyến mãi
     const updatedCoupon = await couponModel.findByIdAndUpdate(
       id,
       {
         code,
         discountPercentage,
-        ...(isoStartDate && { startDate: isoStartDate }),
-        ...(isoExpirationDate && { expirationDate: isoExpirationDate }),
+        startDate: parsedStartDate, // Lưu đối tượng Date
+        expirationDate: parsedExpirationDate, // Lưu đối tượng Date
         minimumPurchaseAmount,
         isActive,
         maxUsage,
@@ -165,9 +182,17 @@ export const updateCoupon = async (req, res) => {
       { new: true }
     );
 
-    res
-      .status(200)
-      .json({ message: "Coupon updated successfully.", coupon: updatedCoupon });
+    // Định dạng lại ngày trước khi trả về frontend
+    const formattedCoupon = {
+      ...updatedCoupon._doc,
+      startDate: format(new Date(updatedCoupon.startDate), "dd-MM-yyyy"),
+      expirationDate: format(
+        new Date(updatedCoupon.expirationDate),
+        "dd-MM-yyyy"
+      ),
+    };
+
+    res.status(200).json(formattedCoupon);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating coupon.", error });

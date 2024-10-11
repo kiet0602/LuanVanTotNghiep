@@ -36,6 +36,8 @@ const SIDEBAR_ITEMS = [
     href: "/evioment",
   },
   { name: "Sản phẩm", icon: ShoppingBag, color: "#8B5CF6", href: "/products" },
+  { name: "Khuyến mãi", icon: ShoppingBag, color: "#8B5CF6", href: "/poupons" },
+
   { name: "Người dùng", icon: Users, color: "#EC4899", href: "/users" },
   { name: "Cài đặt", icon: Settings, color: "#6EE7B7", href: "/settings" },
 ];

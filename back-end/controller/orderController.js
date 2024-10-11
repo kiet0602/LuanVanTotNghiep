@@ -3,6 +3,7 @@ import orderModel from "../models/orderModel.js";
 import couponModel from "../models/couponModel.js";
 import productModel from "../models/productModel.js";
 import userModel from "../models/userModel.js";
+import { sendOrderConfirmationEmail } from "./mailer.js";
 
 // Hàm xử lý checkout
 export const checkout = async (req, res) => {
@@ -83,6 +84,7 @@ export const checkout = async (req, res) => {
       status: "Chờ xử lý", // Trạng thái đơn hàng
     });
     await order.save();
+    await sendOrderConfirmationEmail(user.email, order);
     // 4. Xóa các mục đã được chọn trong giỏ hàng
     for (const item of items) {
       await cartModel.findOneAndUpdate(
@@ -199,8 +201,14 @@ export const getOrderById = async (req, res) => {
 //hàm lấy tất cả đơn hàng
 export const getAllOrders = async (req, res) => {
   try {
-    // Lấy tất cả các đơn hàng và populate thông tin người dùng và sản phẩm
-    const orders = await orderModel.find().populate("user"); // Populate thông tin người dùng
+    // Lấy tất cả các đơn hàng, populate thông tin người dùng và sản phẩm, và sắp xếp theo ngày tạo (createdAt) mới nhất
+    const orders = await orderModel
+      .find()
+      .populate("user")
+      .populate({
+        path: "items.product", // Populate thông tin sản phẩm từ items.product
+      })
+      .sort({ createdAt: -1 }); // Sắp xếp theo ngày tạo mới nhất
 
     if (orders.length === 0) {
       return res.status(404).json({ message: "Không có đơn hàng nào" });
@@ -351,43 +359,45 @@ export const getPending = async (req, res) => {
   try {
     // Các trạng thái cần lấy: Pending và Completed
     const statusList = ["Chờ xử lý", "Đang xử lý", "Đang giao hàng"];
+
     // Tìm đơn hàng có trạng thái thuộc danh sách trên và populate thông tin người dùng
     const orders = await orderModel
       .find({ status: { $in: statusList } })
-      .populate("user"); // Populate thông tin người dùng
+      .populate("user");
 
+    // Nếu không có đơn hàng, trả về mảng rỗng thay vì lỗi
     if (orders.length === 0) {
-      return res.status(404).json({
-        message:
-          "Không có đơn hàng nào với trạng thái 'Pending' hoặc 'Completed'",
-      });
+      return res.status(200).json([]); // Trả về mảng rỗng
     }
+
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 //Lấy doanh số đơn hàng Đã hoàn thành
 export const getCompleted = async (req, res) => {
   try {
-    // Các trạng thái cần lấy: Pending và Completed
+    // Các trạng thái cần lấy: Đã nhận hàng
     const statusList = ["Đã nhận hàng"];
+
     // Tìm đơn hàng có trạng thái thuộc danh sách trên và populate thông tin người dùng
     const orders = await orderModel
       .find({ status: { $in: statusList } })
-      .populate("user"); // Populate thông tin người dùng
+      .populate("user");
 
+    // Nếu không có đơn hàng, trả về mảng rỗng thay vì lỗi
     if (orders.length === 0) {
-      return res.status(404).json({
-        message:
-          "Không có đơn hàng nào với trạng thái 'Pending' hoặc 'Completed'",
-      });
+      return res.status(200).json([]); // Trả về mảng rỗng
     }
+
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 //hàm lấy số lượng đơn hàng của các trạng thái
 export const getOrderCountByStatus = async (req, res) => {
   try {
@@ -410,6 +420,39 @@ export const getOrderCountByStatus = async (req, res) => {
 
     // Trả về kết quả
     res.status(200).json(orderCounts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+//Hàm lấy số lượng đơn hàng theo ngày
+export const getOrderCountByDate = async (req, res) => {
+  try {
+    // Sử dụng aggregate để nhóm đơn hàng theo ngày và đếm số lượng đơn hàng
+    const ordersCountByDate = await orderModel.aggregate([
+      {
+        // Chuyển đổi trường createdAt thành ngày
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }, // Đếm số lượng đơn hàng trong mỗi ngày
+        },
+      },
+      {
+        // Sắp xếp theo ngày
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    if (ordersCountByDate.length === 0) {
+      return res.status(404).json({ message: "Không có đơn hàng nào" });
+    }
+
+    // Chuyển đổi dữ liệu sang định dạng mong muốn
+    const dailyOrdersData = ordersCountByDate.map((order) => ({
+      date: order._id.slice(5), // Lấy phần ngày tháng từ định dạng YYYY-MM-DD
+      orders: order.count, // Sử dụng trường count để lưu số lượng đơn hàng
+    }));
+
+    res.status(200).json(dailyOrdersData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

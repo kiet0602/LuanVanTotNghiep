@@ -1,6 +1,5 @@
 import { CheckCircle, Clock, DollarSign, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
-
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import DailyOrders from "../components/orders/DailyOrders";
@@ -39,17 +38,23 @@ const OrdersPage = () => {
   const fetchOrdersPending = async () => {
     try {
       const OrdersPending = await getAllOrdersByPending();
-      setOrdersPending(OrdersPending.length);
+      setOrdersPending(OrdersPending?.length || 0);
     } catch (error) {
+      setOrdersPending(0);
       console.error("Failed to fetch orders pending", error);
     }
   };
   const fetchOrdersCompleted = async () => {
     try {
       const OrdersCompleted = await getAllOrdersByCompleted();
-      setOrdersCompleted(OrdersCompleted.length);
+
+      // Nếu OrdersCompleted không tồn tại hoặc là mảng rỗng, mặc định là 0
+      setOrdersCompleted(OrdersCompleted?.length || 0);
     } catch (error) {
       console.error("Failed to fetch orders completed", error);
+
+      // Trong trường hợp lỗi, cũng đặt giá trị mặc định là 0
+      setOrdersCompleted(0);
     }
   };
 
@@ -78,7 +83,7 @@ const OrdersPage = () => {
             color="#6366F1"
           />
           <StatCard
-            name=" Đơn hàng đang xử lý"
+            name="Đơn hàng đang xử lý"
             icon={Clock}
             value={ordersPending}
             color="#F59E0B"

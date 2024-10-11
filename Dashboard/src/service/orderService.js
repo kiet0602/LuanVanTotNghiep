@@ -91,10 +91,13 @@ export const getAllOrdersByPending = async () => {
     const response = await axios.get(
       "http://localhost:2000/api/checkout/getPending"
     );
-    return response.data;
+
+    // Nếu không có dữ liệu, trả về mảng trống
+    return response.data || [];
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Lỗi lấy danh sách đơn hàng đang chờ xử lý"
+      error.response?.data?.message ||
+        "Lỗi lấy danh sách đơn hàng đang chờ xử lý"
     );
   }
 };
@@ -104,10 +107,13 @@ export const getAllOrdersByCompleted = async () => {
     const response = await axios.get(
       "http://localhost:2000/api/checkout/getCompleted"
     );
-    return response.data;
+
+    // Nếu không có dữ liệu, trả về mảng trống
+    return response.data || [];
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Lỗi lấy danh sách đơn hàng đã xử lý xong"
+      error.response?.data?.message ||
+        "Lỗi lấy danh sách đơn hàng đã xử lý xong"
     );
   }
 };
@@ -121,6 +127,19 @@ export const getOrderCountByStatus = async () => {
   } catch (error) {
     throw new Error(
       error.response.data.message || "Lỗi lấy đơn hàng theo status"
+    );
+  }
+};
+//hàm lấy số lượng đơn hàng theo ngày
+export const getOrderCountByDate = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/checkout/getOrderCountByDate"
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response.data.message || "Lỗi lấy đơn hàng theo ngày"
     );
   }
 };

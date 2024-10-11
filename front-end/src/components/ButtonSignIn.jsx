@@ -26,11 +26,11 @@ const ButtonSighIn = ({ handleLogin, isLoading }) => {
           Đăng nhập
         </Button>
         {/* Facebook */}
-        <Button w={"full"} colorScheme={"facebook"} leftIcon={<FaFacebook />}>
+        {/* <Button w={"full"} colorScheme={"facebook"} leftIcon={<FaFacebook />}>
           <Center>
             <Text>Tiếp tục với Facebook</Text>
           </Center>
-        </Button>
+        </Button> */}
         {/* Google */}
         <Button w={"full"} variant={"outline"} leftIcon={<FcGoogle />}>
           <Center>

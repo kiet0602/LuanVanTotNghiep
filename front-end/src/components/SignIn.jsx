@@ -14,7 +14,7 @@ import {
   useColorModeValue,
   Button,
 } from "@chakra-ui/react";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaHandPointRight } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 //thư viện
 import axios from "axios";
@@ -151,6 +151,7 @@ const SignIn = () => {
                 justify={"space-between"}
               >
                 <Text>Quên mật khẩu?</Text>
+
                 <NavLink to={"/enterEmail"}>
                   {" "}
                   <Text
@@ -166,6 +167,26 @@ const SignIn = () => {
                 </NavLink>
               </Stack>
 
+              <Stack direction={{ base: "column", sm: "row" }} align={"start"}>
+                <FaHandPointRight
+                  style={{
+                    color: "black",
+                    verticalAlign: "middle",
+                    marginRight: "5px",
+                  }}
+                />
+                <NavLink to={"/"}>
+                  <Text
+                    bgClip="text"
+                    bgGradient="linear(to-l, #0ea5e9, #2563eb)"
+                    fontWeight={"bold"}
+                    cursor={"pointer"}
+                    _hover={{ color: "white" }}
+                  >
+                    Đến trang chủ
+                  </Text>
+                </NavLink>
+              </Stack>
               <ButtonSighIn handleLogin={handleLogin} isLoading={isLoading} />
             </Stack>
           </Stack>

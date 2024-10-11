@@ -13,6 +13,7 @@ import CategoryPage from "./pages/CategoryPage";
 import ColorsPage from "./pages/ColorsPage";
 import FamilyPage from "./pages/FamilyPage";
 import EviomentPage from "./pages/EviomentPage";
+import PouponPage from "./pages/PouponPage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/color" element={<ColorsPage />} />
         <Route path="/family" element={<FamilyPage />} />
         <Route path="/evioment" element={<EviomentPage />} />
+        <Route path="/poupons" element={<PouponPage />} />
       </Routes>
     </div>
   );

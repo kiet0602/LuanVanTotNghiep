@@ -153,7 +153,7 @@ const FamilyTable = () => {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {[{ label: "Tên họ cây", key: "ClassificationName" }].map(
+              {[{ label: "Tên họ cây", key: "classificationName" }].map(
                 ({ key, label }) => (
                   <th
                     key={key}

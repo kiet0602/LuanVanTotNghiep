@@ -23,6 +23,14 @@ const ProductsTable = () => {
 
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
   const [selectedProduct, setSelectedProduct] = useState(null);
+  // hàm rút ngắn chữ khi quá dài
+  const truncateString = (str, maxLength) => {
+    if (str.length > maxLength) {
+      return str.slice(0, maxLength) + "...";
+    }
+    return str;
+  };
+
   // tìm kiếm
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -36,6 +44,7 @@ const ProductsTable = () => {
     setFilteredProducts(filtered);
     setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
   };
+
   // sắp xếp
   const handleSort = (key) => {
     let direction = "asc";
@@ -43,13 +52,22 @@ const ProductsTable = () => {
       direction = "desc";
     }
     setSortConfig({ key, direction });
+
+    const getNestedValue = (obj, key) => {
+      return key.split(".").reduce((acc, part) => acc && acc[part], obj);
+    };
+
     const sorted = [...filteredProducts].sort((a, b) => {
-      if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-      if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
+      const aValue = getNestedValue(a, key);
+      const bValue = getNestedValue(b, key);
+      if (aValue < bValue) return direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return direction === "asc" ? 1 : -1;
       return 0;
     });
+
     setFilteredProducts(sorted);
   };
+
   // Lấy dữ liệu tất cả sản phẩm
   const fetchProducts = async () => {
     try {
@@ -151,11 +169,11 @@ const ProductsTable = () => {
             <tr>
               {[
                 { label: "Tên sản phẩm", key: "productName" },
-                { label: "Thể loại", key: "category" },
+                { label: "Thể loại", key: "category.categoryName" },
                 { label: "Giá gốc", key: "originalPrice" },
                 { label: "Giá cuối", key: "finalPrice" },
                 { label: "Số lượng", key: "quantity" },
-                { label: "Số đơn hàng", key: "orderCount" },
+                { label: "Đã bán", key: "orderCount" },
                 { label: "Giảm giá", key: "discount" },
               ].map(({ label, key }) => (
                 <th
@@ -197,7 +215,7 @@ const ProductsTable = () => {
                     alt="Product img"
                     className="size-10 rounded-full"
                   />
-                  {product?.productName}
+                  {truncateString(product?.productName, 10)}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">

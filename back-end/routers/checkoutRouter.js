@@ -7,6 +7,7 @@ import {
   getCompleted,
   getMonthlyRevenue,
   getOrderById,
+  getOrderCountByDate,
   getOrderCountByStatus,
   getOrders,
   getPending,
@@ -35,5 +36,6 @@ checkoutRouter.get(
 checkoutRouter.get("/getCompleted", getCompleted);
 checkoutRouter.get("/getPending", getPending);
 checkoutRouter.get("/getOrderCountByStatus", getOrderCountByStatus);
+checkoutRouter.get("/getOrderCountByDate", getOrderCountByDate);
 
 export default checkoutRouter;

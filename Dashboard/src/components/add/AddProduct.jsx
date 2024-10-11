@@ -21,12 +21,12 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
   const [description, setDescription] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
   const [size, setSize] = useState("");
-  const [images, setImages] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
   const [quantity, setQuantity] = useState("");
   const [care, setCare] = useState("");
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   // Hàm để lấy danh sách danh mục, môi trường và màu sắc
   const fetchData = async () => {

@@ -11,10 +11,24 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 //thư viện
-import { NavLink } from "react-router-dom";
-//hooks Custom
+import { NavLink, useNavigate } from "react-router-dom";
+import userAtom from "../Atom/userAtom";
+import { useResetRecoilState } from "recoil";
 
+//hooks Custom
 const AvatarUser = ({ userCurrent }) => {
+  const navigate = useNavigate();
+  const resetUser = useResetRecoilState(userAtom);
+
+  const handleLogout = () => {
+    // Xóa token và thông tin người dùng từ localStorage
+    localStorage.removeItem("favoritesCount"); // Xóa token
+    localStorage.removeItem("token"); // Xóa thông tin người dùng nếu có
+    localStorage.removeItem("userCurrent"); // Xóa thông tin người dùng nếu có
+    resetUser();
+    navigate("/signIn");
+  };
+
   return (
     <>
       <Menu isLazy>
@@ -57,7 +71,9 @@ const AvatarUser = ({ userCurrent }) => {
           </MenuItem>
           <MenuDivider />
           <MenuItem>
-            <Text fontWeight="500">Sign Out</Text>
+            <Text fontWeight="500" onClick={handleLogout}>
+              Sign Out
+            </Text>
           </MenuItem>
         </MenuList>
       </Menu>

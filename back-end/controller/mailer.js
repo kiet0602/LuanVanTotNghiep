@@ -7,8 +7,8 @@ let nodeConfig = {
   host: "smtp.ethereal.email",
   port: 587,
   auth: {
-    user: "albert42@ethereal.email",
-    pass: "cz16tqdxDH6wEN7Xu4",
+    user: "iva.wolff@ethereal.email",
+    pass: "WtREEFvyabrQ3ZZHEw",
   },
 };
 
@@ -81,10 +81,10 @@ export const sendVoucherEmail = async (req, res) => {
     }
 
     // Kiểm tra xem voucher còn hạn sử dụng không
-    const now = new Date();
-    if (now < coupon.startDate || now > coupon.expirationDate) {
-      return res.status(400).send({ error: "Voucher is not valid" });
-    }
+    // const now = new Date();
+    // if (now < coupon.startDate || now > coupon.expirationDate) {
+    //   return res.status(400).send({ error: "Voucher is not valid" });
+    // }
 
     // Cập nhật voucher để thêm người dùng vào danh sách đã nhận
     coupon.usedBy.push(userId);
@@ -93,18 +93,29 @@ export const sendVoucherEmail = async (req, res) => {
     // Tạo nội dung email
     const email = {
       body: {
-        intro: `Congratulations! You have received a voucher code from us.`,
+        intro: `Chúc mừng bạn, chúng tôi gửi bạn mã khuyến mãi của cửa hàng của chúng tôi!.`,
         table: {
           data: [
-            { item: "Voucher Code", description: coupon.code },
-            { item: "Discount", description: `${coupon.discountPercentage}%` },
+            { item: "Mã khuyến mãi", description: coupon.code },
             {
-              item: "Expiry Date",
+              item: "Phần trăm khuyến mãi",
+              description: `${coupon.discountPercentage}%`,
+            },
+            {
+              item: "Ngày bắt đầu",
+              description: coupon.startDate.toDateString(),
+            },
+            {
+              item: "Ngày hết hạn",
               description: coupon.expirationDate.toDateString(),
+            },
+            {
+              item: "Số lần sử dụng",
+              description: coupon.maxUsage,
             },
           ],
         },
-        outro: `Use this voucher code at checkout to enjoy your discount!`,
+        outro: `Sử dụng mã voucher này khi thanh toán để tận hưởng ưu đãi giảm giá của bạn!`,
       },
     };
 
@@ -113,7 +124,7 @@ export const sendVoucherEmail = async (req, res) => {
     let message = {
       from: process.env.USERNAME_EMAIL,
       to: user.email,
-      subject: "Your Voucher Code",
+      subject: "Mã khuyến mãi",
       html: emailBody,
     };
 
@@ -124,4 +135,34 @@ export const sendVoucherEmail = async (req, res) => {
     console.error("Error sending voucher email:", error);
     res.status(500).send({ error: "Failed to send voucher email" });
   }
+};
+
+export const sendOrderConfirmationEmail = async (userEmail, order) => {
+  // Tạo nội dung email
+  const email = {
+    body: {
+      intro: `Cảm ơn bạn đã đặt hàng! Đây là thông tin đơn hàng của bạn:`,
+      table: {
+        data: order.items.map((item) => ({
+          item: item.product, // Lấy tên sản phẩm
+          description: `Số lượng: ${item.quantity}, Giá: ${item.price}`,
+        })),
+      },
+      outro: `Tổng giá trị đơn hàng: ${order.finalPrice}.\n
+      Chúng tôi sẽ giao hàng đến địa chỉ: ${order.shippingAddress}.\n
+      Nếu bạn có bất kỳ câu hỏi nào, hãy liên hệ với chúng tôi.`,
+    },
+  };
+
+  const emailBody = mailGenerator.generate(email);
+
+  let message = {
+    from: process.env.USERNAME_EMAIL,
+    to: userEmail,
+    subject: "Xác nhận đơn hàng của bạn",
+    html: emailBody,
+  };
+
+  // Gửi email
+  await transporter.sendMail(message);
 };

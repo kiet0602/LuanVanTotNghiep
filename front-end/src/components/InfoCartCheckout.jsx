@@ -35,6 +35,7 @@ const InfoCartCheckout = ({ items, total }) => {
   const [couponCode, setCouponCode] = useState("");
   const [discountedTotal, setDiscountedTotal] = useState(total);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const taxAmount = 20000; // Thuế
   const shippingFeeThreshold = 300000; // Ngưỡng miễn phí vận chuyển
@@ -105,6 +106,7 @@ const InfoCartCheckout = ({ items, total }) => {
 
   // Hàm thanh toán - gọi API checkout
   const handlePayment = async () => {
+    setIsLoading(true);
     try {
       const orderData = {
         userId,
@@ -125,6 +127,8 @@ const InfoCartCheckout = ({ items, total }) => {
     } catch (err) {
       toast.error(err.response.data.message);
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -216,6 +220,7 @@ const InfoCartCheckout = ({ items, total }) => {
           </HStack>
 
           <Button
+            isLoading={isLoading}
             color={"white"}
             bg={"blue"}
             w="full"

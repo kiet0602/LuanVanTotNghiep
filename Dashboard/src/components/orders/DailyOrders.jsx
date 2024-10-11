@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -9,6 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { getOrderCountByDate } from "../../service/orderService";
 
 const dailyOrdersData = [
   { date: "07/01", orders: 45 },
@@ -21,6 +23,20 @@ const dailyOrdersData = [
 ];
 
 const DailyOrders = () => {
+  const [ordersByDate, setOrdersByDate] = useState([]);
+
+  const dailyOrders = async () => {
+    try {
+      const responsive = await getOrderCountByDate();
+      setOrdersByDate(responsive);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  useEffect(() => {
+    dailyOrders();
+  }, []);
+
   const strokeColor = "9CA3AF";
   return (
     <motion.div
@@ -29,11 +45,13 @@ const DailyOrders = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">Daily Orders</h2>
+      <h2 className="text-xl font-semibold text-gray-100 mb-4">
+        Đơn hàng theo ngày
+      </h2>
 
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
-          <LineChart data={dailyOrdersData}>
+          <LineChart data={ordersByDate}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="date" stroke="#9CA3AF" />
             <YAxis stroke={strokeColor || "#9CA3AF"} />

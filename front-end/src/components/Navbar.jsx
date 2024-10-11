@@ -91,7 +91,7 @@ const Navbar = () => {
                     textDecoration="none"
                   >
                     <Flex alignItems="center">
-                      <Text>Cửa hàng</Text>
+                      <Text fontWeight="semibold">Cửa hàng</Text>
                       <Icon
                         as={BiChevronDown}
                         h={5}
@@ -255,6 +255,7 @@ const CustomNavLink = ({ name, path }) => {
       })}
     >
       <Text
+        fontWeight="semibold"
         _hover={{
           color: hoverColor,
         }}

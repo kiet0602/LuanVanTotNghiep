@@ -14,7 +14,7 @@ const couponRouter = express.Router();
 couponRouter.post("/addCoupon", createCoupon);
 couponRouter.get("/getAllCoupon", getAllCoupons);
 couponRouter.get("/getCouponById/:id", getCouponById);
-couponRouter.delete("/deleteCoupon", deleteCoupon);
+couponRouter.delete("/deleteCoupon/:id", deleteCoupon);
 couponRouter.put("/updateCoupon/:id", updateCoupon);
 
 couponRouter.post("/send-coupon", sendVoucherEmail);

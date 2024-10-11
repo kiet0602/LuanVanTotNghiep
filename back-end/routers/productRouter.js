@@ -6,6 +6,7 @@ import {
   getAllProducts,
   getProductById,
   getProductsByCategoryId,
+  getTopSellingProducts,
   updateProduct,
 } from "../controller/productController.js";
 
@@ -24,5 +25,6 @@ productRouter.get(
   "/getProductByCategoryId/:categoryId",
   getProductsByCategoryId
 );
+productRouter.get("/getTopSellingProducts", getTopSellingProducts);
 
 export default productRouter;

@@ -1,56 +1,69 @@
+import axios from "axios";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
   PieChart,
   Pie,
   Cell,
-  Tooltip,
   ResponsiveContainer,
+  Tooltip,
   Legend,
 } from "recharts";
 import { getQuantitySalesByCategory } from "../../service/orderService";
 
-// Doanh số sản phẩm theo từng loại
-const categoryData = [
-  { categoryName: "Electronics", totalQuantity: 4500 },
-  { categoryName: "Clothing", totalQuantity: 3200 },
-  { categoryName: "Home & Garden", totalQuantity: 2800 },
-  { categoryName: "Books", totalQuantity: 2100 },
-  { categoryName: "Sports & Outdoors", totalQuantity: 1900 },
+const COLORSEE = [
+  "#EC4899", // Màu hồng
+  "#8B5CF6", // Màu tím
+  "#10B981", // Màu xanh lá
+  "#F59E0B", // Màu vàng
+  "#6366F1", // Màu xanh da trời
+  "#FF6B6B", // Màu đỏ
+  "#4ECDC4", // Màu xanh nước biển
+  "#45B7D1", // Màu xanh ngọc
+  "#FED766", // Màu vàng nhạt
+  "#FF9A00", // Màu cam
+  "#FFB6C1", // Màu hồng nhạt
+  "#B0E0E6", // Màu xanh nhẹ
+  "#DDA0DD", // Màu tím nhạt
+  "#FF4500", // Màu cam đậm
+  "#00BFFF", // Màu xanh dương sáng
+  "#7B68EE", // Màu tím đậm
+  "#FF1493", // Màu hồng đậm
+  "#FFD700", // Màu vàng ánh kim
+  "#ADFF2F", // Màu xanh lá sáng
+  "#1E90FF", // Màu xanh da trời đậm
+  "#FF6347", // Màu cà chua
 ];
-
-const COLORS = ["#6366F1", "#8B5CF6", "#EC4899", "#10B981", "#F59E0B"];
 
 const CategoryDistributionChart = () => {
   const [quantitySalesByCategory, setQuantitySalesByCategory] = useState([]);
 
-  useEffect(() => {
-    const fetchQuantitySalesByCategory = async () => {
-      try {
-        const data = await getQuantitySalesByCategory();
-        setQuantitySalesByCategory(data); // Cập nhật dữ liệu doanh thu
-      } catch (error) {
-        console.error("Failed to fetch revenue data:", error);
-      }
-    };
+  // Fetch data from API
+  const fetchQuantitySalesByCategory = async () => {
+    try {
+      const response = await getQuantitySalesByCategory();
+      setQuantitySalesByCategory(response);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
 
+  const truncateString = (str, maxLength) => {
+    if (str.length > maxLength) {
+      return str.slice(0, maxLength) + "...";
+    }
+    return str;
+  };
+
+  // Chuyển đổi categoryName thành name
+  const transformedData = quantitySalesByCategory.map((item) => ({
+    name: item.categoryName, // Đổi categoryName thành name
+    value: item.totalQuantity, // Gán totalQuantity cho value
+  }));
+
+  useEffect(() => {
     fetchQuantitySalesByCategory();
   }, []);
-
-  // Custom Legend component
-  const renderLegend = () => (
-    <div className="flex flex-col">
-      {quantitySalesByCategory.map((entry, index) => (
-        <div key={index} className="flex items-center mb-1">
-          <div
-            style={{ backgroundColor: COLORS[index % COLORS.length] }}
-            className="w-4 h-4 mr-2 rounded-full"
-          />
-          <span className="text-gray-100">{entry.categoryName}</span>
-        </div>
-      ))}
-    </div>
-  );
 
   return (
     <motion.div
@@ -60,27 +73,26 @@ const CategoryDistributionChart = () => {
       transition={{ delay: 0.3 }}
     >
       <h2 className="text-lg font-medium mb-4 text-gray-100">
-        Số lượng bán sản phẩm theo từng thể loại
+        Tỷ lệ bán sản phẩm theo từng thể loại
       </h2>
-      <div className="h-80">
-        <ResponsiveContainer width={"100%"} height={"100%"}>
+      <div style={{ width: "100%", height: 300 }}>
+        <ResponsiveContainer>
           <PieChart>
             <Pie
-              data={quantitySalesByCategory}
-              cx={"50%"}
-              cy={"50%"}
-              labelLine={false}
+              data={transformedData}
+              cx="50%"
+              cy="50%"
               outerRadius={80}
               fill="#8884d8"
-              dataKey="totalQuantity"
-              label={({ categoryName, percent }) =>
-                `${categoryName} ${(percent * 100).toFixed(0)}%`
-              }
+              dataKey="value" // Dùng value cho dữ liệu số lượng
+              label={({ name, percent }) =>
+                `${truncateString(name, 10)} ${(percent * 100).toFixed(0)}%`
+              } // Hiển thị name thay vì categoryName
             >
-              {quantitySalesByCategory.map((entry, index) => (
+              {transformedData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={COLORSEE[index % COLORSEE.length]} // Sử dụng màu sắc từ mảng COLORS
                 />
               ))}
             </Pie>
@@ -91,8 +103,7 @@ const CategoryDistributionChart = () => {
               }}
               itemStyle={{ color: "#E5E7EB" }}
             />
-            {/* Render custom legend */}
-            {renderLegend()}
+            <Legend />
           </PieChart>
         </ResponsiveContainer>
       </div>

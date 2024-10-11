@@ -3,41 +3,60 @@ import productModel from "../models/productModel.js";
 
 export const addComment = async (req, res) => {
   try {
-    const { productId } = req.params;
+    const { productId, parentId } = req.params;
     const { content, rating } = req.body;
     const { userId } = req.user;
 
-    // Tạo bình luận mới
-    const comment = new commentModel({ productId, userId, content, rating });
-    await comment.save();
+    // Tạo bình luận mới hoặc phản hồi
+    const newComment = new commentModel({
+      productId,
+      userId,
+      content,
+      rating: parentId ? undefined : rating, // Nếu là phản hồi, không cần rating
+      parentId: parentId || null, // Nếu là phản hồi, lưu parentId
+    });
 
-    // Cập nhật sản phẩm để tăng số lượng bình luận và cập nhật số lượng đánh giá và điểm trung bình
-    const product = await productModel.findById(productId);
-    if (product) {
-      const totalRatings = product.ratingsCount + 1;
-      const updatedAverageRating =
-        (product.averageRating * product.ratingsCount + rating) / totalRatings;
+    await newComment.save();
 
-      await productModel.findByIdAndUpdate(productId, {
-        $push: { comments: comment._id },
-        $inc: { ratingsCount: 1 },
-        $set: { averageRating: updatedAverageRating },
-      });
+    if (parentId) {
+      // Tìm bình luận cha (parentId) và đệ quy cập nhật
+      const parentComment = await commentModel.findById(parentId);
+      if (!parentComment) {
+        return res.status(404).json({ message: "Parent comment not found" });
+      }
+
+      // Đệ quy thêm bình luận vào đúng cấp độ
+      const addReplyRecursive = async (commentId, replyId) => {
+        const comment = await commentModel.findById(commentId);
+        if (comment) {
+          // Nếu là bình luận cha cuối cùng, thêm phản hồi vào replies
+          if (String(comment._id) === String(parentId)) {
+            comment.replies.push(replyId);
+            await comment.save();
+          } else if (comment.replies.length > 0) {
+            // Nếu vẫn có replies bên trong, tiếp tục đệ quy
+            for (let reply of comment.replies) {
+              await addReplyRecursive(reply, replyId);
+            }
+          }
+        }
+      };
+
+      // Thêm phản hồi vào bình luận đệ quy
+      await addReplyRecursive(parentId, newComment._id);
     }
 
-    res.status(201).send(comment);
+    res.status(201).json(newComment);
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
-// Controller để xóa bình luận
 export const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const userId = req.userId; // Lấy userId từ middleware xác thực
+    const userId = req.userId;
 
-    // Tìm và xóa bình luận
     const comment = await commentModel.findById(commentId);
     if (!comment) return res.status(404).send("Bình luận không tồn tại");
 
@@ -46,24 +65,34 @@ export const deleteComment = async (req, res) => {
       return res.status(403).send("Bạn không có quyền xóa bình luận này");
     }
 
-    // Lấy thông tin sản phẩm để cập nhật số lượng bình luận và điểm trung bình
-    const product = await productModel.findById(comment.productId);
-    if (product) {
-      const totalRatings = product.ratingsCount - 1;
-      const updatedAverageRating =
-        totalRatings > 0
-          ? (product.averageRating * product.ratingsCount - comment.rating) /
-            totalRatings
-          : 0;
+    // Nếu là bình luận gốc, cập nhật sản phẩm
+    if (!comment.parentId) {
+      const product = await productModel.findById(comment.productId);
+      if (product) {
+        const totalRatings = product.ratingsCount - 1;
+        const updatedAverageRating =
+          totalRatings > 0
+            ? (product.averageRating * product.ratingsCount - comment.rating) /
+              totalRatings
+            : 0;
 
-      await productModel.findByIdAndUpdate(comment.productId, {
-        $pull: { comments: commentId },
-        $inc: { ratingsCount: -1 },
-        $set: { averageRating: updatedAverageRating },
+        await productModel.findByIdAndUpdate(comment.productId, {
+          $pull: { comments: commentId },
+          $inc: { ratingsCount: -1 },
+          $set: { averageRating: updatedAverageRating },
+        });
+      }
+    } else {
+      // Nếu là phản hồi, xóa khỏi bình luận cha
+      await commentModel.findByIdAndUpdate(comment.parentId, {
+        $pull: { replies: commentId },
       });
     }
 
-    // Xóa bình luận
+    // Xóa tất cả bình luận con (bao gồm phản hồi)
+    await commentModel.deleteMany({ parentId: commentId });
+
+    // Xóa bình luận hoặc phản hồi
     await commentModel.findByIdAndDelete(commentId);
 
     res.status(200).send({ message: "Bình luận đã được xóa" });
@@ -76,9 +105,8 @@ export const updateComment = async (req, res) => {
   try {
     const { commentId } = req.params;
     const { content, rating } = req.body;
-    const userId = req.userId; // Lấy userId từ middleware xác thực
+    const userId = req.userId;
 
-    // Tìm bình luận cần cập nhật
     const comment = await commentModel.findById(commentId);
     if (!comment) return res.status(404).send("Bình luận không tồn tại");
 
@@ -87,26 +115,30 @@ export const updateComment = async (req, res) => {
       return res.status(403).send("Bạn không có quyền cập nhật bình luận này");
     }
 
-    // Tìm sản phẩm liên quan
-    const product = await productModel.findById(comment.productId);
-    if (!product) return res.status(404).send("Sản phẩm không tồn tại");
+    // Nếu là bình luận gốc và có rating
+    if (!comment.parentId && rating !== undefined) {
+      const product = await productModel.findById(comment.productId);
+      if (!product) return res.status(404).send("Sản phẩm không tồn tại");
 
-    // Tính toán sự thay đổi của điểm đánh giá trung bình
-    const oldRating = comment.rating;
-    const totalRatings = product.ratingsCount;
-    const updatedAverageRating =
-      (product.averageRating * totalRatings - oldRating + rating) /
-      totalRatings;
+      const oldRating = comment.rating;
+      const totalRatings = product.ratingsCount;
 
-    // Cập nhật bình luận
+      const updatedAverageRating =
+        totalRatings > 1
+          ? (product.averageRating * totalRatings - oldRating + rating) /
+            totalRatings
+          : rating; // Nếu chỉ còn 1 đánh giá thì average sẽ là rating hiện tại
+
+      await productModel.findByIdAndUpdate(comment.productId, {
+        $set: { averageRating: updatedAverageRating },
+      });
+    }
+
+    // Cập nhật nội dung
     comment.content = content;
-    comment.rating = rating;
-    await comment.save();
+    if (rating !== undefined) comment.rating = rating;
 
-    // Cập nhật sản phẩm
-    await productModel.findByIdAndUpdate(comment.productId, {
-      $set: { averageRating: updatedAverageRating },
-    });
+    await comment.save();
 
     res.status(200).send(comment);
   } catch (error) {
@@ -114,24 +146,46 @@ export const updateComment = async (req, res) => {
   }
 };
 
-// Controller để lấy tất cả bình luận của một sản phẩm
-// Controller để lấy tất cả bình luận của một sản phẩm
 export const getCommentsByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    // Lấy tất cả bình luận của sản phẩm với thông tin người dùng
-    const product = await productModel.findById(productId).populate({
-      path: "comments",
-      populate: {
-        path: "userId", // Assuming comments have a reference to a user
-        select: "username avatar", // Include user name, image, and ID
-      },
-    });
+    // Lấy tất cả bình luận của sản phẩm với thông tin người dùng và bình luận con
+    const comments = await commentModel
+      .find({ productId, parentId: null }) // Chỉ lấy bình luận gốc
+      .populate({
+        path: "userId",
+        select: "username avatar",
+      })
+      .populate({
+        path: "replies",
+        populate: {
+          path: "userId",
+          select: "username avatar",
+        },
+      });
 
-    if (!product) return res.status(404).send("Sản phẩm không tồn tại");
+    // Lấy tất cả các phản hồi lồng nhau
+    for (let comment of comments) {
+      comment.replies = await commentModel
+        .find({ parentId: comment._id }) // Lấy phản hồi cho từng bình luận
+        .populate({
+          path: "userId",
+          select: "username avatar",
+        })
+        .populate({
+          path: "replies",
+          populate: {
+            path: "userId",
+            select: "username avatar",
+          },
+        });
+    }
 
-    res.status(200).send(product.comments);
+    if (!comments || comments.length === 0)
+      return res.status(404).send("Không có bình luận nào");
+
+    res.status(200).send(comments);
   } catch (error) {
     res.status(500).send(error.message);
   }
