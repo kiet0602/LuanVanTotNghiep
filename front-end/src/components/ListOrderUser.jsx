@@ -152,26 +152,37 @@ const ListOrderUser = () => {
                     </Td>
                     <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
                     <Td textAlign={"end"}>
-                      <IconButton
-                        aria-label="Xem chi tiết"
-                        icon={<FaEye />}
-                        onClick={() => openModal(order)}
-                        mr={2}
-                      />
-                      {order.status === "Chờ xử lý" && (
-                        <IconButton
-                          aria-label="Xóa"
-                          icon={<FaTrash />}
-                          onClick={() => removeOrder(order._id)}
-                        />
-                      )}
-                      {order.status === "Đang giao hàng" && (
-                        <IconButton
-                          aria-label="Cập nhật"
-                          icon={<FaEdit />} // Thay đổi biểu tượng để đại diện cho việc cập nhật (ví dụ, biểu tượng bút)
-                          onClick={() => updateOrder(order._id)} // Thêm hàm xử lý cập nhật đơn hàng
-                        />
-                      )}
+                      <Flex
+                        alignItems="center"
+                        gap={3}
+                        justifyContent="flex-end"
+                      >
+                        <Box
+                          as="span"
+                          aria-label="Xem chi tiết"
+                          onClick={() => openModal(order)}
+                          cursor="pointer"
+                        >
+                          <FaEye color="blue" />
+                        </Box>
+
+                        {order.status === "Chờ xử lý" ||
+                        order.status === "Đã hủy" ? (
+                          <Box
+                            as="span"
+                            aria-label="Xóa"
+                            onClick={() => removeOrder(order._id)}
+                            cursor="pointer"
+                          >
+                            <FaTrash color="red" />
+                          </Box>
+                        ) : (
+                          <Box as="span" aria-label="Biểu tượng ẩn">
+                            <FaTrash color="transparent" />{" "}
+                            {/* Hoặc bạn có thể dùng biểu tượng khác */}
+                          </Box>
+                        )}
+                      </Flex>
                     </Td>
                   </Tr>
                 ))}

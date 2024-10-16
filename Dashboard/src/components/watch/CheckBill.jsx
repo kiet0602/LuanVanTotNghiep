@@ -1,12 +1,12 @@
-import { Dialog } from "@headlessui/react";
-import { PhotoIcon } from "@heroicons/react/24/solid";
-import { LeafyGreen } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { toast } from "react-toastify";
+import { Dialog } from "@headlessui/react";
+import { LeafyGreen } from "lucide-react";
 
 export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
   if (!order) return null;
+
   const {
     user,
     items,
@@ -19,9 +19,57 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
     createdAt,
   } = order;
 
+  const exportPDF = async () => {
+    const element = document.getElementById("bill-content");
+    if (!element) {
+      toast.error("Không tìm thấy nội dung để xuất PDF");
+      return;
+    }
+
+    // Ẩn tất cả hình ảnh trước khi tạo canvas
+    const images = element.querySelectorAll("img");
+    images.forEach((img) => {
+      img.style.display = "none";
+    });
+
+    try {
+      const canvas = await html2canvas(element, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const margin = 10; // Thêm lề
+      const imgWidth = 210 - 2 * margin; // Chiều rộng A4 trừ lề (mm)
+      const pageHeight = 297 - 2 * margin; // Chiều cao A4 trừ lề (mm)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = margin;
+
+      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Nếu hình ảnh cao hơn chiều dài trang, cần chia nhỏ
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight + margin;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save("bill.pdf");
+      toast.success("Xuất PDF thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xuất PDF:", error);
+      toast.error("Có lỗi xảy ra khi xuất PDF.");
+    } finally {
+      // Hiển thị lại hình ảnh sau khi đã xuất PDF
+      images.forEach((img) => {
+        img.style.display = "block";
+      });
+    }
+  };
+
   return (
     <Dialog
-      id="bill-content" // Thêm id vào đây
       open={isOpenSeeBill}
       onClose={() => setIsOpenSeeBill(false)}
       className="relative z-50"
@@ -33,19 +81,20 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="w-full max-w-2xl bg-white p-6 rounded-lg overflow-y-auto max-h-screen scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-gray-400 scrollbar-track-gray-200">
           <form>
-            <div className="space-y-12">
+            {/* Nội dung hóa đơn */}
+            <div className="space-y-12" id="bill-content">
               <div className="border-b border-gray-900/10 pb-12">
                 <div className="border-b border-gray-900/10 pb-12 text-center">
                   <h2 className="text-base font-semibold leading-7 text-gray-900 flex items-center justify-center">
-                    <LeafyGreen className="mr-2" color="#D97706" /> Hóa đơn của
-                    bạn
+                    <LeafyGreen className="mr-2" color="#D97706" /> Thông tin
+                    đơn hàng
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-gray-600">
                     Thông tin hóa đơn đã được hiển thị đầy đủ bên dưới
                   </p>
                 </div>
+                {/* Thông tin hóa đơn */}
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                  {/* Tên người dùng */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Tên người dùng
@@ -53,7 +102,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{user?.username}</div>
                   </div>
 
-                  {/* Mã hóa đơn */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Mã hóa đơn
@@ -61,7 +109,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{order?._id}</div>
                   </div>
 
-                  {/* Địa chỉ giao hàng */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Địa chỉ giao hàng
@@ -69,7 +116,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{shippingAddress}</div>
                   </div>
 
-                  {/* Ngày đặt hàng */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Ngày đặt hàng
@@ -79,7 +125,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     </div>
                   </div>
 
-                  {/* Phương thức thanh toán */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Phương thức thanh toán
@@ -87,7 +132,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{paymentMethod}</div>
                   </div>
 
-                  {/* Tổng số tiền */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Tổng số tiền
@@ -95,7 +139,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{totalPrice} VND</div>
                   </div>
 
-                  {/* Phí vận chuyển */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Phí vận chuyển
@@ -103,7 +146,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{shippingFee} VND</div>
                   </div>
 
-                  {/* Giảm giá */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Giảm giá
@@ -111,7 +153,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1">{discount} VND</div>
                   </div>
 
-                  {/* Tổng thanh toán */}
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Tổng thanh toán
@@ -119,13 +160,11 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1 font-semibold">{finalPrice} VND</div>
                   </div>
 
-                  {/* Danh sách sản phẩm */}
                   <div className="sm:col-span-6">
                     <h2 className="text-lg font-medium text-gray-700">
                       Sản phẩm trong hóa đơn
                     </h2>
                     <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                      {/* Lặp qua từng sản phẩm */}
                       {items.map((item) => (
                         <div
                           key={item._id}
@@ -154,6 +193,7 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                 </div>
               </div>
             </div>
+
             <div className="mt-6 flex items-center justify-end gap-x-6">
               <button
                 type="button"
@@ -165,6 +205,7 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
               <button
                 type="button"
                 className="text-sm font-semibold leading-6 text-green-600"
+                onClick={exportPDF}
               >
                 Xuất PDF
               </button>

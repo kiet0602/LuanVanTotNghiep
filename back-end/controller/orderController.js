@@ -3,6 +3,7 @@ import orderModel from "../models/orderModel.js";
 import couponModel from "../models/couponModel.js";
 import productModel from "../models/productModel.js";
 import userModel from "../models/userModel.js";
+import AddressModel from "../models/addressModel.js";
 import { sendOrderConfirmationEmail } from "./mailer.js";
 
 // Hàm xử lý checkout
@@ -16,6 +17,7 @@ export const checkout = async (req, res) => {
     selectedShippingMethod,
     selectedPaymentMethod,
     couponCode = null,
+    addressId,
   } = req.body;
 
   try {
@@ -25,12 +27,24 @@ export const checkout = async (req, res) => {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
     // Lấy địa chỉ từ người dùng
-    const shippingAddress = `${user.ward}, ${user.district}, ${user.city}`;
-    if (!user.ward || !user.district || !user.city) {
+    const address = await AddressModel.findOne({
+      _id: addressId,
+      user: userId,
+    });
+    let shippingAddress;
+    if (address) {
+      shippingAddress = {
+        street: address.street,
+        ward: address.ward,
+        district: address.district,
+        city: address.city,
+      };
+    } else {
       return res
         .status(400)
-        .json({ message: "Vui lòng cung cấp địa chỉ giao hàng" });
+        .json({ message: "Địa chỉ giao hàng không tồn tại" });
     }
+
     // 2. Xử lý mã khuyến mãi (nếu có)
     let discount = 0;
     if (couponCode) {
@@ -55,6 +69,10 @@ export const checkout = async (req, res) => {
 
         // Cập nhật số lần sử dụng của mã giảm giá
         coupon.usageCount += 1;
+        coupon.maxUsage -= 1; // Giảm maxUsage mỗi khi mã được sử dụng
+        if (coupon.usageCount >= coupon.maxUsage) {
+          coupon.isActive = false; // Vô hiệu hóa mã khuyến mãi nếu đã sử dụng đủ số lần
+        }
         try {
           await coupon.save(); // Lưu thay đổi
         } catch (error) {
@@ -79,12 +97,12 @@ export const checkout = async (req, res) => {
       shippingMethod: selectedShippingMethod, // Phương thức vận chuyển
       discount: discount, // Số tiền giảm giá
       finalPrice: discountedTotal, // Tổng giá sau khi giảm giá
-      shippingAddress: shippingAddress, // Địa chỉ giao hàng
+      shippingAddress: shippingAddress, // Địa chỉ giao hàng từ Address model
       paymentMethod: selectedPaymentMethod, // Phương thức thanh toán
       status: "Chờ xử lý", // Trạng thái đơn hàng
     });
     await order.save();
-    await sendOrderConfirmationEmail(user.email, order);
+    // await sendOrderConfirmationEmail(user.email, order);
     // 4. Xóa các mục đã được chọn trong giỏ hàng
     for (const item of items) {
       await cartModel.findOneAndUpdate(

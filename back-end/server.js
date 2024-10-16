@@ -18,6 +18,7 @@ import checkoutRouter from "./routers/checkoutRouter.js";
 import classificationRouter from "./routers/classificationRouter.js";
 import searchRouter from "./routers/searchRouter.js";
 import fillterRouter from "./routers/fillter.js";
+import addressRouter from "./routers/addressRouter.js";
 /* import commentRouter from "./routers/commentRouter.js";
 import cartRouter from "./routers/cartRouter.js"; */
 
@@ -48,6 +49,7 @@ app.use("/api/comment", commentRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/checkout", checkoutRouter);
 app.use("/api/classification", classificationRouter);
+app.use("/api/address", addressRouter);
 
 app.use("/api/search", searchRouter);
 app.use("/api/fillter", fillterRouter);

@@ -60,7 +60,6 @@ const ColorTable = () => {
   //Cập nhật danh sách khi thêm
   const handleAddColor = async (newColor) => {
     try {
-      console.log("New color added:", newColor); // Kiểm tra dữ liệu mới
       setColors((prev) => [...prev, newColor]);
       setFilteredColors((prev) => [...prev, newColor]);
     } catch (error) {

@@ -15,18 +15,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  ward: {
-    type: String,
-    default: "",
-  },
-  district: {
-    type: String,
-    default: "",
-  },
-  city: {
-    type: String,
-    default: "",
-  },
   numberPhone: {
     type: String,
     required: true,

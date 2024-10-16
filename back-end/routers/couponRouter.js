@@ -5,6 +5,7 @@ import {
   deleteCoupon,
   getAllCoupons,
   getCouponById,
+  getUserCoupons,
   updateCoupon,
 } from "../controller/couponController.js";
 import { sendVoucherEmail } from "../controller/mailer.js";
@@ -16,6 +17,7 @@ couponRouter.get("/getAllCoupon", getAllCoupons);
 couponRouter.get("/getCouponById/:id", getCouponById);
 couponRouter.delete("/deleteCoupon/:id", deleteCoupon);
 couponRouter.put("/updateCoupon/:id", updateCoupon);
+couponRouter.get("/getUserCoupons/:userId", getUserCoupons);
 
 couponRouter.post("/send-coupon", sendVoucherEmail);
 couponRouter.post("/coupon-apply", applyCoupon);

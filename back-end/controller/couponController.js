@@ -1,5 +1,6 @@
 import { parse, format, parseISO, isValid } from "date-fns";
 import couponModel from "../models/couponModel.js";
+import userModel from "../models/userModel.js";
 
 export const createCoupon = async (req, res) => {
   const {
@@ -82,6 +83,32 @@ export const getAllCoupons = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching coupons.", error });
+  }
+};
+export const getUserCoupons = async (req, res) => {
+  const { userId } = req.params; // Lấy userId từ tham số URL
+
+  try {
+    // Tìm người dùng
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Lấy các coupon mà người dùng đã nhận
+    const coupons = await couponModel.find({ usedBy: userId });
+
+    // Chuyển đổi ngày từ đối tượng Date sang DD-MM-YYYY
+    const formattedCoupons = coupons.map((coupon) => ({
+      ...coupon._doc,
+      startDate: format(new Date(coupon.startDate), "dd-MM-yyyy"),
+      expirationDate: format(new Date(coupon.expirationDate), "dd-MM-yyyy"),
+    }));
+
+    res.status(200).json(formattedCoupons);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching user coupons.", error });
   }
 };
 // Lấy một mã khuyến mãi theo ID

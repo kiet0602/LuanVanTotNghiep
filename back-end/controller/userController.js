@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import validator from "validator";
+import AddressModel from "../models/addressModel.js";
 
 const verifyUser = async (req, res, next) => {
   const { email } = req.method === "GET" ? req.query : req.body;
@@ -84,6 +85,9 @@ const login = async (req, res) => {
       return res.status(400).send({ error: "Mật khẩu sai" });
     }
 
+    // Lấy địa chỉ của người dùng
+    const address = await AddressModel.findOne({ user: user._id });
+
     // Tạo token
     const token = jwt.sign(
       {
@@ -94,20 +98,34 @@ const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Gửi phản hồi thành công
-    return res.status(200).json({
+    // Chuẩn bị dữ liệu trả về
+    const responseData = {
       _id: user._id,
       username: user.username,
       email: user.email,
-      password: null, // Ẩn mật khẩu
-      ward: user.ward || "",
-      district: user.district || "",
-      city: user.city || "",
       avatar: user.avatar || "",
       numberPhone: user.numberPhone,
       role: user.role,
       token,
-    });
+      // Kiểm tra và trả về thông tin địa chỉ (nếu có)
+      address: address
+        ? {
+            street: address.street,
+            ward: address.ward,
+            district: address.district,
+            province: address.province,
+            isDefault: address.isDefault,
+          }
+        : {
+            street: "",
+            ward: "",
+            district: "",
+            province: "",
+          },
+    };
+
+    // Gửi phản hồi thành công
+    return res.status(200).json(responseData);
   } catch (error) {
     return res.status(500).send({ error: "Lỗi đăng nhập" });
   }
@@ -115,18 +133,22 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
   const { id } = req.params;
+
   try {
     if (!id) {
-      res.status(400).send({ error: "Chưa nhập id người dùng vào" });
+      return res.status(400).send({ error: "Chưa nhập id người dùng vào" });
     }
+
     const user = await userModel.findById(id);
     if (!user) {
-      res.status(404).send({ error: "Không tìm thấy người dùng" });
+      return res.status(404).send({ error: "Không tìm thấy người dùng" });
     }
+
     const { password, ...rest } = user.toObject();
     return res.status(200).send(rest);
   } catch (error) {
-    res.json("Lỗi lấy người dùng");
+    console.error(error); // Log lỗi để dễ dàng theo dõi
+    return res.status(500).send({ error: "Lỗi lấy người dùng" });
   }
 };
 
@@ -150,7 +172,8 @@ const getAllUsers = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { username, email, numberPhone, ward, district, city } = req.body;
+  const { username, email, numberPhone, street, ward, district, province } =
+    req.body;
 
   try {
     const { userId } = req.user;
@@ -161,12 +184,14 @@ const updateUser = async (req, res) => {
         .send({ error: "Lỗi chưa xác định được người dùng!" });
     }
 
+    // Tìm người dùng hiện tại
     const existingUser = await userModel.findById(userId);
 
     if (!existingUser) {
       return res.status(404).send({ error: "Không tìm thấy được người dùng!" });
     }
 
+    // Kiểm tra email có thay đổi hay không và email mới có bị trùng không
     if (email && email !== existingUser.email) {
       const emailExists = await userModel.findOne({ email });
       if (emailExists) {
@@ -174,6 +199,7 @@ const updateUser = async (req, res) => {
       }
     }
 
+    // Kiểm tra số điện thoại có thay đổi và tính hợp lệ
     if (numberPhone && numberPhone !== existingUser.numberPhone) {
       if (!validator.isMobilePhone(numberPhone, "vi-VN")) {
         return res.status(400).send({ error: "Số điện thoại không hợp lệ" });
@@ -187,24 +213,44 @@ const updateUser = async (req, res) => {
       }
     }
 
+    // Cập nhật các trường thông tin cá nhân
     const updateFields = {};
     if (username) updateFields.username = username;
     if (email) updateFields.email = email;
     if (numberPhone) updateFields.numberPhone = numberPhone;
-    if (ward) updateFields.ward = ward;
-    if (district) updateFields.district = district;
-    if (city) updateFields.city = city;
 
     if (req.file) {
       updateFields.avatar = req.file.filename;
     }
 
+    // Cập nhật thông tin cá nhân của người dùng
     await userModel.updateOne({ _id: userId }, { $set: updateFields });
 
-    const updatedUser = await userModel.findById(userId);
-    return res.status(200).send({ updatedUser });
+    // Cập nhật địa chỉ nếu đã có địa chỉ trong database
+    if (street || ward || district || province) {
+      const existingAddress = await AddressModel.findOne({ user: userId });
+
+      if (existingAddress) {
+        // Cập nhật địa chỉ hiện có
+        await AddressModel.updateOne(
+          { user: userId },
+          { $set: { street, ward, district, province } }
+        );
+      } else {
+        // Thay vì tạo mới, bạn có thể gọi API tạo địa chỉ đã có
+        return res.status(400).send({ error: "Chưa có địa chỉ để cập nhật" });
+      }
+    }
+
+    // Trả về thông tin người dùng đã cập nhật
+    const updatedUser = await userModel
+      .findById(userId)
+      .populate("favoritesProducts");
+    const updatedAddress = await AddressModel.findOne({ user: userId });
+
+    return res.status(200).send({ updatedUser, updatedAddress });
   } catch (error) {
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Lỗi server, vui lòng thử lại sau" });
   }
 };
 

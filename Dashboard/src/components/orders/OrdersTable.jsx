@@ -8,6 +8,9 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import UpdateOrderModal from "../update/UpdateOrderModel";
 import { toast } from "react-toastify";
 import CheckBill from "../watch/CheckBill";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -23,6 +26,31 @@ const OrdersTable = () => {
   const [isOpenSeeBill, setIsOpenSeeBill] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
+
+  const exportToExcel = () => {
+    // Tạo một workbook mới
+    const wb = XLSX.utils.book_new();
+
+    // Chuyển đổi dữ liệu thành định dạng mà XLSX có thể sử dụng
+    const wsData = orders.map((order) => ({
+      "ID đơn hàng": order._id,
+      "Tên khách hàng": order.user?.username || "",
+      "Số tiền": order.finalPrice.toLocaleString("vi-VN") + " Đ",
+      "Trạng thái": order.status,
+      "Ngày đặt": order.createdAt
+        ? format(new Date(order.createdAt), "dd-MM-yyyy")
+        : "",
+    }));
+
+    // Tạo worksheet từ dữ liệu
+    const ws = XLSX.utils.json_to_sheet(wsData);
+
+    // Thêm worksheet vào workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Orders");
+
+    // Xuất file Excel
+    XLSX.writeFile(wb, "orders.xlsx");
+  };
 
   const fetchOrders = async () => {
     try {
@@ -118,10 +146,18 @@ const OrdersTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">
-          {" "}
-          Danh sách đơn hàng
-        </h2>
+        <div className="flex items-center justify-between mb-4 ">
+          <h2 className="text-xl font-semibold text-gray-100">
+            Danh sách đơn hàng
+          </h2>
+          <button
+            onClick={exportToExcel}
+            className="text-green-500 hover:text-green-400 bg-white rounded-lg p-1 ml-3"
+          >
+            Xuất Excel
+          </button>
+        </div>
+
         <div className="relative">
           <input
             type="text"
@@ -249,6 +285,7 @@ const OrdersTable = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
       <UpdateOrderModal
         fetchOrders={fetchOrders}
         isOpenUpdate={isOpenUpdate}
