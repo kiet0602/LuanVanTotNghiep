@@ -40,7 +40,6 @@ const SignIn = () => {
 
   //khai báo useCustom
   const { goRegister, goHome } = useNavigateCustom();
-
   const setResetUserCurrent = useSetRecoilState(userAtom);
 
   //handle
@@ -57,6 +56,7 @@ const SignIn = () => {
     setEmailError("");
     setPasswordError("");
 
+    // Kiểm tra tính hợp lệ của email và mật khẩu
     if (!validateEmail(email)) {
       setEmailError("Email không hợp lệ.");
       isValid = false;
@@ -66,18 +66,33 @@ const SignIn = () => {
       isValid = false;
     }
 
-    if (!isValid) return;
+    if (!isValid) return; // Nếu không hợp lệ, dừng lại
+
     setIsLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:2000/api/user/login",
         { email, password }
       );
+
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("userCurrent", JSON.stringify(response.data));
       setResetUserCurrent(response.data);
       toast.success("Đăng nhập thành công!");
-      goHome();
+
+      // Kiểm tra vai trò của người dùng
+      if (response.data.role) {
+        const confirmNavigation = window.confirm(
+          "Bạn có muốn đến trang quản lý?"
+        );
+        if (confirmNavigation) {
+          window.location.href = "http://localhost:3000/"; // Điều hướng đến trang admin
+        } else {
+          goHome(); // Điều hướng đến trang chính cho người dùng thường
+        }
+      } else {
+        goHome(); // Điều hướng đến trang chính cho người dùng thường
+      }
     } catch (error) {
       toast.error("Đăng nhập thất bại, vui lòng kiểm tra lại thông tin!");
     } finally {

@@ -31,21 +31,20 @@ const InfoUserCheckout = () => {
   const userData = localStorage.getItem("userCurrent");
   const userCurrent = userData ? JSON.parse(userData) : null;
   const [user, setUser] = useState(null);
-
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [shippingMethods, setShippingMethods] = useState([]);
-
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useRecoilState(
     selectedPaymentMethodState
   );
   const [selectedShippingMethod, setSelectedShippingMethod] = useRecoilState(
     selectedShippingMethodState
   );
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const userId = userCurrent?._id;
 
   const textColor = useColorModeValue("gray.600", "whiteAlpha.600");
+
+  const [addressDefaut, setAddressDefaut] = useState(null);
 
   const fetchUser = async () => {
     if (!userId) return;
@@ -59,12 +58,20 @@ const InfoUserCheckout = () => {
       // toast.error("Không thể lấy dữ liệu người dùng."); // Uncomment if you have a toast function
     }
   };
-
-  useEffect(() => {
-    // Fetch payment and shipping methods (replace with actual API calls if available)
-    setPaymentMethods(["Thanh toán khi nhận hàng", "PayPal"]);
-    setShippingMethods(["Giao hàng bình thường", "Giao hàng hỏa tốc"]);
-  }, []);
+  const fetchDataAdressDefautUser = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:2000/api/address/addresses/default/${userId}`
+      );
+      if (!response.data) {
+        console.log("Không có địa chỉ mặc định");
+        return; // Thoát hàm nếu không có dữ liệu
+      }
+      setAddressDefaut(response.data); // Cập nhật địa chỉ mặc định nếu có
+    } catch (error) {
+      console.log("Đã xảy ra lỗi khi lấy địa chỉ mặc định:", error);
+    }
+  };
 
   const handlePaymentMethodChange = (event) => {
     setSelectedPaymentMethod(event.target.value);
@@ -74,7 +81,7 @@ const InfoUserCheckout = () => {
     setSelectedShippingMethod(event.target.value);
   };
 
-  const hasAllData = user?.ward && user?.district && user?.city;
+  const hasAllData = addressDefaut !== undefined || addressDefaut !== null;
 
   const isCashOnDeliveryDisabled =
     selectedPaymentMethod !== "Thanh toán khi nhận hàng";
@@ -82,7 +89,14 @@ const InfoUserCheckout = () => {
 
   useEffect(() => {
     fetchUser();
+    fetchDataAdressDefautUser();
   }, [userId]);
+
+  useEffect(() => {
+    // Fetch payment and shipping methods (replace with actual API calls if available)
+    setPaymentMethods(["Thanh toán khi nhận hàng", "PayPal"]);
+    setShippingMethods(["Giao hàng bình thường", "Giao hàng hỏa tốc"]);
+  }, []);
 
   return (
     <Box>
@@ -103,48 +117,98 @@ const InfoUserCheckout = () => {
           </Text>
         </VStack>
         <SimpleGrid columns={2} columnGap={3} rowGap={4}>
-          <GridItem colSpan={1}>
-            <Box>
+          {/* Thông tin người dùng với shadow */}
+          <GridItem colSpan={2}>
+            <Box
+              p={4}
+              shadow="md"
+              borderRadius="md"
+              bg="white"
+              _hover={{ shadow: "lg" }}
+              height="auto"
+              w={["100%", "100%", "420px"]} // Responsive width: 100% on smaller screens, 420px on larger screens
+            >
               <FormControl>
-                <Flex>
-                  <FormLabel color={textColor}>Tên của bạn:</FormLabel>
-                  <Text fontWeight={"bold"}>{user?.username || ""}</Text>
+                <Flex alignItems="center" justifyContent="space-between">
+                  <FormLabel color={textColor} fontSize={["xs", "sm"]}>
+                    {" "}
+                    {/* Responsive font size */}
+                    Tên của bạn:
+                  </FormLabel>
+                  <Text
+                    fontWeight="bold"
+                    fontSize={["xs", "sm"]}
+                    color="teal.500"
+                  >
+                    {user?.username || ""}
+                  </Text>
+                </Flex>
+              </FormControl>
+
+              <Divider my={3} />
+
+              <FormControl>
+                <Flex alignItems="center" justifyContent="space-between">
+                  <FormLabel color={textColor} fontSize={["xs", "sm"]}>
+                    Địa chỉ email:
+                  </FormLabel>
+                  <Text
+                    fontWeight="bold"
+                    fontSize={["xs", "sm"]}
+                    color="teal.500"
+                  >
+                    {user?.email || ""}
+                  </Text>
+                </Flex>
+              </FormControl>
+
+              <Divider my={3} />
+
+              <FormControl>
+                <Flex alignItems="center" justifyContent="space-between">
+                  <FormLabel color={textColor} fontSize={["xs", "sm"]}>
+                    Số điện thoại:
+                  </FormLabel>
+                  <Text
+                    fontWeight="bold"
+                    fontSize={["xs", "sm"]}
+                    color="teal.500"
+                  >
+                    {user?.numberPhone || ""}
+                  </Text>
+                </Flex>
+              </FormControl>
+
+              <Divider my={3} />
+
+              <FormControl>
+                <Flex alignItems="center" justifyContent="space-between">
+                  <FormLabel color={textColor} fontSize={["xs", "sm"]} flex="1">
+                    Địa chỉ giao hàng:
+                  </FormLabel>
+                  <Text
+                    fontWeight="bold"
+                    fontSize={["xs", "sm"]}
+                    color="teal.500"
+                    flex="2"
+                    textAlign="right"
+                  >
+                    {hasAllData && addressDefaut
+                      ? `${addressDefaut.street || "Không có dữ liệu"}, ${
+                          addressDefaut.ward || "Không có dữ liệu"
+                        }, ${addressDefaut.district || "Không có dữ liệu"}, ${
+                          addressDefaut.province || "Không có dữ liệu"
+                        }`
+                      : "Chưa có địa chỉ"}{" "}
+                  </Text>
                 </Flex>
               </FormControl>
             </Box>
           </GridItem>
+
           <GridItem colSpan={2}>
             <FormControl>
-              <Flex>
-                <FormLabel color={textColor}>Địa chỉ email:</FormLabel>
-                <Text fontWeight={"bold"}>{user?.email}</Text>
-              </Flex>
-            </FormControl>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <FormControl>
-              <Flex>
-                <FormLabel color={textColor}>Số điện thoại:</FormLabel>
-                <Text fontWeight={"bold"}>{user?.numberPhone}</Text>
-              </Flex>
-            </FormControl>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <FormControl>
-              <Flex>
-                <FormLabel color={textColor}>Địa chỉ giao hàng:</FormLabel>
-                <Text fontWeight={"bold"}>
-                  {hasAllData
-                    ? ` ${user?.ward}, ${user?.district}, ${user?.city}`
-                    : "Không có dữ liệu"}
-                </Text>
-              </Flex>
-            </FormControl>
-          </GridItem>
-          <Divider />
-          <GridItem colSpan={2}>
-            <FormControl>
-              <FormLabel color={textColor}>
+              <FormLabel color={textColor} fontSize="sm">
                 Chọn phương thức thanh toán:
               </FormLabel>
               <Stack spacing={2}>
@@ -161,9 +225,10 @@ const InfoUserCheckout = () => {
               </Stack>
             </FormControl>
           </GridItem>
+
           <GridItem colSpan={2}>
             <FormControl>
-              <FormLabel color={textColor}>
+              <FormLabel color={textColor} fontSize="sm">
                 Chọn phương thức vận chuyển:
               </FormLabel>
               <Stack spacing={2}>
@@ -182,12 +247,7 @@ const InfoUserCheckout = () => {
           </GridItem>
 
           <GridItem colSpan={1}>
-            <ModalInfoUser
-              user={user}
-              isOpen={isOpen}
-              onClose={onClose}
-              // onUpdate={handleUpdate} // Pass the update handler to the modal
-            />
+            <ModalInfoUser user={user} isOpen={isOpen} onClose={onClose} />
           </GridItem>
         </SimpleGrid>
       </VStack>

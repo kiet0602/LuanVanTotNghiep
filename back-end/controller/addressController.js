@@ -92,10 +92,23 @@ export const deleteAddress = async (req, res) => {
   const { addressId } = req.params;
 
   try {
-    const address = await AddressModel.findByIdAndDelete(addressId);
+    // Tìm địa chỉ theo ID
+    const address = await AddressModel.findById(addressId);
+
+    // Kiểm tra xem địa chỉ có tồn tại hay không
     if (!address) {
       return res.status(404).json({ message: "Địa chỉ không tồn tại" });
     }
+
+    // Kiểm tra nếu địa chỉ là mặc định (isDefault là true)
+    if (address.isDefault) {
+      return res
+        .status(400)
+        .json({ message: "Không thể xóa địa chỉ mặc định" });
+    }
+
+    // Xóa địa chỉ
+    await AddressModel.findByIdAndDelete(addressId);
 
     res.status(200).json({ message: "Địa chỉ đã được xóa" });
   } catch (error) {

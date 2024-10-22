@@ -111,10 +111,8 @@ const updateProduct = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       updatedData.image = req.files.map((file) => file.filename);
-      console.log("Updated images:", updatedData.image);
     } else {
       updatedData.image = existingProduct.image;
-      console.log("Retaining existing images:", updatedData.image);
     }
 
     const updatedProduct = await productModel.findByIdAndUpdate(

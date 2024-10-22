@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import { FaCheck, FaEdit, FaEye, FaTimes, FaTrash } from "react-icons/fa";
 import {
   Container,
   Box,
@@ -26,6 +26,7 @@ import userAtom from "../Atom/userAtom";
 import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
+import { color } from "framer-motion";
 
 const ListOrderUser = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -70,15 +71,36 @@ const ListOrderUser = () => {
     }
   };
 
-  const removeOrder = async (orderId) => {
+  const receiveOrder = async (orderId) => {
+    try {
+      await axios.put(`http://localhost:2000/api/checkout/${orderId}/receive`);
+      fetchOrdersByUser();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const cancelOrder = async (orderId) => {
     const confirmDelete = window.confirm("Bạn có muốn hủy đơn hàng?");
+    if (confirmDelete) {
+      try {
+        await axios.put(`http://localhost:2000/api/checkout/${orderId}/cancel`);
+        fetchOrdersByUser();
+        toast.success("Bạn đã hủy đơn hàng thành công");
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  };
+
+  const removeOrder = async (orderId) => {
+    const confirmDelete = window.confirm("Bạn có muốn xóa đơn hàng?");
     if (confirmDelete) {
       try {
         await axios.delete(
           `http://localhost:2000/api/checkout/deleteCheckOut/${orderId}`
         );
         fetchOrdersByUser();
-        toast.success("Bạn đã hủy đơn hàng thành công");
+        toast.success("Bạn đã xóa đơn hàng thành công");
       } catch (error) {
         console.log(error.message);
       }
@@ -101,7 +123,7 @@ const ListOrderUser = () => {
   return (
     <>
       <Box bg={useColorModeValue("white", "black")}>
-        <Container maxW="10xl" p={{ base: 5, md: 10 }}>
+        <Container maxW="7xl" p={{ base: 5, md: 10 }}>
           <Flex justifyContent="left" mb={3}>
             <chakra.h3 fontSize="2xl" fontWeight="bold" textAlign="center">
               Danh sách đơn hàng
@@ -166,8 +188,7 @@ const ListOrderUser = () => {
                           <FaEye color="blue" />
                         </Box>
 
-                        {order.status === "Chờ xử lý" ||
-                        order.status === "Đã hủy" ? (
+                        {order.status === "Đã hủy" ? (
                           <Box
                             as="span"
                             aria-label="Xóa"
@@ -176,9 +197,73 @@ const ListOrderUser = () => {
                           >
                             <FaTrash color="red" />
                           </Box>
+                        ) : order.status === "Chờ xử lý" ? (
+                          <Box
+                            as="span"
+                            aria-label="Hủy đơn"
+                            onClick={() => cancelOrder(order._id)} // Gọi hàm hủy đơn
+                            cursor="pointer"
+                            fontSize="sm" // Thay đổi kích thước chữ
+                            display="flex" // Sử dụng flexbox
+                            alignItems="center" // Căn giữa theo chiều dọc
+                          >
+                            <span
+                              style={{
+                                marginLeft: "4px",
+                                padding: "4px 8px", // Thêm khoảng cách
+                                backgroundColor: "teal", // Màu nền của nút
+                                color: "white", // Màu chữ
+                                borderRadius: "4px", // Bo góc
+                                cursor: "pointer", // Con trỏ khi hover
+                                display: "inline-flex", // Căn ngang biểu tượng và text
+                                alignItems: "center", // Căn giữa theo chiều dọc
+                              }}
+                            >
+                              <FaTimes
+                                style={{ marginRight: "4px" }}
+                                color="orange"
+                              />{" "}
+                              {/* Khoảng cách giữa icon và text */}
+                              Hủy đơn
+                            </span>
+
+                            {/* Chữ hủy đơn */}
+                          </Box>
+                        ) : order.status === "Đang giao hàng" ? (
+                          <Box
+                            as="span"
+                            aria-label="Đã nhận"
+                            onClick={() => receiveOrder(order._id)} // Gọi hàm hủy đơn
+                            cursor="pointer"
+                            fontSize="sm" // Thay đổi kích thước chữ
+                            display="flex" // Sử dụng flexbox
+                            alignItems="center" // Căn giữa theo chiều dọc
+                          >
+                            <span
+                              style={{
+                                marginLeft: "4px",
+                                padding: "4px 8px", // Thêm khoảng cách
+                                backgroundColor: "teal", // Màu nền của nút
+                                color: "white", // Màu chữ
+                                borderRadius: "4px", // Bo góc
+                                cursor: "pointer", // Con trỏ khi hover
+                                display: "inline-flex", // Căn ngang biểu tượng và text
+                                alignItems: "center", // Căn giữa theo chiều dọc
+                              }}
+                            >
+                              <FaCheck
+                                style={{ marginRight: "4px" }}
+                                color="green"
+                              />{" "}
+                              {/* Biểu tượng đã nhận */}
+                              Đã nhận
+                            </span>
+
+                            {/* Chữ hủy đơn */}
+                          </Box>
                         ) : (
                           <Box as="span" aria-label="Biểu tượng ẩn">
-                            <FaTrash color="transparent" />{" "}
+                            <FaTrash color="transparent" />
                             {/* Hoặc bạn có thể dùng biểu tượng khác */}
                           </Box>
                         )}

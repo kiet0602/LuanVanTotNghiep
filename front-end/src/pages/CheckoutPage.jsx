@@ -21,7 +21,7 @@ const CheckoutPage = () => {
           {" "}
           <Container maxW="container.xl">
             <Flex
-              h={{ base: "auto", md: "130vh" }}
+              h={{ base: "auto" }}
               py={[0, 10, 20]}
               direction={{
                 base: "column-reverse",

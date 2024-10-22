@@ -1,46 +1,54 @@
 import axios from "axios";
 
-// Thay thế bằng URL cơ sở API thực tế của bạn
-
-export const addComment = async (productId, content, rating, token) => {
+// Thêm bình luận hoặc phản hồi
+export const addComment = async (productId, parentId, content, rating) => {
   try {
+    const token = localStorage.getItem("token"); // Giả sử token lưu trong localStorage
     const response = await axios.post(
-      `http://localhost:2000/api/comment/products/${productId}/comments`,
-      { content, rating },
+      `http://localhost:2000/api/comment/products/${productId}/comments${
+        parentId ? `/${parentId}` : ""
+      }`,
+      // Chỉ gửi rating nếu không có parentId (bình luận cha)
+      {
+        content,
+        ...(parentId ? {} : { rating }), // Nếu có parentId, không gửi rating
+      },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Gửi token JWT để xác thực
         },
       }
     );
+
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data || "Đã xảy ra lỗi khi thêm bình luận."
-    );
+    console.error("Error adding comment:", error);
+    throw error;
   }
 };
 
-export const deleteComment = async (commentId, token) => {
+// Xóa bình luận
+export const deleteComment = async (commentId) => {
   try {
-    const response = await axios.delete(
-      `http://localhost:2000/api/comment/comments/${commentId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const token = localStorage.getItem("token");
+    const response = await axios.delete(`${API_URL}/comments/${commentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data || "Đã xảy ra lỗi khi xóa bình luận.");
+    console.error("Error deleting comment:", error);
+    throw error;
   }
 };
 
-export const updateComment = async (commentId, content, rating, token) => {
+// Cập nhật bình luận
+export const updateComment = async (commentId, content, rating) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.put(
-      `http://localhost:2000/api/comment/comments/${commentId}`,
+      `${API_URL}/comments/${commentId}`,
       { content, rating },
       {
         headers: {
@@ -50,19 +58,20 @@ export const updateComment = async (commentId, content, rating, token) => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data || "Đã xảy ra lỗi khi cập nhật bình luận."
-    );
+    console.error("Error updating comment:", error);
+    throw error;
   }
 };
 
+// Lấy danh sách bình luận theo sản phẩm
 export const getCommentsByProduct = async (productId) => {
   try {
     const response = await axios.get(
-      `http://localhost:2000/api/comment/products/${productId}/comments`
+      `http://localhost:2000/api/comment/products/${productId}/comments/`
     );
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data || "Đã xảy ra lỗi khi lấy bình luận.");
+    console.error("Error fetching comments:", error);
+    throw error;
   }
 };

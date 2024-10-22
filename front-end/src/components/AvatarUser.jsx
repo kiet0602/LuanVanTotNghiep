@@ -22,11 +22,13 @@ const AvatarUser = ({ userCurrent }) => {
 
   const handleLogout = () => {
     // Xóa token và thông tin người dùng từ localStorage
-    localStorage.removeItem("favoritesCount"); // Xóa token
-    localStorage.removeItem("token"); // Xóa thông tin người dùng nếu có
-    localStorage.removeItem("userCurrent"); // Xóa thông tin người dùng nếu có
-    resetUser();
-    navigate("/signIn");
+    localStorage.removeItem("favoritesCount"); // Xóa favorites count
+    localStorage.removeItem("token"); // Xóa token
+    localStorage.removeItem("userCurrent"); // Xóa thông tin người dùng
+
+    resetUser(null); // Reset state người dùng
+    navigate("/signIn"); // Chuyển hướng đến trang đăng nhập
+    window.location.reload(); // Reload lại trang
   };
 
   return (
@@ -40,9 +42,8 @@ const AvatarUser = ({ userCurrent }) => {
         </MenuButton>
         <MenuList
           zIndex={5}
-          border="2px solid"
+          border="1px "
           borderColor={useColorModeValue("gray.700", "gray.100")}
-          boxShadow="4px 4px 0"
         >
           <NavLink _hover={{ textDecoration: "none" }} to={"/profileUser"}>
             <MenuItem>
@@ -63,16 +64,14 @@ const AvatarUser = ({ userCurrent }) => {
               <Text fontWeight="500">Sản phẩm yêu thích</Text>
             </MenuItem>
           </NavLink>
+
           <MenuItem>
-            <Text fontWeight="500">Reading List</Text>
-          </MenuItem>
-          <MenuItem>
-            <Text fontWeight="500">Settings</Text>
+            <Text fontWeight="500">Cài đặt</Text>
           </MenuItem>
           <MenuDivider />
           <MenuItem>
             <Text fontWeight="500" onClick={handleLogout}>
-              Sign Out
+              Đăng xuất
             </Text>
           </MenuItem>
         </MenuList>

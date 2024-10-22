@@ -118,14 +118,14 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
                 {order ? order.paymentMethod : "N/A"}
               </Text>
             </GridItem>
-            <GridItem>
+            {/* <GridItem>
               <Text fontWeight="bold" color="gray.700">
                 Địa chỉ giao hàng:
               </Text>
               <Text color="gray.800">
                 {order ? order.shippingAddress : "N/A"}
               </Text>
-            </GridItem>
+            </GridItem> */}
             <GridItem>
               <Text fontWeight="bold" color="gray.700">
                 Phí vận chuyển:

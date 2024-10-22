@@ -7,7 +7,7 @@ import {
   Stack,
   HStack,
   Avatar,
-  useColorModeValue,
+  useDisclosure,
   Button,
   Modal,
   ModalOverlay,
@@ -18,9 +18,8 @@ import {
   ModalFooter,
   Input,
   Box,
-  useDisclosure,
 } from "@chakra-ui/react";
-import { addComment, getCommentsByProduct } from "../service/commnetService";
+import { addComment, getCommentsByProduct } from "../service/commnetService.js";
 
 const Review = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,6 +27,7 @@ const Review = ({ productId }) => {
   const [content, setContent] = useState("");
   const [comments, setComments] = useState([]);
   const [error, setError] = useState(null);
+  const [parentId, setParentId] = useState(null);
 
   const userData = localStorage.getItem("userCurrent");
   const userCurrent = userData ? JSON.parse(userData) : null;
@@ -42,7 +42,6 @@ const Review = ({ productId }) => {
         setError(err.message);
       }
     };
-
     fetchComments();
   }, [productId]);
 
@@ -56,11 +55,84 @@ const Review = ({ productId }) => {
         alert("Bạn phải đăng nhập để gửi đánh giá.");
         return;
       }
-      await addComment(productId, content, rating, token);
+      await addComment(productId, parentId, content, rating);
       onClose();
+      setContent("");
+      setRating(0);
+      setParentId(null);
+      // Fetch comments again to update the state after adding a comment
+      const data = await getCommentsByProduct(productId);
+      setComments(data);
     } catch (error) {
       console.error("Lỗi khi gửi đánh giá:", error.message);
     }
+  };
+
+  const handleReply = (commentId) => {
+    setParentId(commentId);
+    onOpen();
+  };
+
+  // Hàm đệ quy để hiển thị bình luận và phản hồi
+  const renderComments = (comments) => {
+    if (!Array.isArray(comments) || comments.length === 0) return null; // Kiểm tra nếu comments hợp lệ
+
+    return comments.map((review) => {
+      // Kiểm tra nếu userId hợp lệ
+      const username = review.userId?.username || "Người dùng ẩn danh"; // Thay thế nếu không có username
+      const avatar =
+        `http://localhost:2000/images/${review.userId?.avatar}` || ""; // Thay thế nếu không có avatar
+
+      return (
+        <Stack key={review._id} direction="column" maxW="2xl" spacing={3}>
+          <HStack spacing={3}>
+            <Avatar size="md" name={username} src={avatar} />
+            <Flex direction="column">
+              <Text fontWeight="bold" fontSize="md">
+                {username}
+              </Text>
+              <Text fontWeight="light" fontSize="xs">
+                {new Date(review.createdAt).toLocaleDateString()}
+              </Text>
+            </Flex>
+          </HStack>
+          {/* Hiển thị sao chỉ khi parentId là null */}
+          {review.parentId === null && (
+            <Flex my={3} alignItems="center" justifyContent="start">
+              {Array.from(Array(review.rating).keys()).map((id) => (
+                <Star key={id} fillColor="#EACA4E" />
+              ))}
+              {Array.from(Array(5 - review.rating).keys()).map((id) => (
+                <Star key={id} fillColor="#e2e8f0" />
+              ))}
+            </Flex>
+          )}
+          <Text
+            fontSize="0.87rem"
+            textAlign="left"
+            lineHeight="1.375"
+            fontWeight="300"
+          >
+            {review.content}
+          </Text>
+          <Text
+            color="gray.500"
+            fontSize="sm"
+            onClick={() => handleReply(review._id)}
+            cursor="pointer"
+          >
+            Trả lời
+          </Text>
+
+          {Array.isArray(review.replies) && review.replies.length > 0 && (
+            <Stack spacing={4} pl={5}>
+              {renderComments(review.replies)}{" "}
+              {/* Gọi hàm đệ quy để render các phản hồi */}
+            </Stack>
+          )}
+        </Stack>
+      );
+    });
   };
 
   return (
@@ -77,41 +149,7 @@ const Review = ({ productId }) => {
         </Heading>
       </Flex>
       <Stack direction="column" spacing={5} my={4}>
-        {comments.map((review) => (
-          <Stack key={review._id} direction="column" maxW="2xl">
-            <HStack spacing={3}>
-              <Avatar
-                size="md"
-                name={review.userId.username}
-                src={review.avatarSrc}
-              />
-              <Flex direction="column">
-                <Text fontWeight="bold" fontSize="md">
-                  {review.userId.username}
-                </Text>
-                <Text fontWeight="light" fontSize="xs">
-                  {new Date(review.createdAt).toLocaleDateString()}
-                </Text>
-              </Flex>
-            </HStack>
-            <Flex my={3} alignItems="center" justifyContent="start">
-              {Array.from(Array(review.rating).keys()).map((id) => (
-                <Star key={id} fillColor="#EACA4E" />
-              ))}
-              {Array.from(Array(5 - review.rating).keys()).map((id) => (
-                <Star key={id} fillColor="#e2e8f0" />
-              ))}
-            </Flex>
-            <Text
-              fontSize="0.87rem"
-              textAlign="left"
-              lineHeight="1.375"
-              fontWeight="300"
-            >
-              {review.content}
-            </Text>
-          </Stack>
-        ))}
+        {renderComments(comments)} {/* Sử dụng hàm renderComments */}
       </Stack>
       <Button onClick={onOpen} colorScheme="blue">
         Đánh giá

@@ -93,6 +93,7 @@ const login = async (req, res) => {
       {
         userId: user._id,
         email: user.email,
+        role: user.role, // Lưu vai trò vào token để kiểm tra sau
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
@@ -172,10 +173,10 @@ const getAllUsers = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { username, email, numberPhone, street, ward, district, province } =
-    req.body;
+  const { username, email, numberPhone } = req.body;
 
   try {
+    // Lấy userId từ thông tin người dùng trong middleware Auth
     const { userId } = req.user;
 
     if (!userId) {
@@ -219,6 +220,7 @@ const updateUser = async (req, res) => {
     if (email) updateFields.email = email;
     if (numberPhone) updateFields.numberPhone = numberPhone;
 
+    // Kiểm tra nếu có ảnh đại diện mới
     if (req.file) {
       updateFields.avatar = req.file.filename;
     }
@@ -227,20 +229,6 @@ const updateUser = async (req, res) => {
     await userModel.updateOne({ _id: userId }, { $set: updateFields });
 
     // Cập nhật địa chỉ nếu đã có địa chỉ trong database
-    if (street || ward || district || province) {
-      const existingAddress = await AddressModel.findOne({ user: userId });
-
-      if (existingAddress) {
-        // Cập nhật địa chỉ hiện có
-        await AddressModel.updateOne(
-          { user: userId },
-          { $set: { street, ward, district, province } }
-        );
-      } else {
-        // Thay vì tạo mới, bạn có thể gọi API tạo địa chỉ đã có
-        return res.status(400).send({ error: "Chưa có địa chỉ để cập nhật" });
-      }
-    }
 
     // Trả về thông tin người dùng đã cập nhật
     const updatedUser = await userModel
@@ -250,7 +238,7 @@ const updateUser = async (req, res) => {
 
     return res.status(200).send({ updatedUser, updatedAddress });
   } catch (error) {
-    return res.status(500).send({ error: "Lỗi server, vui lòng thử lại sau" });
+    return res.status(500).send({ error: "Lỗi server, vui lòng thử lại sau." });
   }
 };
 

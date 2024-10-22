@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  cancelOrder,
   checkout,
   deleteOrder,
   getAllOrders,
@@ -13,6 +14,8 @@ import {
   getPending,
   getRevenue,
   getSoldProductCountByCategory,
+  paypalCheckout,
+  receiveOrder,
   updateOrder,
 } from "../controller/orderController.js";
 
@@ -37,5 +40,8 @@ checkoutRouter.get("/getCompleted", getCompleted);
 checkoutRouter.get("/getPending", getPending);
 checkoutRouter.get("/getOrderCountByStatus", getOrderCountByStatus);
 checkoutRouter.get("/getOrderCountByDate", getOrderCountByDate);
+checkoutRouter.put("/:orderId/cancel", cancelOrder);
+checkoutRouter.put("/:orderId/receive", receiveOrder);
+checkoutRouter.post("/paypalCheckout", paypalCheckout);
 
 export default checkoutRouter;

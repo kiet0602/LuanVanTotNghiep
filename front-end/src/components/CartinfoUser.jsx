@@ -24,11 +24,13 @@ import axios from "axios";
 import Breadcrumbss from "./Breadcrumbss.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faDeleteLeft,
   faEdit,
   faEnvelope,
   faPen,
   faPhone,
   faPlusCircle,
+  faTrash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons"; // Đảm bảo rằng bạn đã import faPen
 import AddAddressModel from "./AddAddressModel.jsx";
@@ -55,10 +57,59 @@ const CartinfoUser = () => {
   const userId = userCurrent?._id;
 
   //handle
-  const OpenModal = () => {
-    onOpen();
+  //Xóa địa chỉ
+  const handleDeleteAddress = async (addressId) => {
+    const isConfirmed = window.confirm(
+      "Bạn có chắc chắn muốn xóa địa chỉ này không?"
+    );
+
+    if (!isConfirmed) {
+      return; // Nếu người dùng không xác nhận, thoát ra
+    }
+
+    try {
+      // Gọi API để lấy địa chỉ mặc định, có thể trả về 404 nếu không có
+      let defaultAddress = null;
+      try {
+        const response = await axios.get(
+          `http://localhost:2000/api/address/addresses/default/${userId}`
+        );
+        defaultAddress = response.data;
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          // Nếu không có địa chỉ mặc định, bỏ qua kiểm tra
+          defaultAddress = null;
+        } else {
+          // Nếu có lỗi khác, hiển thị lỗi
+          throw error;
+        }
+      }
+
+      // Kiểm tra nếu địa chỉ đang muốn xóa là địa chỉ mặc định
+      if (defaultAddress && defaultAddress._id === addressId) {
+        toast.error(
+          "Vui lòng chọn địa chỉ khác làm mặc định trước khi xóa địa chỉ này"
+        );
+        return;
+      }
+
+      // Xóa địa chỉ
+      await axios.delete(
+        `http://localhost:2000/api/address/addresses/${addressId}`
+      );
+
+      // Cập nhật danh sách địa chỉ
+      setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
+
+      // Hiển thị thông báo xóa thành công
+      toast.success("Đã xóa thành công địa chỉ");
+    } catch (error) {
+      console.log(error);
+      toast.error("Có lỗi xảy ra khi xóa địa chỉ");
+    }
   };
 
+  //Cập nhật danh sách địa chỉ
   const handelAddAddress = async (newAddress) => {
     try {
       setAddresses((prev) => [...prev, newAddress]);
@@ -66,7 +117,7 @@ const CartinfoUser = () => {
       console.error("Failed to add color:", error);
     }
   };
-
+  //Lấy dữ liệu người dùng
   const fetchUser = async () => {
     try {
       const response = await axios.get(
@@ -80,7 +131,7 @@ const CartinfoUser = () => {
       setLoading(false);
     }
   };
-
+  //Lấy dữ liệu Địa chỉ
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
@@ -91,7 +142,7 @@ const CartinfoUser = () => {
       toast.error("Không thể lấy địa chỉ.");
     }
   };
-
+  //Cập nhật địa chỉ mặc định
   const UpdateAddress = async () => {
     if (!selectedAddress) {
       toast.warn("Vui lòng chọn địa chỉ để cập nhật.");
@@ -247,9 +298,18 @@ const CartinfoUser = () => {
           </Flex>
 
           <Box>
-            <Heading as="h4" fontSize="1.2rem" mb={4}>
-              Danh sách địa chỉ
-            </Heading>
+            <Flex alignItems="center" justifyContent="space-between" mb={4}>
+              <Heading as="h4" fontSize="1.2rem">
+                Danh sách địa chỉ
+              </Heading>
+              <Text fontSize="sm" color="gray.500">
+                Lưu ý: Vui lòng chọn địa chỉ{" "}
+                <Text as="span" fontWeight="bold">
+                  mặc định
+                </Text>{" "}
+                để chúng tôi có thể giao đến địa chỉ bạn đã chọn.
+              </Text>
+            </Flex>
             <Box
               borderRadius="md"
               border="1px"
@@ -319,9 +379,10 @@ const CartinfoUser = () => {
                         top="50%"
                         right="10px"
                         transform="translateY(-50%)"
+                        onClick={(e) => handleDeleteAddress(address._id)}
                       >
                         <FontAwesomeIcon
-                          icon={faEdit}
+                          icon={faTrash}
                           color="teal"
                           cursor="pointer"
                         />

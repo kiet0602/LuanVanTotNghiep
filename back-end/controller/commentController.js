@@ -18,6 +18,25 @@ export const addComment = async (req, res) => {
 
     await newComment.save();
 
+    // Cập nhật sản phẩm tương ứng với bình luận
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Tăng số lượng đánh giá
+    product.ratingsCount += 1;
+
+    // Cập nhật rating trung bình nếu có rating
+    if (parentId === null && rating !== undefined) {
+      const totalRating =
+        product.averageRating * (product.ratingsCount - 1) + rating;
+      product.averageRating = totalRating / product.ratingsCount;
+    }
+
+    // Lưu sản phẩm đã cập nhật
+    await product.save();
+
     if (parentId) {
       // Tìm bình luận cha (parentId) và đệ quy cập nhật
       const parentComment = await commentModel.findById(parentId);

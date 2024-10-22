@@ -93,7 +93,7 @@ const ListCouponUser = () => {
   return (
     <>
       <Box bg={useColorModeValue("white", "black")}>
-        <Container maxW="10xl" p={{ base: 5, md: 10 }}>
+        <Container maxW="7xl" p={{ base: 5, md: 10 }}>
           <Flex justifyContent="left" mb={3}>
             <chakra.h3 fontSize="2xl" fontWeight="bold" textAlign="center">
               Danh sách mã khuyến mãi

@@ -18,6 +18,7 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
     paymentMethod,
     createdAt,
   } = order;
+  console.log(shippingAddress);
 
   const exportPDF = async () => {
     const element = document.getElementById("bill-content");
@@ -113,7 +114,26 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <label className="block text-sm font-medium text-gray-700">
                       Địa chỉ giao hàng
                     </label>
-                    <div className="mt-1">{shippingAddress}</div>
+                    <div className="mt-1 grid grid-cols-2 gap-2">
+                      <span className="font-semibold text-gray-700">
+                        Đường:
+                      </span>{" "}
+                      {/* Màu đậm cho tên trường */}
+                      <span className="">{shippingAddress.street}</span>{" "}
+                      {/* Dữ liệu với màu mờ */}
+                      <span className="font-semibold text-gray-700">
+                        Phường, xã:
+                      </span>
+                      <span className="">{shippingAddress.ward}</span>
+                      <span className="font-semibold text-gray-700">
+                        Quận, huyện:
+                      </span>
+                      <span className="">{shippingAddress.district}</span>
+                      <span className="font-semibold text-gray-700">
+                        Tỉnh, thành phố:
+                      </span>
+                      <span className="">{shippingAddress.province}</span>
+                    </div>
                   </div>
 
                   <div className="sm:col-span-3">

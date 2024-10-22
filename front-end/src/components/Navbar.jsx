@@ -19,7 +19,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { BiChevronDown } from "react-icons/bi";
 import { FaShoppingCart } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faHeart } from "@fortawesome/free-solid-svg-icons";
 
 // Thư viện
 import { NavLink } from "react-router-dom";
@@ -44,6 +44,8 @@ const Navbar = () => {
   // Lấy dữ liệu từ localStorage
   const userData = localStorage.getItem("userCurrent");
   const userCurrent = userData ? JSON.parse(userData) : null;
+  const favoritesCount = localStorage.getItem("favoritesCount");
+  const favorites = favoritesCount ? JSON.parse(favoritesCount) : 0;
   // Style
   const gradientStart = useColorModeValue("#0ea5e9", "#2563eb");
   const gradientEnd = useColorModeValue("#2563eb", "#0ea5e9");
@@ -163,21 +165,7 @@ const Navbar = () => {
                   cursor={"pointer"}
                   onClick={goLogin}
                 >
-                  Đăng nhập
-                </Text>
-                /
-                <Text
-                  fontSize="15px"
-                  display="inline-block"
-                  whiteSpace="nowrap"
-                  _hover={{ color: hoverColor }} // Use hover color based on mode
-                  bgGradient={`linear(to-l, ${gradientStart}, ${gradientEnd})`} // Gradient based on mode
-                  bgClip="text"
-                  fontWeight="bold"
-                  cursor={"pointer"}
-                  onClick={goRegister}
-                >
-                  Đăng kí
+                  ĐĂNG NHẬP
                 </Text>
               </>
             )}
@@ -205,6 +193,31 @@ const Navbar = () => {
                 justifyContent="center"
               >
                 0
+              </Box>
+            </Box>
+          </NavLink>
+          <NavLink to={"/favirotesProduct"}>
+            <Box position="relative" display="inline-block">
+              <FontAwesomeIcon
+                icon={faHeart}
+                size="lg"
+                style={{ opacity: 0.5 }} // Adjust opacity as needed
+              />
+              <Box
+                position="absolute"
+                top="-1"
+                right="-1"
+                backgroundColor="red.500"
+                color="white"
+                fontSize="xs"
+                borderRadius="full"
+                width="16px"
+                height="16px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                {favorites}
               </Box>
             </Box>
           </NavLink>

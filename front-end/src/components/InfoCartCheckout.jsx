@@ -21,6 +21,7 @@ import {
 import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const InfoCartCheckout = ({ items, total }) => {
   const userData = localStorage.getItem("userCurrent");
@@ -36,6 +37,8 @@ const InfoCartCheckout = ({ items, total }) => {
   const [discountedTotal, setDiscountedTotal] = useState(total);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [addressId, setAddressId] = useState(null);
 
   const taxAmount = 20000; // Thuế
   const shippingFeeThreshold = 300000; // Ngưỡng miễn phí vận chuyển
@@ -70,20 +73,16 @@ const InfoCartCheckout = ({ items, total }) => {
       : standardShippingFeeAmount;
 
   // Gọi API lấy thông tin người dùng
-  useEffect(() => {
-    if (!userId) return;
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:2000/api/user/getUser/${userId}`
-        );
-        setUser(response.data);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    fetchUser();
-  }, [userId]);
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:2000/api/user/getUser/${userId}`
+      );
+      setUser(response.data);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   // Hàm gọi API áp dụng mã khuyến mãi
   const applyCoupon = async () => {
@@ -103,10 +102,52 @@ const InfoCartCheckout = ({ items, total }) => {
       );
     }
   };
-
+  const fetchDataAdressDefautUser = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:2000/api/address/addresses/default/${userId}`
+      );
+      if (!response.data) {
+        console.log("Không có địa chỉ mặc định");
+        return; // Thoát hàm nếu không có dữ liệu
+      }
+      setAddressId(response.data._id);
+    } catch (error) {
+      console.log("Đã xảy ra lỗi khi lấy địa chỉ mặc định:", error);
+    }
+  };
   // Hàm thanh toán - gọi API checkout
   const handlePayment = async () => {
     setIsLoading(true);
+
+    // Kiểm tra dữ liệu đầu vào
+    if (
+      !userId ||
+      !items.length ||
+      total <= 0 ||
+      shippingFee < 0 ||
+      !selectedShippingMethod ||
+      !selectedPaymentMethod ||
+      !addressId
+    ) {
+      // Nếu không có địa chỉ, yêu cầu người dùng chọn địa chỉ
+      if (!addressId) {
+        const confirmNavigation = window.confirm(
+          "Bạn chưa có địa chỉ giao hàng. Bạn có muốn chuyển đến trang chọn địa chỉ mặc định không?"
+        );
+
+        if (confirmNavigation) {
+          navigate("/profileUser"); // Thay đổi đường dẫn thành trang chọn địa chỉ của bạn
+        }
+        setIsLoading(false);
+        return; // Dừng hàm nếu có lỗi
+      }
+
+      toast.error("Vui lòng điền đầy đủ thông tin trước khi thanh toán.");
+      setIsLoading(false);
+      return; // Dừng hàm nếu có lỗi
+    }
+
     try {
       const orderData = {
         userId,
@@ -117,32 +158,40 @@ const InfoCartCheckout = ({ items, total }) => {
         selectedShippingMethod, // Phương thức vận chuyển
         selectedPaymentMethod, // Phương thức thanh toán
         couponCode, // Mã khuyến mãi (nếu có)
+        addressId,
       };
-      await axios.post(
-        "http://localhost:2000/api/checkout/checkOut", // Gửi dữ liệu đến API checkout
-        orderData
-      );
-      navigate("/success");
-      toast.success("Đơn hàng đã được tạo thành công!"); // Hiển thị thông báo thành công
+
+      {
+        // Gửi dữ liệu đến API checkout cho phương thức thanh toán khác (như COD)
+        await axios.post(
+          "http://localhost:2000/api/checkout/checkOut", // Gửi dữ liệu đến API checkout
+          orderData
+        );
+
+        navigate("/success");
+        toast.success("Đơn hàng đã được tạo thành công!"); // Hiển thị thông báo thành công
+      }
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(
+        err.response.data.message ||
+          "Có lỗi xảy ra trong quá trình tạo đơn hàng."
+      ); // Hiển thị thông báo lỗi
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (!userId) return;
+    fetchUser();
+    fetchDataAdressDefautUser();
+  }, [userId]);
+
   return (
     <>
       <Box>
-        <VStack
-          w="full"
-          h="full"
-          p={10}
-          spacing={6}
-          align="flex-start"
-          bg={bgColor}
-        >
+        <VStack w="full" p={10} spacing={6} align="flex-start" bg={bgColor}>
           <VStack alignItems="flex-start" spacing={3}>
             <Heading size="xl">Thông tin sản phẩm</Heading>
           </VStack>
@@ -219,26 +268,79 @@ const InfoCartCheckout = ({ items, total }) => {
             <Heading size="lg">{calculateTotal().toLocaleString()} Đ</Heading>
           </HStack>
 
-          <Button
-            isLoading={isLoading}
-            color={"white"}
-            bg={"blue"}
-            w="full"
-            h={"30px"}
-            isDisabled={isCashOnDeliveryDisabled} // Nút "Thanh toán khi nhận hàng" chỉ có thể nhấn khi phương thức này được chọn
-            onClick={handlePayment}
-          >
-            Thanh toán khi nhận hàng
-          </Button>
-          <Button
-            color={"white"}
-            bg={"blue"}
-            w="full"
-            h={"30px"}
-            isDisabled={isPaypalDisabled} // Nút "Thanh toán Paypal" chỉ có thể nhấn khi PayPal được chọn
-          >
-            Thanh toán Paypal
-          </Button>
+          {/* Nút thanh toán */}
+          <HStack width="full" justifyContent="space-between">
+            <Button
+              colorScheme="teal"
+              onClick={handlePayment} // Gọi hàm handlePayment cho COD hoặc các phương thức khác
+              isLoading={isLoading}
+              isDisabled={isCashOnDeliveryDisabled}
+            >
+              {selectedPaymentMethod === "PayPal"
+                ? "Thanh toán PayPal"
+                : "Thanh toán khi nhận hàng"}
+            </Button>
+
+            {selectedPaymentMethod === "PayPal" && (
+              <PayPalScriptProvider
+                options={{
+                  "client-id":
+                    "AbYQl9e3rePP-yHav0YSplhu4nFQko-9I1tO2_KKwykYVqpkpvhG-0qN90f8relHoL8v-LByFmWQTgs1",
+                }}
+              >
+                <PayPalButtons
+                  createOrder={async (data, actions) => {
+                    // Gọi API để tạo đơn hàng trước khi thanh toán
+                    const orderData = {
+                      userId,
+                      items, // Danh sách sản phẩm từ frontend
+                      totalPrice: total,
+                      shippingFee: shippingFee,
+                      discountedTotal: calculateTotal(), // Tổng tiền đã tính thuế và phí vận chuyển
+                      selectedShippingMethod, // Phương thức vận chuyển
+                      selectedPaymentMethod, // Phương thức thanh toán
+                      couponCode, // Mã khuyến mãi (nếu có)
+                      addressId,
+                    };
+
+                    const response = await axios.post(
+                      "http://localhost:2000/api/checkout/paypalCheckout",
+                      orderData
+                    );
+                    if (response.data && response.data.orderId) {
+                      return response.data.orderId;
+                    } else {
+                      throw new Error("Failed to create order in PayPal");
+                    }
+
+                    // Trả về ID đơn hàng cho PayPal
+                    return response.data.orderId;
+                  }}
+                  onApprove={async (data, actions) => {
+                    // Gọi API để xác nhận thanh toán
+                    const orderID = data.orderID;
+                    const response = await axios.post(
+                      "http://localhost:2000/api/checkout/paypalConfirm",
+                      { orderID }
+                    );
+
+                    if (response.data.success) {
+                      toast.success("Thanh toán thành công!");
+                      navigate("/success");
+                    } else {
+                      toast.error(
+                        "Có lỗi xảy ra trong quá trình xác nhận thanh toán."
+                      );
+                    }
+                  }}
+                  onError={(err) => {
+                    toast.error("Có lỗi xảy ra trong quá trình thanh toán.");
+                    console.error(err);
+                  }}
+                />
+              </PayPalScriptProvider>
+            )}
+          </HStack>
         </VStack>
       </Box>
     </>

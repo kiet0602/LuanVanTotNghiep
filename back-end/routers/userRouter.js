@@ -12,7 +12,8 @@ import {
   verifyOTP,
   verifyUser,
 } from "../controller/userController.js";
-import Auth, { localVariables } from "../middleware/auth.js";
+import { localVariables, Auth, isAdmin } from "../middleware/auth.js";
+
 import { registerMail } from "../controller/mailer.js";
 import multer from "multer";
 

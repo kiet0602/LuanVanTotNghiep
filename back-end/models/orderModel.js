@@ -19,7 +19,12 @@ const orderSchema = new mongoose.Schema(
     shippingMethod: { type: String, required: true }, // Phương thức vận chuyển
     discount: { type: Number, default: 0 }, // Giảm giá áp dụng cho đơn hàng
     finalPrice: { type: Number, required: true }, // Giá cuối cùng của đơn hàng sau giảm giá
-    shippingAddress: { type: String, required: true }, // Địa chỉ giao hàng
+    shippingAddress: {
+      street: { type: String, required: true },
+      ward: { type: String, required: true },
+      district: { type: String, required: true },
+      province: { type: String, required: true },
+    },
     paymentMethod: { type: String, required: true }, // Phương thức thanh toán
     status: {
       type: String,

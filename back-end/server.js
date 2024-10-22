@@ -65,6 +65,8 @@ app.get("/", (req, res) => {
   res.send("API was successful");
 });
 
+// Kiểm tra giá trị biến môi trường
+
 app.listen(port, (req, res) => {
   console.log(`listening on http://localhost:${port}`);
 });

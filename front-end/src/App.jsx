@@ -41,11 +41,11 @@ function App() {
           <Route path="/oauth/:token" element={<OAuthCallback />} />
 
           <Route path="/" element={<HomePage />} />
-          {/* <Route
+          <Route
             path="/signIn"
             element={!user ? <SignInPage /> : <Navigate to={"/"} />}
-          /> */}
-          <Route path="/signIn" element={<SignInPage />} />
+          />
+          {/* <Route path="/signIn" element={<SignInPage />} /> */}
 
           <Route
             path="/signUp"
