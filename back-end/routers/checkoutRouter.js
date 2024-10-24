@@ -14,7 +14,6 @@ import {
   getPending,
   getRevenue,
   getSoldProductCountByCategory,
-  paypalCheckout,
   receiveOrder,
   updateOrder,
 } from "../controller/orderController.js";
@@ -42,6 +41,6 @@ checkoutRouter.get("/getOrderCountByStatus", getOrderCountByStatus);
 checkoutRouter.get("/getOrderCountByDate", getOrderCountByDate);
 checkoutRouter.put("/:orderId/cancel", cancelOrder);
 checkoutRouter.put("/:orderId/receive", receiveOrder);
-checkoutRouter.post("/paypalCheckout", paypalCheckout);
+// checkoutRouter.post("/paypalCheckout", paypalCheckout);
 
 export default checkoutRouter;

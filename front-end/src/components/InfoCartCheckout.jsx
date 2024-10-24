@@ -116,6 +116,18 @@ const InfoCartCheckout = ({ items, total }) => {
       console.log("Đã xảy ra lỗi khi lấy địa chỉ mặc định:", error);
     }
   };
+
+  const orderData = {
+    userId,
+    items, // Danh sách sản phẩm từ frontend
+    totalPrice: total,
+    shippingFee: shippingFee,
+    discountedTotal: calculateTotal(), // Tổng tiền đã tính thuế và phí vận chuyển
+    selectedShippingMethod: "Giao hàng bình thường", // Phương thức vận chuyển
+    selectedPaymentMethod, // Phương thức thanh toán
+    couponCode, // Mã khuyến mãi (nếu có)
+    addressId,
+  };
   // Hàm thanh toán - gọi API checkout
   const handlePayment = async () => {
     setIsLoading(true);
@@ -285,57 +297,78 @@ const InfoCartCheckout = ({ items, total }) => {
               <PayPalScriptProvider
                 options={{
                   "client-id":
-                    "AbYQl9e3rePP-yHav0YSplhu4nFQko-9I1tO2_KKwykYVqpkpvhG-0qN90f8relHoL8v-LByFmWQTgs1",
+                    "Af_K7Ncy65OjZuTGjZkap5G_wHCIabKc-Fe9-KX-OR5spwdiS8LXR5htqzRKCQSEeflgpQybZG6wDNNv",
                 }}
               >
                 <PayPalButtons
-                  createOrder={async (data, actions) => {
-                    // Gọi API để tạo đơn hàng trước khi thanh toán
-                    const orderData = {
-                      userId,
-                      items, // Danh sách sản phẩm từ frontend
-                      totalPrice: total,
-                      shippingFee: shippingFee,
-                      discountedTotal: calculateTotal(), // Tổng tiền đã tính thuế và phí vận chuyển
-                      selectedShippingMethod, // Phương thức vận chuyển
-                      selectedPaymentMethod, // Phương thức thanh toán
-                      couponCode, // Mã khuyến mãi (nếu có)
-                      addressId,
-                    };
+                  createOrder={async () => {
+                    try {
+                      const orderData = {
+                        userId,
+                        items,
+                        totalPrice: total,
+                        shippingFee: shippingFee,
+                        discountedTotal: calculateTotal(),
+                        selectedShippingMethod,
+                        selectedPaymentMethod,
+                        couponCode,
+                        addressId,
+                      };
 
-                    const response = await axios.post(
-                      "http://localhost:2000/api/checkout/paypalCheckout",
-                      orderData
-                    );
-                    if (response.data && response.data.orderId) {
-                      return response.data.orderId;
-                    } else {
-                      throw new Error("Failed to create order in PayPal");
+                      console.log("Order Data:", orderData);
+
+                      const response = await axios.post(
+                        "http://localhost:2000/api/paypal/create-order",
+                        orderData
+                      );
+
+                      console.log(
+                        "Create Order Response:",
+                        response.data.approvalUrl.orderId
+                      );
+
+                      if (
+                        !response.data.approvalUrl.approveLink ||
+                        !response.data.approvalUrl.orderId
+                      ) {
+                        throw new Error(
+                          "No order ID or approve link returned from backend"
+                        );
+                      }
+
+                      console.log(
+                        "Order ID:",
+                        response.data.approvalUrl.orderId
+                      );
+
+                      return response.data.approvalUrl.orderId;
+                    } catch (error) {
+                      console.error("Error creating order:", error);
+                      throw error;
                     }
-
-                    // Trả về ID đơn hàng cho PayPal
-                    return response.data.orderId;
                   }}
-                  onApprove={async (data, actions) => {
-                    // Gọi API để xác nhận thanh toán
-                    const orderID = data.orderID;
-                    const response = await axios.post(
-                      "http://localhost:2000/api/checkout/paypalConfirm",
-                      { orderID }
-                    );
+                  onApprove={async (data) => {
+                    try {
+                      console.log("PayPal Order Data:", data);
 
-                    if (response.data.success) {
-                      toast.success("Thanh toán thành công!");
-                      navigate("/success");
-                    } else {
-                      toast.error(
-                        "Có lỗi xảy ra trong quá trình xác nhận thanh toán."
+                      if (!data.orderID) {
+                        throw new Error("Order ID is undefined");
+                      }
+
+                      console.log("Order ID từ PayPal:", data.orderID); // Thêm log này
+
+                      const captureResponse = await axios.post(
+                        "http://localhost:2000/api/paypal/capture-order",
+                        { orderId: data.orderID }
+                      );
+
+                      console.log("Capture Response:", captureResponse.data);
+                    } catch (error) {
+                      console.error("Error capturing payment:", error);
+                      alert(
+                        "Có lỗi xảy ra khi xác thực thanh toán. Vui lòng thử lại."
                       );
                     }
-                  }}
-                  onError={(err) => {
-                    toast.error("Có lỗi xảy ra trong quá trình thanh toán.");
-                    console.error(err);
                   }}
                 />
               </PayPalScriptProvider>

@@ -20,10 +20,10 @@ const orderSchema = new mongoose.Schema(
     discount: { type: Number, default: 0 }, // Giảm giá áp dụng cho đơn hàng
     finalPrice: { type: Number, required: true }, // Giá cuối cùng của đơn hàng sau giảm giá
     shippingAddress: {
-      street: { type: String, required: true },
-      ward: { type: String, required: true },
-      district: { type: String, required: true },
-      province: { type: String, required: true },
+      street: { type: String },
+      ward: { type: String },
+      district: { type: String },
+      province: { type: String },
     },
     paymentMethod: { type: String, required: true }, // Phương thức thanh toán
     status: {
@@ -37,6 +37,7 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Chờ xử lý",
     },
+    paypalOrderId: { type: String }, // Thêm trường lưu orderId của PayPal
   },
   { timestamps: true }
 ); // Tự động thêm createdAt và updatedAt

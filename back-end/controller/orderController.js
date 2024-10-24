@@ -5,86 +5,6 @@ import productModel from "../models/productModel.js";
 import userModel from "../models/userModel.js";
 import AddressModel from "../models/addressModel.js";
 import { sendOrderConfirmationEmail } from "./mailer.js";
-import axios from "axios";
-import paypal from "@paypal/checkout-server-sdk";
-
-const environment = new paypal.core.SandboxEnvironment(
-  process.env.PAYPAL_CLIENT_ID,
-  process.env.PAYPAL_SECRET
-);
-const client = new paypal.core.PayPalHttpClient(environment);
-
-export const paypalCheckout = async (req, res) => {
-  const { totalPrice, items, userId, shippingAddress, selectedPaymentMethod } =
-    req.body;
-
-  // Kiểm tra dữ liệu nhận được từ client
-  console.log("Received data:", req.body); // Thêm dòng này để kiểm tra
-
-  try {
-    // Kiểm tra xem items có phải là một mảng không
-    if (!Array.isArray(items) || items.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Không có sản phẩm nào trong giỏ hàng." });
-    }
-
-    // Tạo yêu cầu thanh toán
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.prefer("return=representation");
-    request.requestBody({
-      intent: "CAPTURE",
-      purchase_units: [
-        {
-          amount: {
-            currency_code: "VND",
-            value: totalPrice.toFixed(2), // Đảm bảo giá trị là số thực
-          },
-          items: items.map((item) => ({
-            name: item.productName,
-            unit_amount: {
-              currency_code: "VND",
-              value: item.totalPriceItemCart.toFixed(2),
-            },
-            quantity: item.quantity,
-          })),
-        },
-      ],
-      application_context: {
-        return_url: `${process.env.FRONTEND_URL}/success`,
-        cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-      },
-    });
-
-    const order = await client.execute(request);
-
-    const newOrder = new orderModel({
-      user: userId,
-      items: items,
-      totalPrice: totalPrice,
-      shippingAddress: shippingAddress,
-      paymentMethod: selectedPaymentMethod,
-      status: "Đang chờ thanh toán",
-    });
-
-    await newOrder.save();
-
-    res.status(201).json({
-      orderId: order.result.id,
-      approvalLink: order.result.links[1].href,
-    });
-  } catch (error) {
-    console.error("Error creating PayPal order:", error); // Thêm thông báo lỗi chi tiết
-    if (error.response) {
-      // Nếu PayPal trả về một lỗi
-      console.error("PayPal error response:", error.response.data);
-      return res
-        .status(500)
-        .json({ message: "Lỗi từ PayPal", details: error.response.data });
-    }
-    res.status(500).json({ message: "Lỗi khi tạo đơn hàng với PayPal" });
-  }
-};
 
 // Hàm xử lý checkout
 export const checkout = async (req, res) => {
@@ -203,18 +123,7 @@ export const checkout = async (req, res) => {
 };
 
 // Hàm tạo access token cho PayPal
-async function generateAccessToken() {
-  const response = await axios({
-    url: process.env.PAYPAL_BASE_URL + "/v1/oauth2/token",
-    method: "post",
-    data: "grant_type=client_credentials",
-    auth: {
-      username: process.env.PAYPAL_CLIENT_ID,
-      password: process.env.PAYPAL_SECRET,
-    },
-  });
-  return response.data.access_token;
-}
+
 //hàm thay đổi trạng thái đơn hàng
 export const updateOrder = async (req, res) => {
   const { orderId } = req.params;
