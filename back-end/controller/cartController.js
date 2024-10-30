@@ -132,36 +132,42 @@ export const updateItemQuantity = async (req, res) => {
       return res.status(404).json({ message: "Sản phẩm không tồn tại" });
     }
 
-    const existingItem = cart.items.find(
-      (item) => item.product.toString() === productId
-    );
+    if (product.quantity === 0) {
+      // Nếu sản phẩm hết hàng, xóa sản phẩm khỏi giỏ hàng
+      cart.items = cart.items.filter(
+        (item) => item.product.toString() !== productId
+      );
+    } else {
+      const existingItem = cart.items.find(
+        (item) => item.product.toString() === productId
+      );
 
-    if (!existingItem) {
-      return res
-        .status(404)
-        .json({ message: "Sản phẩm không có trong giỏ hàng" });
+      if (!existingItem) {
+        return res
+          .status(404)
+          .json({ message: "Sản phẩm không có trong giỏ hàng" });
+      }
+
+      if (parsedQuantity > product.quantity) {
+        return res.status(400).json({
+          message: `Số lượng sản phẩm vượt quá số lượng tồn kho. Số lượng có sẵn: ${product.quantity}`,
+        });
+      }
+
+      // Cập nhật số lượng và tổng giá của sản phẩm trong giỏ hàng
+      existingItem.quantity = parsedQuantity;
+      existingItem.totalPriceItemCart =
+        existingItem.quantity *
+        (product.originalPrice -
+          (product.originalPrice * product.discount) / 100);
     }
 
-    if (parsedQuantity > product.quantity) {
-      return res.status(400).json({
-        message: `Số lượng sản phẩm vượt quá số lượng tồn kho. Số lượng có sẵn: ${product.quantity}`,
-      });
-    }
-
-    existingItem.quantity = parsedQuantity;
-    existingItem.totalPriceItemCart =
-      existingItem.quantity *
-      (product.originalPrice -
-        (product.originalPrice * product.discount) / 100);
-
-    // Tính toán tổng giá và các phí
+    // Tính toán lại tổng giá và các phí
     cart.totalPrice = cart.items.reduce(
       (acc, item) => acc + item.totalPriceItemCart,
       0
     );
     cart.shippingFee = calculateShippingFee(cart.totalPrice);
-
-    // Tính toán giá cuối cùng
     cart.finalPrice = cart.totalPrice + cart.shippingFee;
 
     await cart.save();
@@ -184,28 +190,30 @@ export const getCartById = async (req, res) => {
       return res.status(404).json({ message: "Giỏ hàng không tồn tại" });
     }
 
-    const updatedItems = cart.items.map((item) => {
-      const product = item.product;
+    const updatedItems = cart.items
+      .filter((item) => item.product && item.product.quantity > 0) // Chỉ giữ lại các sản phẩm còn tồn kho
+      .map((item) => {
+        const product = item.product;
 
-      if (!product || !product.originalPrice) {
-        return item;
-      }
+        if (!product || !product.originalPrice) {
+          return item;
+        }
 
-      const discount = product.discount || 0;
-      const finalPrice =
-        product.originalPrice - (product.originalPrice * discount) / 100;
+        const discount = product.discount || 0;
+        const finalPrice =
+          product.originalPrice - (product.originalPrice * discount) / 100;
 
-      const totalItemPrice = finalPrice * item.quantity;
+        const totalItemPrice = finalPrice * item.quantity;
 
-      return {
-        ...item._doc,
-        product: {
-          ...product._doc,
-          finalPrice,
-        },
-        totalItemPrice,
-      };
-    });
+        return {
+          ...item._doc,
+          product: {
+            ...product._doc,
+            finalPrice,
+          },
+          totalItemPrice,
+        };
+      });
 
     cart.items = updatedItems;
     cart.totalPrice = updatedItems.reduce(
@@ -214,6 +222,9 @@ export const getCartById = async (req, res) => {
     );
     cart.shippingFee = calculateShippingFee(cart.totalPrice);
     cart.finalPrice = cart.totalPrice + cart.shippingFee;
+
+    // Lưu giỏ hàng sau khi cập nhật các sản phẩm hết hàng
+    await cart.save();
 
     res.status(200).json(cart);
   } catch (error) {

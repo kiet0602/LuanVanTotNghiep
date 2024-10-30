@@ -153,12 +153,12 @@ const getAllProducts = async (req, res) => {
 };
 
 // Lấy sản phẩm theo ID
-const getProductById = async (req, res) => {
+const getProductByName = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { productName } = req.params; // Lấy tên sản phẩm từ URL
 
     const product = await productModel
-      .findById(id)
+      .findOne({ productName }) // Tìm sản phẩm bằng tên
       .populate("category", "categoryName imageCategory descriptionCategory")
       .populate("environment", "nameEnviroment")
       .populate("color", "nameColor");
@@ -251,13 +251,37 @@ const getTopSellingProducts = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const getAllProductsDiscount = async (req, res) => {
+  try {
+    const products = await productModel
+      .find({ discount: { $gt: 0 } }) // Lọc các sản phẩm có discount > 0
+      .populate("category", "categoryName imageCategory descriptionCategory")
+      .populate("environment", "nameEnviroment")
+      .populate("color", "nameColor");
+
+    const productsWithFinalPrice = products.map((product) => {
+      const finalPrice =
+        product.originalPrice -
+        (product.originalPrice * product.discount) / 100;
+      return {
+        ...product.toObject(),
+        finalPrice,
+      };
+    });
+
+    res.status(200).json(productsWithFinalPrice);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export {
   addProduct,
   updateProduct,
   getAllProducts,
-  getProductById,
+  getProductByName,
   deleteProduct,
   getProductsByCategoryId,
   getTopSellingProducts,
+  getAllProductsDiscount,
 };

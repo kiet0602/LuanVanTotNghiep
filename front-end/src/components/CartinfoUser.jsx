@@ -13,30 +13,35 @@ import {
   Tooltip,
   Radio,
   RadioGroup,
+  UnorderedList,
+  ListItem,
 } from "@chakra-ui/react";
 
-import { FaUserEdit } from "react-icons/fa";
+import { IoLocationOutline, IoPhonePortraitOutline } from "react-icons/io5";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons"; // Đảm bảo rằng bạn đã import faPen
+import { CiPen, CiTrash, CiUser } from "react-icons/ci";
+import { AiOutlineMail } from "react-icons/ai";
+
 import ModalInfoUser from "./ModalInfoUser";
-import { useRecoilValue } from "recoil";
+import Breadcrumbss from "./Breadcrumbss.jsx";
+import AddAddressModel from "./AddAddressModel.jsx";
+
 import { toast } from "react-toastify";
 import axios from "axios";
 
-import Breadcrumbss from "./Breadcrumbss.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faDeleteLeft,
-  faEdit,
-  faEnvelope,
-  faPen,
-  faPhone,
-  faPlusCircle,
-  faTrash,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons"; // Đảm bảo rằng bạn đã import faPen
-import AddAddressModel from "./AddAddressModel.jsx";
-
 const CartinfoUser = () => {
   //khai báo
+
+  const userData = localStorage.getItem("userCurrent");
+  const userCurrent = userData ? JSON.parse(userData) : null;
+  const userId = userCurrent?._id;
+
+  const [user, setUser] = useState(null);
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
   const {
     isOpen: isOpenUserModal,
     onOpen: onOpenUserModal,
@@ -47,15 +52,6 @@ const CartinfoUser = () => {
     onOpen: onOpenAddressModal,
     onClose: onCloseAddressModal,
   } = useDisclosure();
-  const [user, setUser] = useState(null);
-  const [addresses, setAddresses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
-  const userId = userCurrent?._id;
-
   //handle
   //Xóa địa chỉ
   const handleDeleteAddress = async (addressId) => {
@@ -149,14 +145,22 @@ const CartinfoUser = () => {
       return;
     }
 
+    const currentAddress = addresses.find(
+      (addr) => addr._id === selectedAddress
+    );
+
+    // Kiểm tra xem địa chỉ đang cập nhật có phải là địa chỉ mặc định không
+    if (currentAddress.isDefault) {
+      toast.warn("Địa chỉ này đang là mặc định, không cần cập nhật.");
+      return;
+    }
+
     const updatedAddress = {
-      // Bạn có thể cập nhật thêm thông tin ở đây nếu cần
-      street: addresses.find((addr) => addr._id === selectedAddress)?.street,
-      ward: addresses.find((addr) => addr._id === selectedAddress)?.ward,
-      district: addresses.find((addr) => addr._id === selectedAddress)
-        ?.district,
-      province: addresses.find((addr) => addr._id === selectedAddress)
-        ?.province,
+      // Cập nhật thông tin địa chỉ nếu cần
+      street: currentAddress?.street,
+      ward: currentAddress?.ward,
+      district: currentAddress?.district,
+      province: currentAddress?.province,
       isDefault: true, // Đặt địa chỉ này thành mặc định
     };
 
@@ -165,19 +169,25 @@ const CartinfoUser = () => {
         `http://localhost:2000/api/address/addresses/${selectedAddress}`,
         updatedAddress
       );
-      toast.success("Cập nhật địa chỉ thành công!");
+
+      // Nếu địa chỉ được cập nhật không phải là mặc định, cập nhật địa chỉ khác
+      const otherAddresses = addresses.filter(
+        (addr) => addr._id !== selectedAddress
+      );
+      if (otherAddresses.some((addr) => addr.isDefault)) {
+        // Nếu có địa chỉ khác đã được đặt làm mặc định, không cần làm gì thêm
+        toast.success("Cập nhật địa chỉ thành công!");
+      } else {
+        // Nếu không có địa chỉ nào khác là mặc định, chuyển địa chỉ này thành mặc định
+        toast.success("Cập nhật địa chỉ thành công và đã đặt làm mặc định!");
+      }
+
       fetchAddresses(); // Tải lại danh sách địa chỉ sau khi cập nhật
     } catch (error) {
       console.log(error.message);
       toast.error("Cập nhật địa chỉ thất bại.");
     }
   };
-
-  useEffect(() => {
-    if (!userId) return;
-    fetchUser();
-    fetchAddresses();
-  }, [userId]);
 
   const handleAddressChange = (value) => {
     setSelectedAddress(value);
@@ -186,255 +196,334 @@ const CartinfoUser = () => {
   const getRole = (role) => {
     return role ? "Admin" : "Khách hàng";
   };
-
   const hasAllData = addresses.length > 0;
 
+  useEffect(() => {
+    if (!userId) return;
+    fetchUser();
+    fetchAddresses();
+  }, [userId]);
   return (
-    <Container maxW={"7xl"} px={{ base: 5, md: 10 }}>
-      <Breadcrumbss />
-      {loading ? (
-        <Flex justify="center" align="center" height="100vh">
-          <Spinner size="xl" />
-        </Flex>
-      ) : (
-        <Box
-          maxW="64rem"
-          marginX="auto"
-          py={{ base: "3rem", md: "4rem" }}
-          px={{ base: "1rem", md: "0" }}
-        >
-          <Heading
-            as="h3"
-            fontSize="1.5rem"
-            fontWeight="bold"
-            textAlign="left"
-            mb={{ base: "4", md: "2" }}
-            pb={4}
-            borderBottom="1px solid"
-            borderColor="gray.300"
-          >
-            <Box display={"flex"} gap={3} alignItems={"center"}>
-              <Text>{user?.username}</Text>{" "}
-              <Avatar
-                size="sm"
-                src={`http://localhost:2000/images/${user?.avatar}`}
-              />
-              <Tooltip label="Cập nhật thông tin" hasArrow arrowSize={15}>
-                <FontAwesomeIcon
-                  onClick={onOpenUserModal}
-                  cursor={"pointer"}
-                  icon={faPen}
-                  size="sm"
-                  style={{ marginLeft: "8px" }} // Thêm khoảng cách giữa avatar và biểu tượng
-                />
-              </Tooltip>
-            </Box>
-          </Heading>
-
-          <Flex
-            as="section"
-            alignItems="center"
-            justifyContent="space-between"
-            flexDirection={{ base: "column", md: "row" }} // Hàng ngang trên màn hình lớn, dọc trên màn hình nhỏ
-            my={{ base: "1.5rem", md: "2.5rem" }}
-            border="1px solid"
-            borderColor="gray.300"
-            borderRadius="md"
-            p={4}
-            boxShadow="md"
-          >
-            <Box
-              w={{ base: "100%", md: "30%" }} // Chia đều không gian 3 phần
-              px={{ md: "0.5rem" }}
-              mb={{ base: "6", md: "0" }}
-            >
-              <Flex alignItems="center">
-                <FontAwesomeIcon
-                  icon={faEnvelope}
-                  style={{ marginRight: "8px" }}
-                />
-                {/* Icon Email */}
-                <Text fontWeight="700">{user?.email}</Text>
-              </Flex>
-              <Text fontSize="sm" color="gray.500">
-                Địa chỉ email của bạn
-              </Text>
-            </Box>
-
-            <Box
-              w={{ base: "100%", md: "30%" }} // Chia đều không gian 3 phần
-              px={{ md: "0.5rem" }}
-              mb={{ base: "6", md: "0" }}
-            >
-              <Flex alignItems="center">
-                <FontAwesomeIcon
-                  icon={faPhone}
-                  style={{ marginRight: "8px" }}
-                />{" "}
-                {/* Icon Số điện thoại */}
-                <Text fontWeight="700">{user?.numberPhone}</Text>
-              </Flex>
-              <Text fontSize="sm" color="gray.500">
-                Số điện thoại của bạn
-              </Text>
-            </Box>
-
-            <Box
-              w={{ base: "100%", md: "30%" }} // Chia đều không gian 3 phần
-              px={{ md: "0.5rem" }}
-              mb={{ base: "6", md: "0" }}
-            >
-              <Flex alignItems="center">
-                <FontAwesomeIcon icon={faUser} style={{ marginRight: "8px" }} />
-                {/* Icon Vai trò */}
-                <Text fontWeight="700">
-                  {getRole(user?.role) || "Chưa có dữ liệu"}
-                </Text>
-              </Flex>
-              <Text fontSize="sm" color="gray.500">
-                Vai trò của bạn trong hệ thống
-              </Text>
-            </Box>
-          </Flex>
-
-          <Box>
-            <Flex alignItems="center" justifyContent="space-between" mb={4}>
-              <Heading as="h4" fontSize="1.2rem">
-                Danh sách địa chỉ
-              </Heading>
-              <Text fontSize="sm" color="gray.500">
-                Lưu ý: Vui lòng chọn địa chỉ{" "}
-                <Text as="span" fontWeight="bold">
-                  mặc định
-                </Text>{" "}
-                để chúng tôi có thể giao đến địa chỉ bạn đã chọn.
-              </Text>
+    <>
+      {" "}
+      <Box bg={useColorModeValue("green.100", "gray.800")}>
+        <Container maxW={"7xl"} px={{ base: 5, md: 10 }}>
+          <Breadcrumbss />
+          {loading ? (
+            <Flex justify="center" align="center" height="100vh">
+              <Spinner size="xl" />
             </Flex>
+          ) : (
             <Box
-              borderRadius="md"
-              border="1px"
-              borderColor="gray.300"
-              boxShadow="sm"
-              p={4}
-              bg="white"
-              opacity={0.8}
+              maxW="64rem"
+              marginX="auto"
+              py={{ base: "3rem", md: "4rem" }}
+              px={{ base: "1rem", md: "0" }}
             >
-              <RadioGroup
-                onChange={handleAddressChange}
-                value={selectedAddress}
+              <Heading
+                as="h3"
+                fontSize="1.5rem"
+                fontWeight="bold"
+                textAlign="left"
+                mb={{ base: "4", md: "2" }}
+                pb={4}
+                borderColor="gray.300"
               >
-                {hasAllData ? (
-                  addresses.map((address) => (
-                    <Box
-                      key={address._id}
-                      mb={4}
-                      border="1px solid"
-                      borderColor="gray.300"
-                      borderRadius="lg"
-                      boxShadow="sm"
-                      p={3}
-                      bg="gray.50"
-                      position="relative"
-                    >
-                      <Radio
-                        value={address._id}
-                        isChecked={address.isDefault}
-                        colorScheme={address.isDefault ? "blue" : "teal"}
-                      >
-                        <Text
-                          fontSize="sm" // Cập nhật kích thước chữ ở đây
-                          color={address.isDefault ? "blue.600" : "teal.600"}
+                <Box display={"flex"} gap={3} alignItems={"center"}>
+                  <Text color={useColorModeValue("green.800", "green.200")}>
+                    {user?.username}
+                  </Text>{" "}
+                  <Avatar
+                    size="sm"
+                    src={`http://localhost:2000/images/${user?.avatar}`}
+                  />
+                  <CiPen
+                    color={useColorModeValue("black", "white")}
+                    onClick={onOpenUserModal}
+                    cursor={"pointer"}
+                    size="40px"
+                  />
+                </Box>
+              </Heading>
+
+              <Flex
+                bg={"white"}
+                as="section"
+                alignItems="center"
+                justifyContent="space-between"
+                flexDirection={{ base: "column", md: "row" }} // Hàng ngang trên màn hình lớn, dọc trên màn hình nhỏ
+                my={{ base: "1.5rem", md: "2.5rem" }}
+                border="1px solid"
+                borderColor="gray.300"
+                borderRadius="md"
+                p={4}
+                boxShadow="md"
+              >
+                <Box
+                  w={{ base: "100%", md: "30%" }} // Chia đều không gian 3 phần
+                  px={{ md: "0.5rem" }}
+                  mb={{ base: "6", md: "0" }}
+                >
+                  <Flex alignItems="center">
+                    <AiOutlineMail
+                      color={useColorModeValue("gray.500", "black")}
+                      style={{ marginRight: "8px" }}
+                    />
+                    {/* Icon Email */}
+                    <Text fontWeight="700" color={"red.600"}>
+                      {user?.email}
+                    </Text>
+                  </Flex>
+                  <Text color={useColorModeValue("gray.500", "black")}>
+                    Địa chỉ email của bạn
+                  </Text>
+                </Box>
+
+                <Box
+                  w={{ base: "100%", md: "30%" }} // Chia đều không gian 3 phần
+                  px={{ md: "0.5rem" }}
+                  mb={{ base: "6", md: "0" }}
+                >
+                  <Flex alignItems="center">
+                    <IoPhonePortraitOutline
+                      color={useColorModeValue("gray.500", "black")}
+                      style={{ marginRight: "8px" }}
+                    />{" "}
+                    {/* Icon Số điện thoại */}
+                    <Text fontWeight="700" color={"red.600"}>
+                      {user?.numberPhone}
+                    </Text>
+                  </Flex>
+                  <Text color={useColorModeValue("gray.500", "black")}>
+                    Số điện thoại của bạn
+                  </Text>
+                </Box>
+
+                <Box
+                  w={{ base: "100%", md: "30%" }} // Chia đều không gian 3 phần
+                  px={{ md: "0.5rem" }}
+                  mb={{ base: "6", md: "0" }}
+                >
+                  <Flex alignItems="center">
+                    <CiUser
+                      color={useColorModeValue("gray.500", "black")}
+                      style={{ marginRight: "8px" }}
+                    />
+                    {/* Icon Vai trò */}
+                    <Text fontWeight="700" color={"red.600"}>
+                      {getRole(user?.role) || "Chưa có dữ liệu"}
+                    </Text>
+                  </Flex>
+                  <Text
+                    fontSize="sm"
+                    color={useColorModeValue("gray.500", "black")}
+                  >
+                    Vai trò của bạn trong hệ thống
+                  </Text>
+                </Box>
+              </Flex>
+
+              <Box>
+                <Flex alignItems="center" justifyContent="space-between" mb={4}>
+                  <Heading as="h4" fontSize="1.2rem">
+                    Danh sách địa chỉ
+                  </Heading>
+                  <Text fontSize="sm" color="gray.500">
+                    Lưu ý: Vui lòng chọn địa chỉ{" "}
+                    <Text as="span" fontWeight="bold">
+                      mặc định
+                    </Text>{" "}
+                    để chúng tôi có thể giao đến địa chỉ bạn đã chọn.
+                  </Text>
+                </Flex>
+                <Box
+                  borderRadius="xl"
+                  boxShadow="md"
+                  p={4}
+                  bg={useColorModeValue("white", "gray.100")}
+                >
+                  <RadioGroup
+                    onChange={handleAddressChange}
+                    value={selectedAddress}
+                  >
+                    {hasAllData ? (
+                      addresses.map((address) => (
+                        <Box
+                          key={address._id}
+                          mb={4}
+                          borderRadius="full"
+                          boxShadow="lg"
+                          border={"1px ridge"}
+                          p={3}
+                          bg={
+                            address.isDefault
+                              ? useColorModeValue("green.100", "white") // Màu khác cho chế độ sáng và tối nếu là mặc định
+                              : useColorModeValue("white", "green.200") //
+                          }
+                          position="relative"
                         >
-                          <span style={{ fontWeight: "normal" }}>Đường:</span>{" "}
-                          <span
-                            style={{ fontWeight: "bold", color: "teal.600" }}
+                          <Radio
+                            value={address._id}
+                            isChecked={selectedAddress === address._id}
+                            colorScheme={useColorModeValue(
+                              address.isDefault ? "green" : "red", // Màu cho chế độ sáng
+                              address.isDefault ? "red" : "white" // Màu cho chế độ tối
+                            )}
                           >
-                            {address.street}
-                          </span>
-                          , <span style={{ fontWeight: "normal" }}>Xã:</span>{" "}
-                          <span
-                            style={{ fontWeight: "bold", color: "teal.600" }}
+                            <Text>
+                              <Flex alignItems="center" justifyContent="center">
+                                <IoLocationOutline
+                                  color="black"
+                                  style={{ marginRight: "8px" }}
+                                />{" "}
+                                {/* Thêm khoảng cách giữa biểu tượng và văn bản */}
+                                <Text color="black" pr="20px">
+                                  Địa chỉ giao hàng:
+                                </Text>
+                                <Box
+                                  color="red.700"
+                                  as="span"
+                                  fontWeight="bold"
+                                  pr="5px"
+                                >
+                                  Đường:
+                                </Box>
+                                <Box
+                                  color={useColorModeValue("gray.600", "black")}
+                                  as="span"
+                                  fontWeight="normal"
+                                  pr="20px"
+                                >
+                                  {address.street}
+                                </Box>
+                                <Box
+                                  color="red.700"
+                                  as="span"
+                                  fontWeight="bold"
+                                  pr="5px"
+                                >
+                                  Xã:
+                                </Box>
+                                <Box
+                                  as="span"
+                                  fontWeight="normal"
+                                  color={useColorModeValue("gray.600", "black")}
+                                  pr="20px"
+                                >
+                                  {address.ward}
+                                </Box>
+                                <Box
+                                  color="red.700"
+                                  as="span"
+                                  fontWeight="bold"
+                                  pr="5px"
+                                >
+                                  Quận/Huyện:
+                                </Box>
+                                <Box
+                                  as="span"
+                                  fontWeight="normal"
+                                  pr="20px"
+                                  color={useColorModeValue("gray.600", "black")}
+                                >
+                                  {address.district}
+                                </Box>
+                                <Box
+                                  color="red.700"
+                                  as="span"
+                                  fontWeight="bold"
+                                  pr="5px"
+                                >
+                                  Tỉnh:
+                                </Box>
+                                <Box
+                                  as="span"
+                                  fontWeight="normal"
+                                  pr="20px"
+                                  color={useColorModeValue("gray.600", "black")}
+                                >
+                                  {address.province}
+                                </Box>
+                              </Flex>
+                            </Text>
+                          </Radio>
+                          <Box
+                            position="absolute"
+                            top="50%"
+                            right="10px"
+                            transform="translateY(-50%)"
+                            onClick={(e) => handleDeleteAddress(address._id)}
                           >
-                            {address.ward}
-                          </span>
-                          ,{" "}
-                          <span style={{ fontWeight: "normal" }}>
-                            Quận/Huyện:
-                          </span>{" "}
-                          <span
-                            style={{ fontWeight: "bold", color: "teal.600" }}
-                          >
-                            {address.district}
-                          </span>
-                          , <span style={{ fontWeight: "normal" }}>Tỉnh:</span>{" "}
-                          <span
-                            style={{ fontWeight: "bold", color: "teal.600" }}
-                          >
-                            {address.province}
-                          </span>
-                        </Text>
-                      </Radio>
-                      <Box
-                        position="absolute"
-                        top="50%"
-                        right="10px"
-                        transform="translateY(-50%)"
-                        onClick={(e) => handleDeleteAddress(address._id)}
-                      >
-                        <FontAwesomeIcon
-                          icon={faTrash}
-                          color="teal"
-                          cursor="pointer"
-                        />
-                      </Box>
-                    </Box>
-                  ))
-                ) : (
-                  <Text>Bạn chưa có địa chỉ giao hàng</Text>
+                            <Box
+                              as="button"
+                              bg="red.300" // Màu nền
+                              borderRadius="full" // Làm cho nền hình tròn
+                              p="2" // Khoảng cách xung quanh biểu tượng
+                              cursor="pointer"
+                              _hover={{ bg: "gray.300" }} // Màu nền khi hover
+                            >
+                              <CiTrash
+                                color={useColorModeValue("gray.600", "black")}
+                                size="25px"
+                              />
+                            </Box>
+                          </Box>
+                        </Box>
+                      ))
+                    ) : (
+                      <Text>Bạn chưa có địa chỉ giao hàng</Text>
+                    )}
+                  </RadioGroup>
+                  <UnorderedList color={useColorModeValue("red.900", "black")}>
+                    <ListItem>Bước 1: Chọn địa chỉ</ListItem>
+                    <ListItem>Bước 2: Nhấn nút đặt địa chỉ</ListItem>
+                    <ListItem>
+                      Mặc định: Xanh nhạt(nền sáng), Trắng nhạt(nền tối){" "}
+                    </ListItem>{" "}
+                  </UnorderedList>
+                </Box>
+
+                {setSelectedAddress && hasAllData && (
+                  <Button onClick={UpdateAddress} mt={4}>
+                    Đặt địa chỉ mặc định
+                  </Button>
                 )}
-              </RadioGroup>
+                {/* Nút thêm địa chỉ mới */}
+                <Box
+                  mt={4}
+                  border="1px solid"
+                  borderColor="gray.300"
+                  borderRadius="md"
+                  boxShadow="sm"
+                  p={3}
+                  bg="white"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  cursor="pointer"
+                  onClick={onOpenAddressModal}
+                >
+                  <FontAwesomeIcon icon={faPlusCircle} color="teal" size="lg" />
+                  <Text ml={2} color="black" fontWeight="bold">
+                    Thêm địa chỉ mới
+                  </Text>
+                </Box>
+              </Box>
             </Box>
-
-            {/* Nút thêm địa chỉ mới */}
-            <Box
-              mt={4}
-              border="1px solid"
-              borderColor="gray.300"
-              borderRadius="md"
-              boxShadow="sm"
-              p={3}
-              bg="white"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              cursor="pointer"
-              onClick={onOpenAddressModal}
-            >
-              <FontAwesomeIcon icon={faPlusCircle} color="teal" size="lg" />
-              <Text ml={2} color="teal.600" fontWeight="bold">
-                Thêm địa chỉ mới
-              </Text>
-            </Box>
-
-            {setSelectedAddress && hasAllData && (
-              <Button onClick={UpdateAddress} colorScheme="teal" mt={4}>
-                Đặt địa chỉ này thành mặc định
-              </Button>
-            )}
-          </Box>
-        </Box>
-      )}
-      <ModalInfoUser
-        user={user}
-        isOpen={isOpenUserModal}
-        onClose={onCloseUserModal}
-      />
-      <AddAddressModel
-        isOpen={isOpenAddressModal}
-        onClose={onCloseAddressModal}
-        onAdd={handelAddAddress}
-      />
-    </Container>
+          )}
+          <ModalInfoUser
+            user={user}
+            isOpen={isOpenUserModal}
+            onClose={onCloseUserModal}
+          />
+          <AddAddressModel
+            isOpen={isOpenAddressModal}
+            onClose={onCloseAddressModal}
+            onAdd={handelAddAddress}
+          />
+        </Container>
+      </Box>
+    </>
   );
 };
 

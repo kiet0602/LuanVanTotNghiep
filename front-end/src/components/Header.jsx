@@ -45,7 +45,7 @@ const Header = () => {
                 <Text>
                   <FontAwesomeIcon icon={message.icon} size="lg" />
                 </Text>
-                <Text>{message.text}</Text>
+                <Text fontFamily="'Quicksand', sans-serif">{message.text}</Text>
               </Flex>
             </Box>
           ))}

@@ -38,7 +38,7 @@ const InfoCartCheckout = ({ items, total }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const [addressId, setAddressId] = useState(null);
+  const [addressId, setAddressId] = useState("");
 
   const taxAmount = 20000; // Thuế
   const shippingFeeThreshold = 300000; // Ngưỡng miễn phí vận chuyển
@@ -117,17 +117,6 @@ const InfoCartCheckout = ({ items, total }) => {
     }
   };
 
-  const orderData = {
-    userId,
-    items, // Danh sách sản phẩm từ frontend
-    totalPrice: total,
-    shippingFee: shippingFee,
-    discountedTotal: calculateTotal(), // Tổng tiền đã tính thuế và phí vận chuyển
-    selectedShippingMethod: "Giao hàng bình thường", // Phương thức vận chuyển
-    selectedPaymentMethod, // Phương thức thanh toán
-    couponCode, // Mã khuyến mãi (nếu có)
-    addressId,
-  };
   // Hàm thanh toán - gọi API checkout
   const handlePayment = async () => {
     setIsLoading(true);
@@ -193,16 +182,75 @@ const InfoCartCheckout = ({ items, total }) => {
       setIsLoading(false);
     }
   };
+  const createOrder = async () => {
+    try {
+      const orderData = {
+        userId,
+        items,
+        totalPrice: total,
+        shippingFee: shippingFee,
+        discountedTotal: calculateTotal(),
+        selectedShippingMethod: "Giao hàng",
+        selectedPaymentMethod,
+        couponCode,
+        addressId,
+      };
+      const response = await axios.post(
+        "http://localhost:2000/api/paypal/create-order",
+        orderData
+      );
+      if (
+        !response.data.approvalUrl.approveLink ||
+        !response.data.approvalUrl.orderId
+      ) {
+        throw new Error("No order ID or approve link returned from backend");
+      }
+      return response.data.approvalUrl.orderId;
+    } catch (error) {
+      throw error;
+    }
+  };
+  // Định nghĩa hàm onApprove bên ngoài
+  const onApprove = async (data) => {
+    try {
+      const orderData = {
+        userId,
+        items,
+        totalPrice: total,
+        shippingFee: shippingFee,
+        discountedTotal: calculateTotal(),
+        selectedShippingMethod: "Giao hàng",
+        selectedPaymentMethod,
+        couponCode,
+        addressId,
+      };
+
+      if (!data.orderID) {
+        throw new Error("Order ID is undefined");
+      }
+
+      const captureResponse = await axios.post(
+        "http://localhost:2000/api/paypal/capture-order",
+        { orderId: data.orderID, orderData }
+      );
+
+      //  window.location.reload();
+      navigate("/success");
+      toast.success("Đơn hàng đã được tạo thành công!"); // Hiển thị thông báo thành công
+    } catch (error) {
+      alert("Có lỗi xảy ra khi xác thực thanh toán. Vui lòng thử lại.");
+    }
+  };
 
   useEffect(() => {
     if (!userId) return;
     fetchUser();
-    fetchDataAdressDefautUser();
-  }, [userId]);
+    fetchDataAdressDefautUser(); // Gọi hàm lấy địa chỉ mặc định
+  }, []);
 
   return (
     <>
-      <Box>
+      <Box pl={"50px"}>
         <VStack w="full" p={10} spacing={6} align="flex-start" bg={bgColor}>
           <VStack alignItems="flex-start" spacing={3}>
             <Heading size="xl">Thông tin sản phẩm</Heading>
@@ -282,97 +330,40 @@ const InfoCartCheckout = ({ items, total }) => {
 
           {/* Nút thanh toán */}
           <HStack width="full" justifyContent="space-between">
-            <Button
-              colorScheme="teal"
-              onClick={handlePayment} // Gọi hàm handlePayment cho COD hoặc các phương thức khác
-              isLoading={isLoading}
-              isDisabled={isCashOnDeliveryDisabled}
-            >
-              {selectedPaymentMethod === "PayPal"
-                ? "Thanh toán PayPal"
-                : "Thanh toán khi nhận hàng"}
-            </Button>
-
-            {selectedPaymentMethod === "PayPal" && (
-              <PayPalScriptProvider
-                options={{
-                  "client-id":
-                    "Af_K7Ncy65OjZuTGjZkap5G_wHCIabKc-Fe9-KX-OR5spwdiS8LXR5htqzRKCQSEeflgpQybZG6wDNNv",
-                }}
+            {selectedPaymentMethod === "Thanh toán khi nhận hàng" ? (
+              <Button
+                onClick={handlePayment}
+                isLoading={isLoading}
+                isDisabled={isCashOnDeliveryDisabled}
+                mt="5px"
+                px="50px"
+                borderRadius="none"
+                bg={useColorModeValue("red.500", "white")}
+                color={useColorModeValue("white", "black")}
+                fontWeight="300"
+                boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+                width="full"
               >
-                <PayPalButtons
-                  createOrder={async () => {
-                    try {
-                      const orderData = {
-                        userId,
-                        items,
-                        totalPrice: total,
-                        shippingFee: shippingFee,
-                        discountedTotal: calculateTotal(),
-                        selectedShippingMethod,
-                        selectedPaymentMethod,
-                        couponCode,
-                        addressId,
-                      };
-
-                      console.log("Order Data:", orderData);
-
-                      const response = await axios.post(
-                        "http://localhost:2000/api/paypal/create-order",
-                        orderData
-                      );
-
-                      console.log(
-                        "Create Order Response:",
-                        response.data.approvalUrl.orderId
-                      );
-
-                      if (
-                        !response.data.approvalUrl.approveLink ||
-                        !response.data.approvalUrl.orderId
-                      ) {
-                        throw new Error(
-                          "No order ID or approve link returned from backend"
-                        );
-                      }
-
-                      console.log(
-                        "Order ID:",
-                        response.data.approvalUrl.orderId
-                      );
-
-                      return response.data.approvalUrl.orderId;
-                    } catch (error) {
-                      console.error("Error creating order:", error);
-                      throw error;
-                    }
+                Thanh toán khi nhận hàng
+              </Button>
+            ) : selectedPaymentMethod === "PayPal" ? (
+              <Box width="100%">
+                <PayPalScriptProvider
+                  options={{
+                    "client-id":
+                      "Af_K7Ncy65OjZuTGjZkap5G_wHCIabKc-Fe9-KX-OR5spwdiS8LXR5htqzRKCQSEeflgpQybZG6wDNNv",
                   }}
-                  onApprove={async (data) => {
-                    try {
-                      console.log("PayPal Order Data:", data);
-
-                      if (!data.orderID) {
-                        throw new Error("Order ID is undefined");
-                      }
-
-                      console.log("Order ID từ PayPal:", data.orderID); // Thêm log này
-
-                      const captureResponse = await axios.post(
-                        "http://localhost:2000/api/paypal/capture-order",
-                        { orderId: data.orderID }
-                      );
-
-                      console.log("Capture Response:", captureResponse.data);
-                    } catch (error) {
-                      console.error("Error capturing payment:", error);
-                      alert(
-                        "Có lỗi xảy ra khi xác thực thanh toán. Vui lòng thử lại."
-                      );
-                    }
-                  }}
-                />
-              </PayPalScriptProvider>
-            )}
+                >
+                  <PayPalButtons
+                    style={{ layout: "vertical", width: "100%" }}
+                    // Đặt chiều rộng 100% cho nút PayPal
+                    createOrder={createOrder}
+                    onApprove={onApprove}
+                  />
+                </PayPalScriptProvider>
+              </Box>
+            ) : null}{" "}
+            {/* Không hiển thị gì nếu không chọn phương thức nào */}
           </HStack>
         </VStack>
       </Box>

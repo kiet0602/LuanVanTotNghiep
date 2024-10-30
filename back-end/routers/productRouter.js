@@ -4,7 +4,8 @@ import {
   addProduct,
   deleteProduct,
   getAllProducts,
-  getProductById,
+  getAllProductsDiscount,
+  getProductByName,
   getProductsByCategoryId,
   getTopSellingProducts,
   updateProduct,
@@ -20,7 +21,8 @@ productRouter.put(
 );
 productRouter.delete("/deleteProduct/:id", deleteProduct);
 productRouter.get("/getAllProducts", getAllProducts);
-productRouter.get("/getProductById/:id", getProductById);
+productRouter.get("/getAllProductsDiscount", getAllProductsDiscount);
+productRouter.get("/getProductByName/:productName", getProductByName);
 productRouter.get(
   "/getProductByCategoryId/:categoryId",
   getProductsByCategoryId

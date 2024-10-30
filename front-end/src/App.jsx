@@ -33,7 +33,7 @@ function App() {
   return (
     <>
       {/* Set the position to fixed to keep the button in place on scroll */}
-      <Box position={"fixed"} bottom={4} right={4} zIndex={9}>
+      <Box position={"fixed"} bottom={4} left={4} zIndex={9} ml={"20px"}>
         <ButtonIconModeColor />
       </Box>
       <Box position={"relative"} w={"full"}>
@@ -59,10 +59,7 @@ function App() {
             path="/checkOut"
             element={user ? <CheckoutPage /> : <Navigate to={"/signIn"} />}
           />
-          <Route
-            path="/productDetail/:productId"
-            element={<ProductDetailPage />}
-          />
+          <Route path="/:productName" element={<ProductDetailPage />} />
           <Route
             path="/cart"
             element={user ? <CartPage /> : <Navigate to={"/signIn"} />}

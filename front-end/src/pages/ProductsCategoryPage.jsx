@@ -28,6 +28,8 @@ import { toast } from "react-toastify";
 import CardNew from "../components/CardNew";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 import { AiOutlineClose } from "react-icons/ai"; // Icon từ react-icons
+import { MdFilterListOff } from "react-icons/md";
+import { MdFilterList } from "react-icons/md";
 
 const ProductsCategory = () => {
   const [products, setProducts] = useState([]); // Dữ liệu sản phẩm hiện tại
@@ -42,6 +44,7 @@ const ProductsCategory = () => {
   const { categoryId } = useParams();
   const [colors, setColors] = useState([]); // Dữ liệu sản phẩm hiện tại
   const [selectedColor, setSelectedColor] = useState(""); // Màu sắc được chọn
+  const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     const fetchColors = async () => {
@@ -184,96 +187,146 @@ const ProductsCategory = () => {
           iconColor="#FF5733"
         />
       )}
-      <Box bg={useColorModeValue("white", "black")}>
+      <Box bg={useColorModeValue("green.100", "gray.800")}>
         <Container maxW="6xl" p={{ base: 5, md: 10 }}>
-          {/* Bộ lọc */}
-          <Box mb={6}>
-            <Flex direction="column" mb={4}>
-              <Flex mb={4} align="center" gap={4}>
-                <FormControl>
-                  <FormLabel htmlFor="productSearch">
-                    Tìm kiếm theo tên
-                  </FormLabel>
-                  <Input
-                    id="productSearch"
-                    placeholder="Nhập tên sản phẩm"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                  />
-                </FormControl>
+          <Flex justify="center" align="center">
+            <Button
+              ml="40px"
+              mb={"4"}
+              px="50px"
+              borderRadius="none"
+              bg="white"
+              color="black"
+              fontWeight="300"
+              boxShadow="sm"
+              onClick={() => setShowFilter(!showFilter)}
+            >
+              {showFilter ? (
+                <>
+                  <MdFilterList /> <Text pl={"10px"}>Ẩn Bộ Lọc</Text>
+                </>
+              ) : (
+                <>
+                  <MdFilterListOff /> <Text pl={"10px"}>Lọc sản phẩm</Text>
+                </>
+              )}
+            </Button>
+          </Flex>
 
-                <FormControl>
-                  <FormLabel htmlFor="sortOptions">Sắp xếp theo</FormLabel>
-                  <Select
-                    id="sortOptions"
-                    value={sortBy}
-                    onChange={(e) => {
-                      setSortBy(e.target.value);
-                    }}
-                  >
-                    <option value="">Không sắp xếp</option>
-                    <option value="orderCount">Số lượng đặt hàng</option>
-                    <option value="priceAsc">Giá thấp đến cao</option>
-                    <option value="priceDesc">Giá cao đến thấp</option>
-                    <option value="rating">Lượt đánh giá</option>
-                    <option value="nameAsc">Tên A đến Z</option>
-                    <option value="nameDesc">Tên Z đến A</option>
-                  </Select>
-                </FormControl>
-              </Flex>
-              <Box mb={4}>
-                <Flex align="center" gap={4}>
-                  <Text mr={4}>Giá:</Text>
-                  <RangeSlider
-                    aria-label={["min", "max"]}
-                    min={0}
-                    max={1000000}
-                    step={1000}
-                    defaultValue={priceRange}
-                    onChangeEnd={(values) => {
-                      console.log("Price Range Changed:", values);
-                      setPriceRange(values);
-                    }}
-                    width="800px"
-                  >
-                    <RangeSliderTrack>
-                      <RangeSliderFilledTrack />
-                    </RangeSliderTrack>
-                    <RangeSliderThumb index={0} />
-                    <RangeSliderThumb index={1} />
-                  </RangeSlider>
-                  <Text ml={4}>{`${priceRange[0]}Đ - ${priceRange[1]}Đ`}</Text>
+          {/* <Button
+            bg={useColorModeValue("white", "white")}
+            color={useColorModeValue("black", "black")}
+            w={"full"}
+            mb={"4"}
+            onClick={() => setShowFilter(!showFilter)}
+            boxShadow={useColorModeValue(
+              "0px 4px 10px rgba(0, 0, 0, 0.3)", // Shadow đen cho chế độ sáng
+              "0px 4px 10px rgba(255, 255, 255, 0.3)" // Shadow trắng cho chế độ tối
+            )}
+            _hover={{
+              boxShadow: useColorModeValue(
+                "0px 6px 15px rgba(0, 0, 0, 0.5)", // Hover shadow đen cho chế độ sáng
+                "0px 6px 15px rgba(255, 255, 255, 0.5)" // Hover shadow trắng cho chế độ tối
+              ),
+            }}
+          >
+            {showFilter
+              ? "Ẩn Bộ Lọc"
+              : "Nhấn ở đây!, để tìm kiếm theo tiêu chí của bạn"}
+          </Button> */}
+
+          {showFilter && (
+            <Box>
+              <Flex direction="column" mb={4}>
+                <Flex mb={4} align="center" gap={4}>
+                  <FormControl>
+                    <FormLabel htmlFor="productSearch">
+                      Tìm kiếm theo tên
+                    </FormLabel>
+                    <Input
+                      id="productSearch"
+                      placeholder="Nhập tên sản phẩm"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel htmlFor="sortOptions">Sắp xếp theo</FormLabel>
+                    <Select
+                      id="sortOptions"
+                      value={sortBy}
+                      onChange={(e) => {
+                        setSortBy(e.target.value);
+                      }}
+                    >
+                      <option value="">Không sắp xếp</option>
+                      <option value="orderCount">Số lượng đặt hàng</option>
+                      <option value="priceAsc">Giá thấp đến cao</option>
+                      <option value="priceDesc">Giá cao đến thấp</option>
+                      <option value="rating">Lượt đánh giá</option>
+                      <option value="nameAsc">Tên A đến Z</option>
+                      <option value="nameDesc">Tên Z đến A</option>
+                    </Select>
+                  </FormControl>
                 </Flex>
-              </Box>
-              <FormControl mb={4}>
-                <FormLabel>Chọn màu sắc</FormLabel>
-                <RadioGroup onChange={setSelectedColor} value={selectedColor}>
-                  <Flex wrap="wrap">
-                    {colors.map((color) => (
-                      <Radio key={color._id} value={color.nameColor} mr={4}>
-                        {color.nameColor}
-                      </Radio>
-                    ))}
+                <Box mb={4}>
+                  <Flex align="center" gap={4}>
+                    <Text mr={4}>Giá:</Text>
+                    <RangeSlider
+                      aria-label={["min", "max"]}
+                      min={0}
+                      max={1000000}
+                      step={1000}
+                      defaultValue={priceRange}
+                      onChangeEnd={(values) => {
+                        console.log("Price Range Changed:", values);
+                        setPriceRange(values);
+                      }}
+                      width="800px"
+                    >
+                      <RangeSliderTrack>
+                        <RangeSliderFilledTrack />
+                      </RangeSliderTrack>
+                      <RangeSliderThumb index={0} />
+                      <RangeSliderThumb index={1} />
+                    </RangeSlider>
+                    <Text
+                      ml={4}
+                    >{`${priceRange[0]}Đ - ${priceRange[1]}Đ`}</Text>
                   </Flex>
-                </RadioGroup>
-              </FormControl>
-              <Flex justifyContent="flex-end" mb={4}>
-                {(query ||
-                  selectedColor ||
-                  sortBy ||
-                  priceRange[0] !== 0 ||
-                  priceRange[1] !== 1000000) && (
-                  <Button
-                    colorScheme="red"
-                    onClick={resetFilters}
-                    leftIcon={<AiOutlineClose />}
-                  >
-                    Xóa lọc
-                  </Button>
-                )}
+                </Box>
+                <FormControl mb={4}>
+                  <FormLabel>Chọn màu sắc</FormLabel>
+                  <RadioGroup onChange={setSelectedColor} value={selectedColor}>
+                    <Flex wrap="wrap">
+                      {colors.map((color) => (
+                        <Radio key={color._id} value={color.nameColor} mr={4}>
+                          {color.nameColor}
+                        </Radio>
+                      ))}
+                    </Flex>
+                  </RadioGroup>
+                </FormControl>
+                <Flex justifyContent="flex-end" mb={4}>
+                  {(query ||
+                    selectedColor ||
+                    sortBy ||
+                    priceRange[0] !== 0 ||
+                    priceRange[1] !== 1000000) && (
+                    <Button
+                      colorScheme="red"
+                      onClick={resetFilters}
+                      leftIcon={<AiOutlineClose />}
+                    >
+                      Xóa lọc
+                    </Button>
+                  )}
+                </Flex>
               </Flex>
-            </Flex>
-          </Box>
+            </Box>
+          )}
+
           {loading ? (
             <Box textAlign="center" mt={10}>
               <Spinner size="xl" />
@@ -295,7 +348,7 @@ const ProductsCategory = () => {
                 mx="auto"
               />
               <Text fontWeight={"bold"} mt={4}>
-                XIN LỖI CHÚNG TÔI CHƯA CÓ SẢN PHẨM NÀY
+                CHÚNG TÔI CHƯA CÓ SẢN PHẨM NÀY
               </Text>
             </Box>
           ) : (

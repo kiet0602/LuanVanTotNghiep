@@ -17,13 +17,10 @@ import {
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiChevronDown } from "react-icons/bi";
-import { FaShoppingCart } from "react-icons/fa";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { CiHeart, CiShoppingCart } from "react-icons/ci";
 
 // Thư viện
 import { NavLink } from "react-router-dom";
-import { useRecoilValue } from "recoil";
 // Components
 
 import AvatarUser from "./AvatarUser";
@@ -40,35 +37,45 @@ const Navbar = () => {
   // Use React
   const { isOpen, onOpen, onClose } = useDisclosure();
   // Use Custom Hook
-  const { goHome, goRegister, goLogin } = useNavigateCustom();
+  const { goHome, goLogin } = useNavigateCustom();
   // Lấy dữ liệu từ localStorage
   const userData = localStorage.getItem("userCurrent");
   const userCurrent = userData ? JSON.parse(userData) : null;
   const favoritesCount = localStorage.getItem("favoritesCount");
   const favorites = favoritesCount ? JSON.parse(favoritesCount) : 0;
   // Style
-  const gradientStart = useColorModeValue("#0ea5e9", "#2563eb");
-  const gradientEnd = useColorModeValue("#2563eb", "#0ea5e9");
-  const hoverColor = useColorModeValue("black", "white");
+  // Lấy giá trị cartCount từ localStorage
+  const cartCount = JSON.parse(localStorage.getItem("cartCount")) || 0;
+
+  // Sử dụng cartCount trong component hoặc logic của bạn
 
   return (
     <Box
-      px={4}
-      bg={useColorModeValue("white", "gray.800")}
+      pr={4}
+      bg={useColorModeValue("white", "black")}
       position="sticky"
       top={0}
       zIndex={10}
+      width={"200"}
     >
-      <Flex h={16} alignItems="center" justifyContent="space-between" mx="auto">
-        <Flex gap={2} alignItems="center" onClick={goHome}>
+      <Flex alignItems="center" justifyContent="space-between" mx="auto">
+        <Flex
+          gap={1}
+          alignItems="center" // Căn giữa nội dung theo chiều dọc
+          justifyContent="center" // Căn giữa nội dung theo chiều ngang
+          p="4"
+          pl={10}
+          onClick={goHome}
+          cursor={"pointer"}
+        >
           <Image borderRadius={"20px"} src={imgSenda} alt="" h={8} w={8} />
           <Text
-            cursor={"pointer"}
-            bgGradient="linear(to-l, #0ea5e9, #2563eb)" // Linear gradient from right to left
-            bgClip="text" // Clips the background to the text
-            fontSize="20px" // Example font size
+            fontFamily="'Allura', cursive"
+            pr={10}
+            pt={2}
             fontWeight="bold"
-            as="i"
+            fontSize={"30px"} // Thêm 'px' để xác định đơn vị
+            color={useColorModeValue("green.800", "green.200")}
           >
             Plant Paradise
           </Text>
@@ -93,7 +100,16 @@ const Navbar = () => {
                     textDecoration="none"
                   >
                     <Flex alignItems="center">
-                      <Text fontWeight="semibold">Cửa hàng</Text>
+                      <Text
+                        fontFamily="'Quicksand', sans-serif"
+                        fontWeight="bold"
+                        textTransform="uppercase"
+                        _hover={{
+                          color: "blue.200",
+                        }}
+                      >
+                        Cửa hàng
+                      </Text>
                       <Icon
                         as={BiChevronDown}
                         h={5}
@@ -137,46 +153,61 @@ const Navbar = () => {
           <Search />
           <Box display="flex" alignItems="center" gap={2}>
             {userCurrent ? (
-              <>
+              <Flex
+                alignItems="center"
+                bg={useColorModeValue("black", "white")}
+                borderRadius="full" // Bo góc
+                pl="1" // Khoảng trống giữa nội dung và viền
+              >
                 <AvatarUser userCurrent={userCurrent} />
                 <Text
+                  fontFamily="'Playfair Display', serif"
+                  color={useColorModeValue("black", "white")}
+                  fontWeight="bold"
                   fontSize="15px"
                   display="inline-block"
                   whiteSpace="nowrap"
-                  _hover={{ color: hoverColor }} // Use hover color based on mode
-                  bgGradient={`linear(to-l, ${gradientStart}, ${gradientEnd})`} // Gradient based on mode
-                  bgClip="text"
-                  fontWeight="bold"
+                  bg={useColorModeValue("green.100", "green.800")}
+                  borderRadius="full" // Bo góc
+                  p="2"
                   cursor={"pointer"}
+                  ml={2}
                 >
                   <NavLink to={"/profileUser"}>{userCurrent?.username}</NavLink>
                 </Text>
-              </>
+              </Flex>
             ) : (
-              <>
+              <Flex
+                alignItems="center"
+                backgroundColor="green.200" // Nền xanh lá cho chữ ĐĂNG NHẬP
+                borderRadius="full" // Bo góc
+                pl="1"
+              >
                 <Text
+                  fontFamily="'Playfair Display', serif"
+                  fontWeight="bold"
                   fontSize="15px"
                   display="inline-block"
                   whiteSpace="nowrap"
-                  _hover={{ color: hoverColor }} // Use hover color based on mode
-                  bgGradient={`linear(to-l, ${gradientStart}, ${gradientEnd})`} // Gradient based on mode
-                  bgClip="text"
-                  fontWeight="bold"
+                  backgroundColor="green.200" // Nền xanh lá nhạt cho tên và avatar
+                  borderRadius="full" // Bo góc
+                  p="2"
                   cursor={"pointer"}
                   onClick={goLogin}
                 >
                   ĐĂNG NHẬP
                 </Text>
-              </>
+              </Flex>
             )}
           </Box>
 
           <NavLink to={"/cart"}>
             <Box position="relative" display="inline-block">
-              <FontAwesomeIcon
-                icon={faCartShopping}
-                size="lg"
-                style={{ opacity: 0.5 }} // Adjust opacity as needed
+              <CiShoppingCart
+                justifyContent="center" // Căn giữa theo chiều ngang
+                alignItems="center" // Căn giữa theo chiều dọc
+                size={"30px"}
+                color={useColorModeValue("black", "white")}
               />
               <Box
                 position="absolute"
@@ -192,17 +223,19 @@ const Navbar = () => {
                 alignItems="center"
                 justifyContent="center"
               >
-                0
+                {cartCount}
               </Box>
             </Box>
           </NavLink>
           <NavLink to={"/favirotesProduct"}>
             <Box position="relative" display="inline-block">
-              <FontAwesomeIcon
-                icon={faHeart}
-                size="lg"
-                style={{ opacity: 0.5 }} // Adjust opacity as needed
+              <CiHeart
+                color={useColorModeValue("black", "white")}
+                justifyContent="center" // Căn giữa theo chiều ngang
+                alignItems="center" // Căn giữa theo chiều dọc
+                size={"30px"}
               />
+
               <Box
                 position="absolute"
                 top="-1"
@@ -238,7 +271,14 @@ const Navbar = () => {
               <CustomNavLink key={index} name={link.name} path={link.path} />
             ))}
             <Fillter />
-            <Text fontWeight="semibold" color="gray.500">
+            <Text
+              fontFamily="'Quicksand', sans-serif"
+              fontWeight="bold"
+              textTransform="uppercase"
+              _hover={{
+                color: "blue.200",
+              }}
+            >
               Cửa hàng
             </Text>
 
@@ -268,7 +308,9 @@ const CustomNavLink = ({ name, path }) => {
       })}
     >
       <Text
-        fontWeight="semibold"
+        fontFamily="'Quicksand', sans-serif"
+        fontWeight="bold"
+        textTransform="uppercase" // Thêm thuộc tính này để hiển thị chữ hoa
         _hover={{
           color: hoverColor,
         }}
@@ -294,7 +336,13 @@ const MenuLink = ({ name, path, onClose }) => {
           bg: useColorModeValue("gray.200", "gray.700"),
         }}
       >
-        <Text>{name}</Text>
+        <Text
+          fontFamily="'Quicksand', sans-serif"
+          fontWeight="bold"
+          textTransform="uppercase"
+        >
+          {name}
+        </Text>
       </MenuItem>
     </NavLink>
   );

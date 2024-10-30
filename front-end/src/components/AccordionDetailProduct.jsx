@@ -15,7 +15,13 @@ const AccordionDetailProduct = ({ description }) => {
         <AccordionItem>
           <h2>
             <AccordionButton>
-              <Box as="span" flex="1" textAlign="left" fontWeight="bold">
+              <Box
+                as="span"
+                flex="1"
+                textAlign="left"
+                fontWeight="bold"
+                fontFamily="'Playfair Display', serif"
+              >
                 MÔ TẢ CHI TIẾT
               </Box>
               <AccordionIcon />
@@ -27,7 +33,13 @@ const AccordionDetailProduct = ({ description }) => {
         <AccordionItem>
           <h2>
             <AccordionButton>
-              <Box as="span" flex="1" textAlign="left" fontWeight="bold">
+              <Box
+                as="span"
+                flex="1"
+                textAlign="left"
+                fontWeight="bold"
+                fontFamily="'Playfair Display', serif"
+              >
                 KÍCH THƯỚC & HÌNH THỨC CÂY
               </Box>
               <AccordionIcon />

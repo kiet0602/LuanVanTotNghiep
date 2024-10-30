@@ -10,16 +10,16 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import InputSearch from "./InputSearch";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { CiSearch } from "react-icons/ci";
 
 function Search() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
-      <Button onClick={onOpen} m={4} borderRadius={40}>
-        <FontAwesomeIcon icon={faMagnifyingGlass} />
+      <Button onClick={onOpen} borderRadius={40}>
+        <CiSearch size={"30px"} />
       </Button>
       <Drawer onClose={onClose} isOpen={isOpen} size="sm">
         <DrawerOverlay />

@@ -2,6 +2,8 @@ import axios from "axios";
 import orderModel from "../models/orderModel.js";
 import cartModel from "../models/cartModel.js";
 import productModel from "../models/productModel.js";
+import AddressModel from "../models/addressModel.js";
+import couponModel from "../models/couponModel.js";
 
 // Hàm để lấy access token từ PayPal
 async function generateAccessToken() {
@@ -52,9 +54,40 @@ export async function createOrder(orderData) {
 
     // Tính phí vận chuyển
     const shippingFee = (orderData.shippingFee / 23000).toFixed(2);
+
+    // Tính toán giảm giá nếu có mã khuyến mãi
+    let discount = 0;
+    if (orderData.couponCode) {
+      const coupon = await couponModel.findOne({ code: orderData.couponCode });
+      if (coupon) {
+        if (
+          !coupon.isActive ||
+          coupon.expirationDate <= Date.now() ||
+          itemTotal < coupon.minimumPurchaseAmount
+        ) {
+          throw new Error("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+        }
+        discount = (itemTotal * coupon.discountPercentage) / 100;
+        console.log(`Giảm giá tính được: ${discount.toFixed(2)}`);
+      } else {
+        throw new Error("Mã giảm giá không hợp lệ");
+      }
+    }
+
     const finalPrice = (
-      parseFloat(itemTotal) + parseFloat(shippingFee)
+      parseFloat(itemTotal) +
+      parseFloat(shippingFee) -
+      discount
     ).toFixed(2);
+
+    // Lấy địa chỉ giao hàng từ cơ sở dữ liệu
+    const address = await AddressModel.findOne({
+      _id: orderData.addressId,
+      user: orderData.userId,
+    });
+    if (!address) {
+      throw new Error("Địa chỉ giao hàng không tồn tại");
+    }
 
     // Dữ liệu để gửi lên PayPal
     const data = {
@@ -81,14 +114,27 @@ export async function createOrder(orderData) {
                 currency_code: "USD",
                 value: shippingFee,
               },
+              discount: {
+                currency_code: "USD",
+                value: discount.toFixed(2),
+              },
+            },
+          },
+          shipping: {
+            address: {
+              address_line_1: address.street,
+              address_line_2: address.ward || "", // Thêm ward nếu có
+              admin_area_2: address.district,
+              admin_area_1: address.province,
+              postal_code: address.postalCode || "", // Thêm mã bưu chính nếu có
+              country_code: "VN", // Đặt mã quốc gia
             },
           },
         },
       ],
       application_context: {
-        return_url: process.env.FRONTEND_URL + "/complete-order",
-        cancel_url: process.env.FRONTEND_URL + "/cancel-order",
-        shipping_preference: "NO_SHIPPING",
+        return_url: process.env.FRONTEND_URL + "/success",
+        cancel_url: process.env.FRONTEND_URL + "/checkout",
         user_action: "PAY_NOW",
         brand_name: "manfra.io",
       },
@@ -115,22 +161,77 @@ export async function createOrder(orderData) {
     console.log("Order ID nhận được từ PayPal:", orderId);
     console.log("Approve link nhận được:", approveLink);
 
-    // Tạo đơn hàng mới và lưu orderId vào cơ sở dữ liệu
+    // Trả về liên kết phê duyệt và orderId mà không lưu vào cơ sở dữ liệu ngay
+    return {
+      approveLink,
+      orderId,
+    };
+  } catch (error) {
+    console.error(
+      "Lỗi trong quá trình tạo đơn hàng:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error("Error creating order");
+  }
+}
+
+// Hàm để lưu đơn hàng vào cơ sở dữ liệu sau khi thanh toán thành công
+export async function saveOrderAfterPayment(orderId, orderData) {
+  try {
+    const address = await AddressModel.findOne({
+      _id: orderData.addressId,
+      user: orderData.userId,
+    });
+
+    const totalPrice = Number(orderData.totalPrice);
+    const shippingFee = Number(orderData.shippingFee) || 0; // Gán 0 nếu shippingFee không hợp lệ
+
+    // Sử dụng giá trị discount từ mã giảm giá đã xử lý
+    let discount = 0;
+    if (orderData.couponCode) {
+      const coupon = await couponModel.findOne({ code: orderData.couponCode });
+      if (coupon && coupon.isActive && coupon.expirationDate > Date.now()) {
+        discount = (totalPrice * coupon.discountPercentage) / 100;
+
+        // Cập nhật số lần sử dụng của mã giảm giá
+        coupon.usageCount += 1;
+        coupon.maxUsage -= 1;
+        if (coupon.usageCount >= coupon.maxUsage) {
+          coupon.isActive = false; // Vô hiệu hóa mã khuyến mãi nếu đã sử dụng đủ số lần
+        }
+        await coupon.save(); // Lưu thay đổi
+      }
+    }
+
+    // Tính toán finalPrice
+    const finalPrice = totalPrice - discount + shippingFee + 20000;
+
+    if (isNaN(finalPrice)) {
+      throw new Error("Tính toán finalPrice không hợp lệ.");
+    }
+
     const newOrder = new orderModel({
       user: orderData.userId,
       items: orderData.items.map((item) => ({
         product: item.product,
         quantity: item.quantity,
-        price: (item.totalPriceItemCart / 23000).toFixed(2), // Lưu giá của từng sản phẩm vào đơn hàng
+        price: (item.totalPriceItemCart / 23000).toFixed(2), // Nếu cần phải chuyển đổi
       })),
-      totalPrice: orderData.totalPrice, // Tổng giá trị VND của đơn hàng
-      shippingFee: orderData.shippingFee, // Phí vận chuyển VND
-      shippingMethod: orderData.selectedShippingMethod, // Phương thức vận chuyển
-      finalPrice: finalPrice, // Tổng giá trị USD sau khi tính phí vận chuyển
-      shippingAddress: orderData.addressId ? orderData.addressId : null, // Địa chỉ giao hàng (nếu có)
-      paymentMethod: "PayPal", // Phương thức thanh toán
-      status: "Chờ xử lý", // Trạng thái đơn hàng
-      paypalOrderId: orderId, // Lưu PayPal orderId để sử dụng trong các bước tiếp theo
+      totalPrice: orderData.totalPrice,
+      shippingFee: shippingFee.toString(), // Chuyển đổi shippingFee thành chuỗi nếu cần
+      shippingMethod: orderData.selectedShippingMethod,
+      discount: discount, // Sử dụng discount đã tính toán
+      finalPrice: finalPrice, // Sử dụng giá trị đã tính toán cho finalPrice
+      shippingAddress: {
+        street: address.street,
+        ward: address.ward,
+        district: address.district,
+        province: address.province,
+        postalCode: address.postalCode || "",
+      },
+      paymentMethod: "PayPal",
+      status: "Chờ xử lý",
+      paypalOrderId: orderId,
     });
 
     // Lưu đơn hàng vào cơ sở dữ liệu
@@ -143,13 +244,10 @@ export async function createOrder(orderData) {
     // Cập nhật giỏ hàng và số lượng sản phẩm
     await Promise.all(
       orderData.items.map(async (item) => {
-        // Xóa sản phẩm đã đặt từ giỏ hàng
         await cartModel.findOneAndUpdate(
           { user: orderData.userId },
-          { $pull: { items: { product: item.product } } } // Xóa sản phẩm có product tương ứng
+          { $pull: { items: { product: item.product } } }
         );
-
-        // Cập nhật số lượng sản phẩm trong kho
         await productModel.findByIdAndUpdate(item.product, {
           $inc: { quantity: -item.quantity, orderCount: item.quantity },
         });
@@ -157,17 +255,8 @@ export async function createOrder(orderData) {
     );
 
     console.log("Cập nhật giỏ hàng và số lượng sản phẩm thành công.");
-
-    // Trả về liên kết phê duyệt và orderId
-    return {
-      approveLink,
-      orderId,
-    };
   } catch (error) {
-    console.error(
-      "Lỗi trong quá trình tạo đơn hàng:",
-      error.response ? error.response.data : error.message
-    );
-    throw new Error("Error creating order");
+    console.error("Lỗi khi lưu đơn hàng vào cơ sở dữ liệu:", error.message);
+    throw new Error("Error saving order after payment");
   }
 }

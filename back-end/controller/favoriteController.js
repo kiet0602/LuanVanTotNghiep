@@ -70,16 +70,21 @@ export const getAllFavoriteProducts = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Tìm kiếm user và populate các sản phẩm yêu thích
-    const user = await userModel.findById(userId).populate("favoritesProducts");
+    // Tìm kiếm user và populate các sản phẩm yêu thích,
+    // đồng thời populate đầy đủ các trường có ObjectId: category, color, environment
+    const user = await userModel.findById(userId).populate({
+      path: "favoritesProducts",
+      populate: [
+        { path: "category" }, // Lấy đầy đủ dữ liệu của category
+        { path: "color" }, // Lấy đầy đủ dữ liệu của color
+        { path: "environment" }, // Lấy đầy đủ dữ liệu của environment
+      ],
+    });
 
     if (!user) return res.status(404).send("User not found");
 
-    // Lấy danh sách sản phẩm yêu thích
-    const products = user.favoritesProducts;
-
-    // Tính toán finalPrice cho từng sản phẩm
-    const productsWithFinalPrice = products.map((product) => {
+    // Lấy danh sách sản phẩm yêu thích và tính toán finalPrice cho từng sản phẩm
+    const productsWithFinalPrice = user.favoritesProducts.map((product) => {
       const finalPrice =
         product.originalPrice -
         (product.originalPrice * product.discount) / 100;
@@ -89,7 +94,7 @@ export const getAllFavoriteProducts = async (req, res) => {
       };
     });
 
-    // Trả về danh sách sản phẩm yêu thích với finalPrice
+    // Trả về danh sách sản phẩm yêu thích với finalPrice và đầy đủ dữ liệu của các trường liên kết
     res.status(200).send(productsWithFinalPrice);
   } catch (error) {
     res.status(500).send(error.message);

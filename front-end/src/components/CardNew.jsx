@@ -17,8 +17,14 @@ import { toast } from "react-toastify";
 
 //Atom
 import userAtom from "../Atom/userAtom.js";
-import { useRecoilState, useRecoilValue } from "recoil";
+
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
+import {
+  cartItemProducts,
+  cartItemProductsCount,
+} from "../Atom/cartCountProductAtom.js";
+
 //service
 import { addToCart } from "../service/cartService.js";
 import {
@@ -29,30 +35,29 @@ import {
 
 const CardNew = ({ products }) => {
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
-  const textColor = useColorModeValue("black", "white"); // Text color
+
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
   //Atom
   const user = useRecoilValue(userAtom);
+
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
-  const [favoritesCount, setFavoritesCount] =
-    useRecoilState(favoritesCountAtom);
+  const setFavoritesCount = useSetRecoilState(favoritesCountAtom);
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      if (!user?._id) return; // If userId is not available, exit early
-      try {
-        const userId = user._id;
-        const favorites = await getAllFavoriteProducts(userId);
-        setFavoriteProducts(favorites);
-        setFavoritesCount(favorites.length);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách yêu thích:", error);
-      }
-    };
+  const setItemsCart = useSetRecoilState(cartItemProducts);
+  const setItemsCartCount = useSetRecoilState(cartItemProductsCount);
 
-    fetchFavorites();
-  }, [user, setFavoriteProducts, setFavoritesCount]); // Dependency on user
+  const fetchFavorites = async () => {
+    if (!user?._id) return; // If userId is not available, exit early
+    try {
+      const userId = user._id;
+      const favorites = await getAllFavoriteProducts(userId);
+      setFavoriteProducts(favorites);
+      setFavoritesCount(favorites.length);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách yêu thích:", error);
+    }
+  };
 
   const isFavorite = (productId) =>
     favoriteProducts.some((fav) => fav._id === productId);
@@ -69,7 +74,6 @@ const CardNew = ({ products }) => {
         toast.error("Sản phẩm này đã hết hàng!");
         return;
       }
-
       const quantity = 1;
       await addToCart(user._id, productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
@@ -106,7 +110,6 @@ const CardNew = ({ products }) => {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
       return;
     }
-
     try {
       await removeFavoriteProduct(user._id, productId);
       toast.success("Đã bỏ thích sản phẩm");
@@ -131,17 +134,21 @@ const CardNew = ({ products }) => {
     }
   };
 
+  useEffect(() => {
+    fetchFavorites();
+  }, []); // Dependency on user
   return (
     <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
       <SimpleGrid columns={[1, 2, 3]} spacing="15px">
         {products.map((product, index) => {
           return (
             <Box
+              borderRadius={"10px"}
+              bg={"white"}
               position="relative"
               key={index}
               _hover={{ ".overlay": { opacity: 1 } }}
             >
-              {/* Nhãn dán khuyến mãi */}
               {product?.discount > 0 && (
                 <Box
                   position="absolute"
@@ -151,6 +158,7 @@ const CardNew = ({ products }) => {
                   borderRadius="full"
                   borderWidth="2px"
                   borderColor="red.400"
+                  // sửa               fontWeight={"bold"}
                   px="3"
                   py="1"
                   zIndex="1"
@@ -214,7 +222,7 @@ const CardNew = ({ products }) => {
                     color={isFavorite(product._id) ? "red.500" : "black"}
                   />
                 </Tooltip>
-                <NavLink to={`/productDetail/${product?._id}`}>
+                <NavLink to={`/${product?.productName}`}>
                   <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                     <IconButton
                       icon={<FaEye />}
@@ -235,10 +243,10 @@ const CardNew = ({ products }) => {
               </Box>
 
               {/* Nội dung thẻ */}
-              <NavLink to={`/productDetail/${product?._id}`}>
+              <NavLink to={`/${product?.productName}`}>
                 <Box
-                  borderWidth="1px"
-                  shadow="md"
+                  // borderWidth="1px"
+
                   rounded="lg"
                   overflow="hidden"
                   position="relative"
@@ -257,8 +265,11 @@ const CardNew = ({ products }) => {
                         textTransform="uppercase"
                         ml="2"
                         textAlign="center"
+                        color={"black"}
                       >
-                        {product?.productName}
+                        {product?.productName.length > 20
+                          ? `${product.productName.substring(0, 25)}...`
+                          : product.productName}
                       </Box>
                     </Box>
                     <Box>
@@ -276,29 +287,43 @@ const CardNew = ({ products }) => {
                             fontStyle="italic"
                             fontWeight="light"
                             mr="2"
-                            textColor
+                            color={"black"}
                           >
                             Giá:
                           </Text>
                           {product.finalPrice !== product.originalPrice && (
                             <>
                               <Badge
+                                bg={"gray.300"}
                                 rounded="full"
                                 px="3"
                                 fontSize="sm"
                                 textDecoration="line-through"
-                                color="gray.500"
+                                color="black"
                               >
                                 {product.originalPrice.toLocaleString("vi-VN")}Đ
                               </Badge>
-                              <Badge rounded="full" px="3" mx="1" fontSize="sm">
+                              <Badge
+                                bg={"gray.300"}
+                                color={"red"}
+                                rounded="full"
+                                px="3"
+                                mx="1"
+                                fontSize="sm"
+                              >
                                 {product.finalPrice.toLocaleString("vi-VN")}Đ
                               </Badge>
                             </>
                           )}
                           {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
                           {product.finalPrice === product.originalPrice && (
-                            <Badge rounded="full" px="3" fontSize="sm">
+                            <Badge
+                              bg={"gray.300"}
+                              color={"black"}
+                              rounded="full"
+                              px="3"
+                              fontSize="sm"
+                            >
                               {product.originalPrice.toLocaleString("vi-VN")}Đ
                             </Badge>
                           )}
@@ -314,14 +339,21 @@ const CardNew = ({ products }) => {
                         fontSize="large"
                         mt="2" // Optional: adds some margin-top for spacing
                       >
-                        <Badge rounded="full" px="2" colorScheme="teal">
-                          Màu sắc: {product?.color?.nameColor}
+                        <Badge rounded="full" px="2" bg="gray.300">
+                          <Text color={"black"}>
+                            Màu sắc: {product?.color?.nameColor}
+                          </Text>
                         </Badge>
-                        <Badge rounded="full" px="2" colorScheme="teal">
-                          Đánh giá: {product?.ratingsCount}
+                        <Badge rounded="full" px="2" bg="gray.300">
+                          <Text color={"black"}>
+                            {" "}
+                            Đánh giá: {product?.ratingsCount}
+                          </Text>
                         </Badge>
-                        <Badge rounded="full" px="2" colorScheme="teal">
-                          Bán: {product?.orderCount}
+                        <Badge rounded="full" px="2" bg="gray.300">
+                          <Text color={"black"}>
+                            Bán: {product?.orderCount}
+                          </Text>
                         </Badge>
                       </Box>
                     </Box>
@@ -331,8 +363,8 @@ const CardNew = ({ products }) => {
                       fontWeight="semibold"
                       noOfLines={3}
                       lineHeight="tight"
-                      textColor
                       fontSize="sm"
+                      color={"gray.600"}
                     >
                       {product?.description}
                     </Text>

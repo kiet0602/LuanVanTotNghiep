@@ -7,7 +7,10 @@ const FavoritesPage = () => {
   return (
     <>
       <Layout>
-        <TitlleCustom title={"Sản phẩm yêu thích của bạn"} />
+        <TitlleCustom
+          title={"Sản phẩm yêu thích của bạn"}
+          description={"Những sản phẩm bạn đã thích ở cửa hàng chúng tôi"}
+        />
         <CartFavoritesProductsUser />
       </Layout>
     </>

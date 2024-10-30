@@ -119,20 +119,20 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                         Đường:
                       </span>{" "}
                       {/* Màu đậm cho tên trường */}
-                      <span className="">{shippingAddress.street}</span>{" "}
+                      <span className="">{shippingAddress?.street}</span>{" "}
                       {/* Dữ liệu với màu mờ */}
                       <span className="font-semibold text-gray-700">
                         Phường, xã:
                       </span>
-                      <span className="">{shippingAddress.ward}</span>
+                      <span className="">{shippingAddress?.ward}</span>
                       <span className="font-semibold text-gray-700">
                         Quận, huyện:
                       </span>
-                      <span className="">{shippingAddress.district}</span>
+                      <span className="">{shippingAddress?.district}</span>
                       <span className="font-semibold text-gray-700">
                         Tỉnh, thành phố:
                       </span>
-                      <span className="">{shippingAddress.province}</span>
+                      <span className="">{shippingAddress?.province}</span>
                     </div>
                   </div>
 

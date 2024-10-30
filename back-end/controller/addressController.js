@@ -11,8 +11,14 @@ export const createAddress = async (req, res) => {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
 
+    // Lấy danh sách địa chỉ của người dùng
+    const existingAddresses = await AddressModel.find({ user: userId });
+
+    // Nếu người dùng chưa có địa chỉ nào, đặt isDefault = true
+    const isAddressDefault = existingAddresses.length === 0 ? true : isDefault;
+
     // Nếu isDefault = true, cập nhật các địa chỉ khác của người dùng để không còn là mặc định
-    if (isDefault) {
+    if (isAddressDefault) {
       await AddressModel.updateMany(
         { user: userId, isDefault: true },
         { isDefault: false }
@@ -26,7 +32,7 @@ export const createAddress = async (req, res) => {
       ward,
       district,
       province,
-      isDefault,
+      isDefault: isAddressDefault,
     });
     await address.save();
 

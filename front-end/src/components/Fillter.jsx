@@ -16,6 +16,7 @@ import {
   TabPanel,
   Flex,
   Image,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
@@ -77,7 +78,16 @@ function Filter() {
 
   return (
     <>
-      <Text cursor={"pointer"} fontWeight="semibold" onClick={handleMouseEnter}>
+      <Text
+        cursor={"pointer"}
+        fontFamily="'Quicksand', sans-serif"
+        fontWeight="bold"
+        textTransform="uppercase"
+        onClick={handleMouseEnter}
+        _hover={{
+          color: "blue.200",
+        }}
+      >
         Loại
       </Text>
       <Drawer placement={"top"} onClose={onClose} isOpen={isOpen} size={"lg"}>
@@ -88,12 +98,12 @@ function Filter() {
             <Flex gap={2} alignItems="center">
               <Image borderRadius={"20px"} src={imgSenda} alt="" h={8} w={8} />
               <Text
+                fontFamily="'Allura', cursive"
                 cursor={"pointer"}
-                bgGradient="linear(to-l, #0ea5e9, #2563eb)" // Linear gradient from right to left
-                bgClip="text" // Clips the background to the text
-                fontSize="20px" // Example font size
+                color={useColorModeValue("green.800", "green.200")}
+                fontSize="30px" // Example font size
                 fontWeight="bold"
-                as="i"
+                //  as="i"
               >
                 Plant Paradise
               </Text>
@@ -109,6 +119,7 @@ function Filter() {
                 {classifications.length > 0 ? (
                   classifications.map((classification, index) => (
                     <Tab
+                      color={useColorModeValue("green.800", "white")}
                       key={classification._id}
                       onClick={() => handleTabChange(index)}
                     >

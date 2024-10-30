@@ -51,7 +51,7 @@ const CardProduct = ({ products }) => {
     };
 
     fetchFavorites();
-  }, [user, setFavoriteProducts, setFavoritesCount]); // Dependency on user
+  }, []); // Dependency on user
 
   const isFavorite = (productId) =>
     favoriteProducts.some((fav) => fav._id === productId);
@@ -137,6 +137,8 @@ const CardProduct = ({ products }) => {
         {products.map((product, index) => {
           return (
             <Box
+              borderRadius={"10px"}
+              bg={"white"}
               position="relative"
               key={index}
               _hover={{ ".overlay": { opacity: 1 } }}
@@ -151,6 +153,7 @@ const CardProduct = ({ products }) => {
                   borderRadius="full"
                   borderWidth="2px"
                   borderColor="red.400"
+                  fontWeight={"bold"}
                   px="3"
                   py="1"
                   zIndex="1"
@@ -214,7 +217,7 @@ const CardProduct = ({ products }) => {
                     color={isFavorite(product._id) ? "red.500" : "black"}
                   />
                 </Tooltip>
-                <NavLink to={`/productDetail/${product?._id}`}>
+                <NavLink to={`/${product?.productName}`}>
                   <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                     <IconButton
                       icon={<FaEye />}
@@ -235,10 +238,9 @@ const CardProduct = ({ products }) => {
               </Box>
 
               {/* Nội dung thẻ */}
-              <NavLink to={`/productDetail/${product?._id}`}>
+              <NavLink to={`/${product?.productName}`}>
                 <Box
-                  borderWidth="1px"
-                  shadow="md"
+                  // borderWidth="1px"
                   rounded="lg"
                   overflow="hidden"
                   position="relative"
@@ -246,7 +248,6 @@ const CardProduct = ({ products }) => {
                   <Image
                     src={`http://localhost:2000/images/${product.image[0]}`}
                     alt="Product image"
-                    // Ensure the image covers the container
                   />
                   <Box p={{ base: 4, lg: 6 }}>
                     <Box d="flex" alignItems="center" justifyContent="center">
@@ -257,8 +258,11 @@ const CardProduct = ({ products }) => {
                         textTransform="uppercase"
                         ml="2"
                         textAlign="center"
+                        color={"black"}
                       >
-                        {product?.productName}
+                        {product?.productName.length > 20
+                          ? `${product.productName.substring(0, 25)}...`
+                          : product.productName}
                       </Box>
                     </Box>
                     <Box>
@@ -276,29 +280,43 @@ const CardProduct = ({ products }) => {
                             fontStyle="italic"
                             fontWeight="light"
                             mr="2"
-                            textColor
+                            color={"black"}
                           >
                             Giá:
                           </Text>
                           {product.finalPrice !== product.originalPrice && (
                             <>
                               <Badge
+                                bg={"gray.300"}
                                 rounded="full"
                                 px="3"
                                 fontSize="sm"
                                 textDecoration="line-through"
-                                color="gray.500"
+                                color="black"
                               >
                                 {product.originalPrice.toLocaleString("vi-VN")}Đ
                               </Badge>
-                              <Badge rounded="full" px="3" mx="1" fontSize="sm">
+                              <Badge
+                                color={"red"}
+                                rounded="full"
+                                px="3"
+                                mx="1"
+                                fontSize="sm"
+                                bg={"gray.300"}
+                              >
                                 {product.finalPrice.toLocaleString("vi-VN")}Đ
                               </Badge>
                             </>
                           )}
                           {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
                           {product.finalPrice === product.originalPrice && (
-                            <Badge rounded="full" px="3" fontSize="sm">
+                            <Badge
+                              color="black"
+                              rounded="full"
+                              px="3"
+                              fontSize="sm"
+                              bg={"gray.300"}
+                            >
                               {product.originalPrice.toLocaleString("vi-VN")}Đ
                             </Badge>
                           )}
@@ -314,14 +332,21 @@ const CardProduct = ({ products }) => {
                         fontSize="large"
                         mt="2" // Optional: adds some margin-top for spacing
                       >
-                        <Badge rounded="full" px="2" colorScheme="teal">
-                          Màu sắc: {product?.color?.nameColor}
+                        <Badge rounded="full" px="2" bg="gray.300">
+                          <Text color={"black"}>
+                            Màu sắc: {product?.color?.nameColor}
+                          </Text>
                         </Badge>
-                        <Badge rounded="full" px="2" colorScheme="teal">
-                          Đánh giá: {product?.ratingsCount}
+                        <Badge rounded="full" px="2" bg="gray.300">
+                          <Text color={"black"}>
+                            {" "}
+                            Đánh giá: {product?.ratingsCount}
+                          </Text>
                         </Badge>
-                        <Badge rounded="full" px="2" colorScheme="teal">
-                          Bán: {product?.orderCount}
+                        <Badge rounded="full" px="2" bg="gray.300">
+                          <Text color={"black"}>
+                            Bán: {product?.orderCount}
+                          </Text>
                         </Badge>
                       </Box>
                     </Box>
@@ -331,8 +356,8 @@ const CardProduct = ({ products }) => {
                       fontWeight="semibold"
                       noOfLines={3}
                       lineHeight="tight"
-                      textColor
                       fontSize="sm"
+                      color={"gray.600"}
                     >
                       {product?.description}
                     </Text>

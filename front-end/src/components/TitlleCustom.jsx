@@ -9,7 +9,7 @@ import {
 import React from "react";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 
-const TitlleCustom = ({ title }) => {
+const TitlleCustom = ({ title, description }) => {
   // Use useColorModeValue to switch between light and dark modes
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
   const textColor = useColorModeValue("black", "white"); // Text color
@@ -43,20 +43,27 @@ const TitlleCustom = ({ title }) => {
         zIndex={2}
       >
         <Heading
+          fontFamily="'Allura', cursive"
           as="h3"
-          size="lg"
           fontWeight="bold"
           textAlign="center"
           mb={{ base: "4", md: "2" }}
           textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)"
+          textTransform="uppercase"
+          size="xl"
         >
           {title}
         </Heading>
         <Text
+          fontFamily="'Playfair Display', serif"
           fontWeight={"bold"}
           fontStyle="italic" // Chữ nghiêng
           textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)" // Đổ bóng chữ
-        ></Text>
+          textAlign="center" // Căn giữa văn bản
+        >
+          {" "}
+          {description}
+        </Text>
         <Flex alignItems={{ base: "start", md: "center" }}>
           <svg
             viewBox="0 0 24 24"

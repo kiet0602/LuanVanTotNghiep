@@ -22,7 +22,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import userAtom from "../Atom/userAtom";
 import {
   getCartById,
@@ -31,12 +31,22 @@ import {
 } from "../service/cartService";
 import { toast } from "react-toastify";
 
+import {
+  cartItemProducts,
+  cartItemProductsCount,
+} from "../Atom/cartCountProductAtom.js";
+
 const ItemCart = () => {
   const user = useRecoilValue(userAtom);
   const userId = user?._id;
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]); // Thêm state để lưu các sản phẩm được chọn
+
+  const [itemsCart, setItemsCart] = useRecoilState(cartItemProducts);
+  const [ItemsCartCount, setItemsCartCount] = useRecoilState(
+    cartItemProductsCount
+  );
 
   const navigate = useNavigate();
   const boxBgColor = useColorModeValue("white", "gray.700");
@@ -47,6 +57,7 @@ const ItemCart = () => {
     try {
       const cartData = await getCartById(userId);
       setCart(cartData);
+
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -81,10 +92,10 @@ const ItemCart = () => {
   // Xóa sản phẩm khỏi giỏ hàng
   const handleRemoveFromCart = async (productId) => {
     try {
-      const response = await removeFromCart(userId, productId);
-
+      await removeFromCart(userId, productId);
       // Hiển thị thông báo thành công
       toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
+
       // Cập nhật trạng thái giỏ hàng ngay lập tức
       setCart((prevCart) => ({
         ...prevCart,
@@ -131,7 +142,7 @@ const ItemCart = () => {
   }
 
   return (
-    <Container maxW="6xl" p={{ base: 5, md: 12 }}>
+    <Container maxW="7xl" p={{ base: 5, md: 12 }}>
       {cart?.items.length > 0 ? (
         <>
           <VStack spacing={4} marginBottom={6} align="left" mx={[0, 0, 6]}>
@@ -242,8 +253,17 @@ const ItemCart = () => {
               </Text>{" "}
               Đ
             </Heading>
-            <Button mt={2} colorScheme="teal" onClick={handleCheckout}>
-              Thanh toán
+            <Button
+              mt="5px"
+              px="50px"
+              borderRadius="none"
+              bg="white"
+              color="black"
+              fontWeight="300"
+              boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+              onClick={handleCheckout}
+            >
+              Mua Ngay
             </Button>
           </Flex>
         </>

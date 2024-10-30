@@ -5,6 +5,9 @@ import Features from "../components/Features";
 import { Divider } from "@chakra-ui/react";
 
 import Layout from "../components/Layout";
+import LineReviewShop from "../components/LineReviewShop";
+import CartProductsDiscount from "../components/CartProductsDiscount";
+import IntroduceShop from "../components/IntroduceShop";
 
 ///
 const HomePage = () => {
@@ -12,8 +15,9 @@ const HomePage = () => {
     <>
       <Layout>
         <Hero />
-        <Divider mx="auto" maxWidth={"6xl"} />
-        <Divider mx="auto" maxWidth={"6xl"} />
+        <LineReviewShop />
+        <CartProductsDiscount />
+        <IntroduceShop />
         <Features />
       </Layout>
     </>

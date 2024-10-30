@@ -42,7 +42,7 @@ const InfoUserCheckout = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const userId = userCurrent?._id;
 
-  const textColor = useColorModeValue("gray.600", "whiteAlpha.600");
+  const textColor = useColorModeValue("black", "black");
 
   const [addressDefaut, setAddressDefaut] = useState(null);
 
@@ -104,7 +104,7 @@ const InfoUserCheckout = () => {
       <VStack w="full" h="full" p={10} spacing={10} align="flex-start">
         <VStack spacing={2} align="flex-start">
           <Heading>Thông tin giao hàng</Heading>
-          <Text color={textColor}>
+          <Text color={useColorModeValue("green.800", "white")}>
             Thông tin của bạn nếu bạn muốn thay đổi nhấn vào đây:{" "}
             <Tooltip label="Cập nhật thông tin" hasArrow arrowSize={15}>
               <FontAwesomeIcon
@@ -208,7 +208,10 @@ const InfoUserCheckout = () => {
 
           <GridItem colSpan={2}>
             <FormControl>
-              <FormLabel color={textColor} fontSize="sm">
+              <FormLabel
+                color={useColorModeValue("green.800", "white")}
+                fontSize="sm"
+              >
                 Chọn phương thức thanh toán:
               </FormLabel>
               <Stack spacing={2}>
@@ -226,25 +229,30 @@ const InfoUserCheckout = () => {
             </FormControl>
           </GridItem>
 
-          <GridItem colSpan={2}>
-            <FormControl>
-              <FormLabel color={textColor} fontSize="sm">
-                Chọn phương thức vận chuyển:
-              </FormLabel>
-              <Stack spacing={2}>
-                {shippingMethods.map((method, index) => (
-                  <Checkbox
-                    key={index}
-                    value={method}
-                    isChecked={selectedShippingMethod === method}
-                    onChange={handleShippingMethodChange}
-                  >
-                    {method}
-                  </Checkbox>
-                ))}
-              </Stack>
-            </FormControl>
-          </GridItem>
+          {selectedPaymentMethod === "Thanh toán khi nhận hàng" && (
+            <GridItem colSpan={2}>
+              <FormControl>
+                <FormLabel
+                  color={useColorModeValue("green.800", "white")}
+                  fontSize="sm"
+                >
+                  Chọn phương thức vận chuyển:
+                </FormLabel>
+                <Stack spacing={2}>
+                  {shippingMethods.map((method, index) => (
+                    <Checkbox
+                      key={index}
+                      value={method}
+                      isChecked={selectedShippingMethod === method}
+                      onChange={handleShippingMethodChange}
+                    >
+                      {method}
+                    </Checkbox>
+                  ))}
+                </Stack>
+              </FormControl>
+            </GridItem>
+          )}
 
           <GridItem colSpan={1}>
             <ModalInfoUser user={user} isOpen={isOpen} onClose={onClose} />

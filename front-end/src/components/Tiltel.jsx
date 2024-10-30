@@ -42,17 +42,20 @@ const Tiltel = ({ title, imageCategory, iconColor, descriptionCategory }) => {
         zIndex={2}
       >
         <Heading
+          fontFamily="'Allura', cursive"
           as="h3"
-          size="lg"
+          size="xl"
           fontWeight="bold"
           textAlign="center"
           mb={{ base: "4", md: "2" }}
           textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)"
           color={textColor}
+          textTransform="uppercase"
         >
           {title}
         </Heading>
         <Text
+          fontFamily="'Playfair Display', serif"
           fontWeight={"bold"}
           fontStyle="italic" // Chữ nghiêng
           textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)" // Đổ bóng chữ
@@ -71,7 +74,7 @@ const Tiltel = ({ title, imageCategory, iconColor, descriptionCategory }) => {
           >
             {/* SVG Path */}
           </svg>
-          <Text pl={2} textAlign="left" color={textColor}></Text>
+          {/* <Text pl={2} textAlign="left" color={textColor}></Text> */}
         </Flex>
       </Container>
     </Box>

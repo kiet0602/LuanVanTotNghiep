@@ -18,19 +18,19 @@ import axios from "axios";
 
 const ProductDetailPage = () => {
   const [product, setProduct] = useState("");
-  const { productId } = useParams();
+  const { productName } = useParams();
 
   useEffect(() => {
-    if (!productId) {
+    if (!productName) {
       console.error("Không xác thực được ID");
       return;
     }
-    const fetchProductsById = async () => {
+    const fetchProductsByName = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:2000/api/product/getProductById/${productId}`
+          `http://localhost:2000/api/product/getProductByName/${productName}`
         );
-
+        console.log(response);
         if (response.status === 200) {
           setProduct(response.data);
         } else {
@@ -41,7 +41,7 @@ const ProductDetailPage = () => {
       }
     };
 
-    fetchProductsById();
+    fetchProductsByName();
   }, []);
 
   // Sample product data
@@ -60,8 +60,8 @@ const ProductDetailPage = () => {
       <CardProductDetail product={product} />
       <Divider />
 
-      <Flex justify="center" mt={8}>
-        <Tabs variant="soft-rounded" colorScheme="green" maxW={"7xl"}>
+      {/* <Flex justify="center" mt={8}>
+         <Tabs variant="soft-rounded" colorScheme="green" maxW={"7xl"}>
           <TabList>
             <Tab>21312</Tab>
             <Tab>Care Instructions</Tab>
@@ -92,10 +92,10 @@ const ProductDetailPage = () => {
               </Box>
             </TabPanel>
           </TabPanels>
-        </Tabs>
-      </Flex>
+        </Tabs> 
+      </Flex> */}
 
-      <Review productId={productId} />
+      <Review productId={product._id} />
     </Layout>
   );
 };

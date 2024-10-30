@@ -11,7 +11,7 @@ import {
 import { footerData } from "../assets/data/datalink/datalink.js";
 
 const Footer = () => {
-  const bgColor = useColorModeValue("white", "gray.900");
+  const bgColor = useColorModeValue("white", "black");
   const textColor = useColorModeValue("gray.800", "gray.300");
   return (
     <Box bg={bgColor} py={5}>

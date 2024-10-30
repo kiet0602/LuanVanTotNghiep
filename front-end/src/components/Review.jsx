@@ -18,11 +18,19 @@ import {
   ModalFooter,
   Input,
   Box,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { addComment, getCommentsByProduct } from "../service/commnetService.js";
+import { VscComment, VscCommentDiscussion } from "react-icons/vsc";
 
 const Review = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isReplyOpen,
+    onOpen: onReplyOpen,
+    onClose: onReplyClose,
+  } = useDisclosure();
+  const [showComment, setShowComment] = useState(false);
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
   const [comments, setComments] = useState([]);
@@ -70,12 +78,17 @@ const Review = ({ productId }) => {
 
   const handleReply = (commentId) => {
     setParentId(commentId);
-    onOpen();
+    onReplyOpen();
   };
 
   // Hàm đệ quy để hiển thị bình luận và phản hồi
   const renderComments = (comments) => {
-    if (!Array.isArray(comments) || comments.length === 0) return null; // Kiểm tra nếu comments hợp lệ
+    if (!Array.isArray(comments) || comments.length === 0)
+      return (
+        <Text fontSize="lg" color="gray.500" textAlign="center">
+          Sản phẩm chưa được đánh giá bởi khách hàng.
+        </Text>
+      ); // Kiểm tra nếu comments hợp lệ
 
     return comments.map((review) => {
       // Kiểm tra nếu userId hợp lệ
@@ -136,70 +149,147 @@ const Review = ({ productId }) => {
   };
 
   return (
-    <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-      <Flex justifyContent="center">
-        <Heading
-          as="h3"
-          size="lg"
-          fontWeight="bold"
-          textAlign="left"
-          mb={{ base: "4", md: "2" }}
+    <Box bg={useColorModeValue("white", "gray.800")}>
+      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
+        <Flex justifyContent="center">
+          <Heading
+            as="h3"
+            size="lg"
+            fontWeight="bold"
+            textAlign="left"
+            mb={{ base: "4", md: "2" }}
+          >
+            Đánh giá gần đây
+          </Heading>
+        </Flex>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          direction="column"
+          mt={"20px"}
         >
-          Đánh giá gần đây
-        </Heading>
-      </Flex>
-      <Stack direction="column" spacing={5} my={4}>
-        {renderComments(comments)} {/* Sử dụng hàm renderComments */}
-      </Stack>
-      <Button onClick={onOpen} colorScheme="blue">
-        Đánh giá
-      </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Gửi Đánh Giá Của Bạn</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack spacing={4}>
-              <Box>
-                <Text fontSize="lg" mb={2}>
-                  Xếp Hạng:
-                </Text>
-                <HStack spacing={2}>
-                  {Array.from(Array(5).keys()).map((id) => (
-                    <Star
-                      key={id}
-                      fillColor={id < rating ? "#EACA4E" : "#e2e8f0"}
-                      onClick={() => handleRatingChange(id + 1)}
-                      style={{ cursor: "pointer" }}
-                    />
-                  ))}
-                </HStack>
-              </Box>
-              <Box>
-                <Text fontSize="lg" mb={2}>
-                  Nhận Xét:
-                </Text>
-                <Input
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Viết nhận xét của bạn ở đây..."
-                  size="md"
-                />
-              </Box>
-            </Stack>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAddComment}>
-              Gửi
-            </Button>
-            <Button variant="outline" ml={3} onClick={onClose}>
-              Hủy
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Container>
+          {!showComment ? (
+            <>
+              <VscCommentDiscussion fontSize={"30px"} />
+              <Text
+                _hover={{
+                  color: "red",
+                }}
+                color={useColorModeValue("black", "black")}
+                mb={"4"}
+                onClick={() => setShowComment(true)}
+                cursor="pointer"
+                fontWeight="bold"
+              >
+                Xem nhận xét
+              </Text>
+            </>
+          ) : (
+            <>
+              <VscCommentDiscussion fontSize={"30px"} />
+              <Text
+                _hover={{
+                  color: "red",
+                }}
+                color={useColorModeValue("black", "black")}
+                mb={"4"}
+                onClick={() => setShowComment(false)}
+                cursor="pointer"
+                fontWeight="bold"
+              >
+                Ẩn nhận xét
+              </Text>
+            </>
+          )}
+        </Flex>
+        {showComment && (
+          <Stack direction="column" spacing={5} my={4}>
+            {renderComments(comments)} {/* Sử dụng hàm renderComments */}
+          </Stack>
+        )}
+        {showComment && (
+          <Button onClick={onOpen} colorScheme="blue">
+            Đánh giá
+          </Button>
+        )}
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Gửi Đánh Giá Của Bạn</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack spacing={4}>
+                <Box>
+                  <Text fontSize="lg" mb={2}>
+                    Xếp Hạng:
+                  </Text>
+                  <HStack spacing={2}>
+                    {Array.from(Array(5).keys()).map((id) => (
+                      <Star
+                        key={id}
+                        fillColor={id < rating ? "#EACA4E" : "#e2e8f0"}
+                        onClick={() => handleRatingChange(id + 1)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    ))}
+                  </HStack>
+                </Box>
+                <Box>
+                  <Text fontSize="lg" mb={2}>
+                    Nhận Xét:
+                  </Text>
+                  <Input
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Viết nhận xét của bạn ở đây..."
+                    size="md"
+                  />
+                </Box>
+              </Stack>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={handleAddComment}>
+                Gửi
+              </Button>
+              <Button variant="outline" ml={3} onClick={onClose}>
+                Hủy
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={isReplyOpen} onClose={onReplyClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Gửi Phản Hồi Của Bạn</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack spacing={4}>
+                <Box>
+                  <Text fontSize="lg" mb={2}>
+                    Nhận Xét:
+                  </Text>
+                  <Input
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Viết phản hồi của bạn ở đây..."
+                    size="md"
+                  />
+                </Box>
+              </Stack>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={handleAddComment}>
+                Gửi
+              </Button>
+              <Button variant="outline" ml={3} onClick={onReplyClose}>
+                Hủy
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Container>{" "}
+    </Box>
   );
 };
 
