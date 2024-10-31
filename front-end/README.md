@@ -59,3 +59,18 @@ b6:
     _hover={{
           color: hoverColor,
         }}
+
+        1. "lightHorizontalLines"
+
+Vẽ đường kẻ ngang nhẹ giữa các hàng.
+Thích hợp cho bảng không quá phức tạp. 2. "noBorders"
+Không có đường kẻ nào, không có đường biên cho bảng.
+Thích hợp cho các bảng đơn giản không cần phân cách rõ ràng giữa các ô. 3. "headerLineOnly"
+Vẽ đường kẻ chỉ ở phần tiêu đề của bảng, không có đường kẻ cho các hàng bên dưới.
+Tốt cho bảng có tiêu đề rõ ràng. 4. "lightVerticalLines"
+Vẽ đường kẻ dọc nhẹ giữa các cột.
+Thích hợp cho bảng có nhiều cột. 5. "noPadding"
+Không có độ đệm (padding) cho các ô trong bảng, giúp các ô khít lại với nhau. 6. "compact"
+Tương tự như noPadding, nhưng chỉ áp dụng cho các hàng và cột mà không có độ đệm. 7. "evenlyDistributed"
+Cố định chiều rộng của các cột, giúp phân bố đồng đều. 8. Tùy chỉnh Layout
+Bạn có thể tự định nghĩa layout của riêng mình bằng cách sử dụng các thuộc tính như hLineWidth, vLineWidth, hLineColor, vLineColor, v.v.

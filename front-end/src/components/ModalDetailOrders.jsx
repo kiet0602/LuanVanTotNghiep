@@ -10,71 +10,237 @@ import {
   Button,
   Text,
   Divider,
-  Table,
-  Tbody,
-  Tr,
-  Td,
   Grid,
   GridItem,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
+import { toast } from "react-toastify";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { text } from "@fortawesome/fontawesome-svg-core";
 
-import { toast } from "react-toastify"; // Đảm bảo bạn đã import toast
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const ModalDetailOrders = ({ isOpen, onClose, order }) => {
   if (!order) {
     return;
   }
-
-  const exportPDF = async () => {
-    const element = document.getElementById("bill-content");
-    if (!element) {
-      toast.error("Không tìm thấy nội dung để xuất PDF");
+  console.log(order);
+  const exportPDF = () => {
+    if (!order) {
+      toast.error("Không có dữ liệu để xuất PDF");
       return;
     }
 
-    // Ẩn tất cả hình ảnh trước khi tạo canvas
-    const images = element.querySelectorAll("img");
-    images.forEach((img) => {
-      img.style.display = "none";
-    });
+    const docDefinition = {
+      content: [
+        { text: "Cửa hàng Plant Paradise", style: "shopName" }, // Tên shop
+        {
+          text: "ĐƠN HÀNG",
+          style: "name",
+          margin: [0, 10, 0, 0],
+          alignment: "center",
+        },
+        {
+          text: "Chi tiết đơn hàng",
+          style: "header",
+          margin: [0, 0, 0, 0],
+          alignment: "center",
+        },
+        {
+          text: "Thông tin",
+          fontSize: 20,
+          margin: [0, 0, 0, 0],
+        },
 
-    try {
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
+        {
+          table: {
+            widths: ["*", "*"], // Chiều rộng của các cột
+            body: [
+              [
+                {
+                  text: "ID đơn hàng:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 0, 0, 0],
+                },
+                {
+                  text: order._id,
+                  alignment: "justify",
+                  margin: [0, 0, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Ngày lập:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: order
+                    ? format(new Date(order.createdAt), "dd-MM-yyyy")
+                    : "N/A",
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Tên khách hàng:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: order?.user?.username,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Địa chỉ email:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: order?.user?.email,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Số điện thoại:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: order?.user?.numberPhone,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Địa chỉ giao hàng:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: `Đường: ${order?.shippingAddress?.street}, Xã ${order?.shippingAddress?.ward}, Quận/Huyện ${order?.shippingAddress?.district}, Tỉnh/Thành phố ${order?.shippingAddress?.province}`,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Phương thức thanh toán:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: order.paymentMethod,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: "Khuyến mãi:",
+                  bold: true,
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+                {
+                  text: order.discount.toLocaleString("vi-VN") + " đ",
+                  alignment: "justify",
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+            ],
+          },
+          layout: "noBorders", // Layout của bảng
+        },
+        {
+          text: "Sản phẩm",
+          fontSize: 20,
+          margin: [0, 20, 0, 0],
+        },
 
-      const margin = 10; // Thêm lề
-      const imgWidth = 210 - 2 * margin; // Chiều rộng A4 trừ lề (mm)
-      const pageHeight = 297 - 2 * margin; // Chiều cao A4 trừ lề (mm)
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = margin;
+        // Thêm bảng sản phẩm
+        {
+          table: {
+            widths: ["*", "auto", "auto"], // Chiều rộng của các cột
+            body: [
+              // Header của bảng sản phẩm
+              [
+                { text: "Tên sản phẩm", style: "tableHeader" },
+                { text: "Số lượng", style: "tableHeader" },
+                { text: "Giá", style: "tableHeader" },
+              ],
+              // Duyệt qua các sản phẩm trong items
+              ...order.items.map((item) => [
+                {
+                  text: item.product.productName,
+                },
+                {
+                  text: item.quantity.toString(),
+                  alignment: "center",
+                },
+                {
+                  text: `${item.price.toLocaleString("vi-VN")} đ`, // Giá sau khuyến mãi
+                  alignment: "right",
+                },
+              ]),
+            ],
+          },
+          layout: "lightHorizontalLines", // Layout của bảng
+        },
+        //  {
+        //   table: {
+        //     widths: ["*", "*"], // Chiều rộng của các cột
+        //         body: [
+        //           [
 
-      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+        //             {
 
-      // Nếu hình ảnh cao hơn chiều dài trang, cần chia nhỏ
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight + margin;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+        //             }
+        //           ]
+        //         ]
+        //   }
+        //  }
+        {
+          text: "Thuế: 20.000đ",
+          margin: [400, 20, 0, 0],
+        },
+        {
+          text: `Tổng tiền: ${order.finalPrice.toLocaleString("vi-VN")}đ`,
+          margin: [400, 0, 0, 0],
+        },
+      ],
 
-      pdf.save("bill.pdf");
-      toast.success("Xuất PDF thành công!");
-    } catch (error) {
-      console.error("Lỗi khi xuất PDF:", error);
-      toast.error("Có lỗi xảy ra khi xuất PDF.");
-    } finally {
-      // Hiển thị lại hình ảnh sau khi đã xuất PDF
-      images.forEach((img) => {
-        img.style.display = "block";
-      });
-    }
+      styles: {
+        shopName: { fontSize: 10, bold: false },
+        name: { fontSize: 30, bold: true },
+        subheader: { fontSize: 12, bold: true, margin: [0, 5, 0, 5] },
+        sectionHeader: { fontSize: 14, bold: true, color: "green" },
+        normalText: { fontSize: 12, margin: [0, 2, 0, 2] },
+        tableHeader: { fontSize: 12, bold: true, fillColor: "#eeeeee" },
+      },
+
+      defaultStyle: {
+        font: "Roboto",
+      },
+    };
+
+    pdfMake.createPdf(docDefinition).download("bill.pdf");
+    toast.success("Xuất PDF thành công!");
   };
 
   return (
@@ -118,14 +284,6 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
                 {order ? order.paymentMethod : "N/A"}
               </Text>
             </GridItem>
-            {/* <GridItem>
-              <Text fontWeight="bold" color="gray.700">
-                Địa chỉ giao hàng:
-              </Text>
-              <Text color="gray.800">
-                {order ? order.shippingAddress : "N/A"}
-              </Text>
-            </GridItem> */}
             <GridItem>
               <Text fontWeight="bold" color="gray.700">
                 Phí vận chuyển:
@@ -150,7 +308,7 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
               </Text>
               <Text color="gray.800">
                 {order
-                  ? order.totalPrice.toLocaleString("vi-VN") + " đ"
+                  ? order.finalPrice.toLocaleString("vi-VN") + " đ"
                   : "N/A"}
               </Text>
             </GridItem>
@@ -181,10 +339,31 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
           </Grid>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={onClose} colorScheme="teal" mr={2}>
+          <Button
+            onClick={onClose}
+            mt="5px"
+            px="50px"
+            borderRadius="none"
+            bg="gray"
+            color="black"
+            fontWeight="300"
+            boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+            mr={2}
+          >
             Đóng
           </Button>
-          <Button onClick={exportPDF} colorScheme="red">
+
+          <Button
+            onClick={exportPDF}
+            mt="5px"
+            px="50px"
+            borderRadius="none"
+            bg="red"
+            color="black"
+            fontWeight="300"
+            boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+            mr={2}
+          >
             Xuất PDF
           </Button>
         </ModalFooter>

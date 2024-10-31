@@ -84,6 +84,7 @@ export const checkout = async (req, res) => {
         return res.status(400).json({ message: "Mã giảm giá không hợp lệ" });
       }
     }
+
     // 3. Tạo đơn hàng
     const order = new orderModel({
       user: userId,
@@ -247,8 +248,14 @@ export const getOrders = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // Lấy tất cả đơn hàng của người dùng và populate toàn bộ thông tin người dùng và sản phẩm
-    const orders = await orderModel.find({ user: userId }).populate("user"); // Populate toàn bộ thông tin của user
+    // Lấy tất cả đơn hàng của người dùng, populate toàn bộ thông tin người dùng và sản phẩm
+    const orders = await orderModel
+      .find({ user: userId })
+      .populate("user") // Populate toàn bộ thông tin của user
+      .populate({
+        path: "items.product", // Populate các trường trong product thuộc items
+        model: "Product", // Tên model của sản phẩm
+      });
 
     if (orders.length === 0) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng nào" });
