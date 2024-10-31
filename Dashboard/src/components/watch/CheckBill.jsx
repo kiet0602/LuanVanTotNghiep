@@ -18,7 +18,6 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
     paymentMethod,
     createdAt,
   } = order;
-  console.log(shippingAddress);
 
   const exportPDF = async () => {
     const element = document.getElementById("bill-content");

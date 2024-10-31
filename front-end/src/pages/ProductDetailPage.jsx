@@ -30,7 +30,7 @@ const ProductDetailPage = () => {
         const response = await axios.get(
           `http://localhost:2000/api/product/getProductByName/${productName}`
         );
-        console.log(response);
+
         if (response.status === 200) {
           setProduct(response.data);
         } else {

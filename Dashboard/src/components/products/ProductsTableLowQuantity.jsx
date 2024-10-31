@@ -2,13 +2,17 @@ import { motion } from "framer-motion";
 import { Edit, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import AddProduct from "../add/AddProduct";
-import { deleteProduct, getProducts } from "../../service/productService";
+import {
+  deleteProduct,
+  getAllProductLowQuantity,
+  getProducts,
+} from "../../service/productService";
 import Pagination from "../pagination/Pagination";
 import UpdateProductModal from "../update/UpdateProductModal";
 
-const PRODUCTS_PER_PAGE = 10;
+const PRODUCTS_PER_PAGE = 5;
 
-const ProductsTable = () => {
+const ProductsTableLowQuantity = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({
     key: "name",
@@ -71,7 +75,7 @@ const ProductsTable = () => {
   // Lấy dữ liệu tất cả sản phẩm
   const fetchProducts = async () => {
     try {
-      const data = await getProducts();
+      const data = await getAllProductLowQuantity();
       setProducts(data);
       setFilteredProducts(data); // Cập nhật filteredCategories sau khi fetch
     } catch (error) {
@@ -80,6 +84,7 @@ const ProductsTable = () => {
       setLoading(false);
     }
   };
+
   // phân trang
   const offset = currentPage * PRODUCTS_PER_PAGE;
   const currentProducts = filteredProducts.slice(
@@ -130,7 +135,7 @@ const ProductsTable = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [products.length]);
+  }, []);
 
   return (
     <motion.div
@@ -142,14 +147,14 @@ const ProductsTable = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="">
           <h2 className="text-xl font-semibold text-gray-100 mb-4">
-            Danh sách sản phẩm
+            Danh sách sản phẩm tồn kho ít
           </h2>
-          <button
+          {/* <button
             className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
             onClick={() => setIsOpen(true)}
           >
-            <Plus size={18} /> {/* Icon cộng */}
-          </button>
+            <Plus size={18} />
+          </button> */}
         </div>
         <div className="relative">
           <input
@@ -295,4 +300,4 @@ const ProductsTable = () => {
     </motion.div>
   );
 };
-export default ProductsTable;
+export default ProductsTableLowQuantity;

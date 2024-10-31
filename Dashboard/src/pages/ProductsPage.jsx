@@ -13,9 +13,41 @@ import {
 import CategoryDistributionChart from "../components/overview/CategoryDistributionChart";
 import SalesTrendChart from "../components/products/SalesTrendChart";
 import ProductsTable from "../components/products/ProductsTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ProductsTableLowQuantity from "../components/products/ProductsTableLowQuantity";
+import {
+  getAllProductLowQuantity,
+  getProducts,
+} from "../service/productService";
+import DailyOrders from "../components/orders/DailyOrders";
 
 const ProductsPage = () => {
+  const [products, setProducts] = useState([]);
+  const [productsLowQuantity, setProductsLowQuantity] = useState([]);
+
+  const getProductLowQuantity = async () => {
+    try {
+      const data = await getAllProductLowQuantity();
+      setProductsLowQuantity(data);
+    } catch (error) {
+      console.error("Failed to fetch classifications:", error);
+    }
+  };
+
+  const getAllProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Failed to fetch classifications:", error);
+    }
+  };
+
+  useEffect(() => {
+    getProductLowQuantity();
+    getAllProducts();
+  }, []);
+
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Sản phẩm" />
@@ -29,38 +61,41 @@ const ProductsPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Products"
+            name="Tất cả sản phẩm"
             icon={Package}
-            value={1234}
+            value={products.length}
             color="#6366F1"
           />
-          <StatCard
+          {/* <StatCard
             name="Top Selling"
             icon={TrendingUp}
             value={89}
             color="#10B981"
-          />
+          /> */}
           <StatCard
-            name="Low Stock"
+            name="Sản phẩm số lượng < 5"
             icon={AlertTriangle}
-            value={23}
+            value={productsLowQuantity.length}
             color="#F59E0B"
           />
-          <StatCard
+          {/* <StatCard
             name="Total Revenue"
             icon={DollarSign}
             value={"$543,210"}
             color="#EF4444"
-          />
+          /> */}
         </motion.div>
         {/* Button to open modal */}
-
-        <ProductsTable />
-        {/* CHARTS */}
-        <div className="grid grid-col-1 lg:grid-cols-2 gap-8">
-          <SalesTrendChart />
+        <div className="grid grid-col-1 lg:grid-cols-2 gap-8 mb-10">
+          {/* <SalesTrendChart /> */}
+          <DailyOrders />
           <CategoryDistributionChart />
         </div>
+
+        <ProductsTable />
+        <ProductsTableLowQuantity />
+
+        {/* CHARTS */}
       </main>
     </div>
   );

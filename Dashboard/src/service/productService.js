@@ -104,3 +104,15 @@ export const getProductsSaleHigh = async () => {
     throw error;
   }
 };
+
+export const getAllProductLowQuantity = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/product/getAllProductLowQuantity"
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};

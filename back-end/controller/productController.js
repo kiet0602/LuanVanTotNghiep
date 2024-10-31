@@ -152,6 +152,31 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getAllProductLowQuantity = async (req, res) => {
+  try {
+    // Lấy tất cả sản phẩm có số lượng tồn kho dưới 5
+    const products = await productModel
+      .find({ quantity: { $lt: 5 } }) // Điều kiện lọc
+      .populate("category", "categoryName imageCategory descriptionCategory")
+      .populate("environment", "nameEnviroment")
+      .populate("color", "nameColor");
+
+    const productsWithFinalPrice = products.map((product) => {
+      const finalPrice =
+        product.originalPrice -
+        (product.originalPrice * product.discount) / 100;
+      return {
+        ...product.toObject(),
+        finalPrice,
+      };
+    });
+
+    res.status(200).json(productsWithFinalPrice);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Lấy sản phẩm theo ID
 const getProductByName = async (req, res) => {
   try {
@@ -284,4 +309,5 @@ export {
   getProductsByCategoryId,
   getTopSellingProducts,
   getAllProductsDiscount,
+  getAllProductLowQuantity,
 };

@@ -5,7 +5,7 @@ import Pagination from "../pagination/Pagination";
 import { getAllUsers } from "../../service/userService";
 import SendVoucher from "../Send/SendVoucher";
 
-const PRODUCTS_PER_PAGE = 5;
+const PRODUCTS_PER_PAGE = 10;
 
 const UsersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");

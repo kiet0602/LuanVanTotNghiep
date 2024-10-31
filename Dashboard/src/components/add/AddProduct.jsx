@@ -102,7 +102,8 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
     }
 
     const formData = new FormData();
-    formData.append("productName", nameProduct);
+    const productNameWithSize = `${nameProduct} (${size})`.trim();
+    formData.append("productName", productNameWithSize);
     formData.append("category", selectedCategory);
     formData.append("environment", selectedEnvironment);
     formData.append("color", selectedColor);

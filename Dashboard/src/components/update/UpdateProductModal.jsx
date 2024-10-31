@@ -74,8 +74,6 @@ export default function UpdateProductModal({
     }
   }, [product]);
 
-  console.log(images);
-
   useEffect(() => {
     fetchData();
   }, []);

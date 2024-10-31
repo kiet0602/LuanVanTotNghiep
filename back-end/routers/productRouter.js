@@ -3,6 +3,7 @@ import upload from "../configImage/multer.js";
 import {
   addProduct,
   deleteProduct,
+  getAllProductLowQuantity,
   getAllProducts,
   getAllProductsDiscount,
   getProductByName,
@@ -28,5 +29,6 @@ productRouter.get(
   getProductsByCategoryId
 );
 productRouter.get("/getTopSellingProducts", getTopSellingProducts);
+productRouter.get("/getAllProductLowQuantity", getAllProductLowQuantity);
 
 export default productRouter;
