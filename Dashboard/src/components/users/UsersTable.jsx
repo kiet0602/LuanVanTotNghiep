@@ -129,9 +129,9 @@ const UsersTable = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-700">
-            {currentUsers.map((user) => (
+            {currentUsers.map((user, index) => (
               <motion.tr
-                key={user.id}
+                key={index}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}

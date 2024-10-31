@@ -14,7 +14,7 @@ import ImageIntroduceShop from "../assets/data/image/Senda/Who_We_Are_2160x.jpg"
 
 const IntroduceShop = () => {
   return (
-    <Box bg={useColorModeValue("teal.300", "teal.800")}>
+    <Box bg={useColorModeValue("teal.50", "teal.800")}>
       {" "}
       <Container maxW="7xl">
         {" "}
@@ -36,9 +36,12 @@ const IntroduceShop = () => {
               >
                 <Flex justify="center" align="center" pb="20px">
                   <Box
+                    fontFamily="'Allura', cursive"
+                    color={useColorModeValue("gray.500", "green.200")}
                     display="inline-block"
                     position="relative"
                     textAlign="center"
+                    fontSize={"60px"}
                     letterSpacing="3px" // Tạo khoảng cách giữa các chữ
                   >
                     Chúng Tôi Là Ai?

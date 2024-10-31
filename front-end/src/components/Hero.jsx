@@ -17,6 +17,7 @@ import { GoChevronRight } from "react-icons/go";
 import { MdBolt } from "react-icons/md";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 import DottedBox from "./DottedBox";
+import { NavLink } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -85,17 +86,20 @@ const Hero = () => {
               mb={{ base: "3rem !important", sm: 0 }}
               flexWrap="wrap"
             >
-              <Button
-                mt="5px"
-                px="50px"
-                borderRadius="none"
-                bg="white"
-                color="black"
-                fontWeight="300"
-                boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
-              >
-                Mua Ngay
-              </Button>
+              <NavLink to={`/products `}>
+                {" "}
+                <Button
+                  mt="5px"
+                  px="50px"
+                  borderRadius="none"
+                  bg="white"
+                  color="black"
+                  fontWeight="300"
+                  boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+                >
+                  Mua Ngay
+                </Button>
+              </NavLink>
             </HStack>
           </Stack>
           <Box ml={{ base: 0, md: 5 }} pos="relative">

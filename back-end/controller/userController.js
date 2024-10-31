@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import validator from "validator";
 import AddressModel from "../models/addressModel.js";
+import orderModel from "../models/orderModel.js";
 
 const verifyUser = async (req, res, next) => {
   const { email } = req.method === "GET" ? req.query : req.body;
@@ -303,6 +304,44 @@ const authenticate = (req, res) => {
   res.end();
 };
 
+const getAllUsersWithOrderStatus = async (req, res) => {
+  try {
+    // Lấy tất cả người dùng
+    const users = await userModel.find();
+
+    // Lấy tất cả đơn hàng và chỉ populate thông tin người dùng
+    const orders = await orderModel.find().populate("user");
+
+    // Tạo danh sách userId của người dùng đã mua hàng
+    const userIdsWithOrders = new Set(
+      orders.map((order) => order.user._id.toString())
+    );
+
+    // Phân loại người dùng thành đã mua hàng và chưa mua hàng
+    const usersWithOrders = [];
+    const usersWithoutOrders = [];
+
+    users.forEach((user) => {
+      const userObject = user.toObject();
+      delete userObject.password; // Loại bỏ mật khẩu
+
+      if (userIdsWithOrders.has(user._id.toString())) {
+        usersWithOrders.push(userObject);
+      } else {
+        usersWithoutOrders.push(userObject);
+      }
+    });
+
+    // Trả về phản hồi với hai danh sách
+    return res.status(200).json({
+      usersWithOrders,
+      usersWithoutOrders,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Lỗi lấy danh sách người dùng" });
+  }
+};
+
 export {
   register,
   login,
@@ -315,4 +354,5 @@ export {
   authenticate,
   verifyUser,
   getAllUsers,
+  getAllUsersWithOrderStatus,
 };

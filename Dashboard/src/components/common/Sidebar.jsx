@@ -23,9 +23,9 @@ import { ThemeContext } from "../../Theme/ThemeContext.jsx"; // Import ThemeCont
 
 const SIDEBAR_ITEMS = [
   { name: "Tổng quan", icon: ChartLine, color: "#4F46E5", href: "/" },
-  { name: "Đã bán", icon: DollarSign, color: "#10B981", href: "/sales" },
+  // { name: "Đã bán", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Đơn hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
-  { name: "Analytics", icon: TrendingUp, color: "#3B82F6", href: "/analytics" },
+  // { name: "Analytics", icon: TrendingUp, color: "#3B82F6", href: "/analytics" },
   { name: "Họ cây", icon: NotebookTabs, color: "#22C55E", href: "/family" },
   { name: "Thể loại", icon: LeafyGreen, color: "#D97706", href: "/category" },
   { name: "Màu sắc", icon: Rainbow, color: "#F43F5E", href: "/color" },
@@ -39,7 +39,7 @@ const SIDEBAR_ITEMS = [
   { name: "Khuyến mãi", icon: ShoppingBag, color: "#8B5CF6", href: "/poupons" },
 
   { name: "Người dùng", icon: Users, color: "#EC4899", href: "/users" },
-  { name: "Cài đặt", icon: Settings, color: "#6EE7B7", href: "/settings" },
+  // { name: "Cài đặt", icon: Settings, color: "#6EE7B7", href: "/settings" },
 ];
 
 const Sidebar = () => {

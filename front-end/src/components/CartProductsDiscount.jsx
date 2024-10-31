@@ -28,6 +28,7 @@ import {
   removeFavoriteProduct,
 } from "../service/favoritesService.js";
 import { getAllDiscountProducts } from "../service/productsDiscountService.js";
+import { LuTreeDeciduous } from "react-icons/lu";
 
 const CartProductsDiscount = () => {
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
@@ -144,11 +145,16 @@ const CartProductsDiscount = () => {
   };
 
   return (
-    <Box bg={useColorModeValue("green.100", "green.900")}>
+    <Box bg={useColorModeValue("green.50", "gray.900")}>
       {" "}
       <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
-        <Text fontSize={"15px"} textAlign={"center"} mb={"40px"}>
-          TOP SẢN PHẨM KHUYẾN MÃI
+        <Text
+          fontSize={"18px"}
+          textAlign={"center"}
+          fontWeight={"bold"}
+          mb={"40px"}
+        >
+          TOP SẢN PHẨM KHUYẾN MÃI (%)
         </Text>
         <SimpleGrid columns={[1, 2, 3]} spacing="15px">
           {productsDiscounts.slice(0, 6).map((productsDiscount, index) => {
@@ -399,16 +405,19 @@ const CartProductsDiscount = () => {
           })}
         </SimpleGrid>
         <Box mt={"30px"} textAlign="center">
-          <Button
-            px={"50px"}
-            borderRadius={"none"}
-            color={"black"}
-            bg={useColorModeValue("white", "green.50")}
-            mx="auto"
-            fontWeight="300" // Giảm độ đậm của chữ
-          >
-            Tất cả sản phẩm
-          </Button>
+          <NavLink to={"/products"}>
+            {" "}
+            <Button
+              px={"50px"}
+              borderRadius={"none"}
+              color={"black"}
+              bg={useColorModeValue("gray.100", "green.50")}
+              mx="auto"
+              fontWeight="300" // Giảm độ đậm của chữ
+            >
+              Tất cả sản phẩm
+            </Button>
+          </NavLink>
         </Box>
       </Container>
     </Box>

@@ -4,7 +4,6 @@ import { getProductsSaleHigh } from "../../service/productService";
 
 const OverviewTableProductSaleHigh = () => {
   const [productsSalesHigh, setProductSaleHigh] = useState([]);
-  const [currentProducts, setCurrentProducts] = useState([]); // Khởi tạo currentProducts
 
   const fetchProductsSaleHigh = async () => {
     try {
@@ -19,11 +18,6 @@ const OverviewTableProductSaleHigh = () => {
     fetchProductsSaleHigh();
   }, []);
 
-  // Chỉ định lại currentProducts mỗi khi productsSalesHigh thay đổi
-  useEffect(() => {
-    setCurrentProducts(productsSalesHigh);
-  }, [productsSalesHigh]);
-
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
@@ -33,7 +27,7 @@ const OverviewTableProductSaleHigh = () => {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100 mb-4">
-          Danh sách sản top 5 phẩm bán chạy
+          Danh sách top 5 sản phẩm bán chạy
         </h2>
       </div>
 
@@ -61,7 +55,7 @@ const OverviewTableProductSaleHigh = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-700">
-            {currentProducts.map((product) => (
+            {productsSalesHigh.slice(0, 5).map((product) => (
               <motion.tr
                 key={product._id}
                 initial={{ opacity: 0 }}
@@ -72,7 +66,7 @@ const OverviewTableProductSaleHigh = () => {
                   <img
                     src={`http://localhost:2000/images/${product.image[0]}`}
                     alt="Product img"
-                    className="size-10 rounded-full"
+                    className="w-10 h-10 rounded-full"
                   />
                   {product?.productName}
                 </td>

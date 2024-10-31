@@ -456,7 +456,6 @@ const CartinfoUser = () => {
                           >
                             <Box
                               as="button"
-                              bg="red.300" // Màu nền
                               borderRadius="full" // Làm cho nền hình tròn
                               p="2" // Khoảng cách xung quanh biểu tượng
                               cursor="pointer"
@@ -484,7 +483,16 @@ const CartinfoUser = () => {
                 </Box>
 
                 {setSelectedAddress && hasAllData && (
-                  <Button onClick={UpdateAddress} mt={4}>
+                  <Button
+                    px="50px"
+                    borderRadius="none"
+                    bg="white"
+                    color="black"
+                    fontWeight="300"
+                    boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+                    onClick={UpdateAddress}
+                    mt={4}
+                  >
                     Đặt địa chỉ mặc định
                   </Button>
                 )}

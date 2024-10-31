@@ -203,11 +203,11 @@ const ProductsCategory = () => {
             >
               {showFilter ? (
                 <>
-                  <MdFilterList /> <Text pl={"10px"}>Ẩn Bộ Lọc</Text>
+                  <MdFilterListOff /> <Text pl={"10px"}>Ẩn Bộ Lọc</Text>
                 </>
               ) : (
                 <>
-                  <MdFilterListOff /> <Text pl={"10px"}>Lọc sản phẩm</Text>
+                  <MdFilterList /> <Text pl={"10px"}>Lọc sản phẩm</Text>
                 </>
               )}
             </Button>

@@ -91,7 +91,7 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                         <FormLabel>Đường</FormLabel>
                         <Input
                           type="text"
-                          placeholder="Ahmad"
+                          placeholder="Nhập tên đường của bạn"
                           rounded="md"
                           onChange={(e) => setStreet(e.target.value)}
                         />
@@ -100,7 +100,7 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                         <FormLabel>Xã</FormLabel>
                         <Input
                           type="email"
-                          placeholder="test@test.com"
+                          placeholder=" Nhập tên xã của bạn"
                           rounded="md"
                           onChange={(e) => setWard(e.target.value)}
                         />
@@ -109,7 +109,7 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                         <FormLabel>Huyện/Quận</FormLabel>
                         <Input
                           type="tel"
-                          placeholder="0123456789"
+                          placeholder="Nhập Quận/Huyện của bạn"
                           rounded="md"
                           onChange={(e) => setDistrict(e.target.value)}
                         />
@@ -118,7 +118,7 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                         <FormLabel>Tỉnh/Thành phố</FormLabel>
                         <Input
                           type="tel"
-                          placeholder="0123456789"
+                          placeholder="Nhập Tỉnh/Thành Phố của bạn"
                           rounded="md"
                           onChange={(e) => setProvince(e.target.value)}
                         />
@@ -131,18 +131,33 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                     ></Stack>
                   </VStack>
                   <VStack w="100%">
-                    <Button
-                      onClick={handleUpdateUser}
-                      bg={"red"}
-                      color="white"
-                      _hover={{
-                        bg: "green.500",
-                      }}
-                      rounded="md"
-                      w={{ base: "100%", md: "max-content" }}
-                    >
-                      Lưu thông tin
-                    </Button>
+                    <Flex gap={3}>
+                      {" "}
+                      <Button
+                        onClick={handleUpdateUser}
+                        mt="5px"
+                        px="50px"
+                        borderRadius="none"
+                        bg="white"
+                        color="black"
+                        fontWeight="300"
+                        boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+                      >
+                        Lưu địa chỉ
+                      </Button>
+                      <Button
+                        onClick={onClose}
+                        mt="5px"
+                        px="50px"
+                        borderRadius="none"
+                        bg="white"
+                        color="black"
+                        fontWeight="300"
+                        boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+                      >
+                        Hủy bỏ
+                      </Button>
+                    </Flex>
                   </VStack>
                 </VStack>
               </Stack>

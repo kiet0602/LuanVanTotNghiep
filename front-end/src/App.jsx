@@ -14,8 +14,8 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
-import OAuthCallback from "./pages/OAuthCallback";
-import Test from "./pages/Test";
+// import OAuthCallback from "./pages/OAuthCallback";
+// import Test from "./pages/Test";
 import EnterEmailPage from "./pages/EnterEmailPage";
 import SubmitCodeOTPPage from "./pages/SubmitCodeOTPPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -38,15 +38,13 @@ function App() {
       </Box>
       <Box position={"relative"} w={"full"}>
         <Routes>
-          <Route path="/oauth/:token" element={<OAuthCallback />} />
-
+          {/* <Route path="/oauth/:token" element={<OAuthCallback />} /> */}
           <Route path="/" element={<HomePage />} />
           <Route
             path="/signIn"
             element={!user ? <SignInPage /> : <Navigate to={"/"} />}
           />
           {/* <Route path="/signIn" element={<SignInPage />} /> */}
-
           <Route
             path="/signUp"
             element={!user ? <SignUpPage /> : <Navigate to={"/"} />}
@@ -65,10 +63,11 @@ function App() {
             element={user ? <CartPage /> : <Navigate to={"/signIn"} />}
           />
           {/* Route for Google Authentication */}
-          <Route path="/test" element={<Test />} />
-
-          <Route path="/favirotesProduct" element={<FavoritesPage />} />
-
+          {/* <Route path="/test" element={<Test />} /> */}
+          <Route
+            path="/favirotesProduct"
+            element={user ? <FavoritesPage /> : <Navigate to={"/signIn"} />}
+          />
           <Route
             path="/enterEmail"
             element={!user ? <EnterEmailPage /> : <Navigate to={"/"} />}
@@ -85,7 +84,10 @@ function App() {
 
           <Route path="/news" element={<NewsPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/success" element={<SuccessOrderPage />} />
+          <Route
+            path="/success"
+            element={user ? <SuccessOrderPage /> : <Navigate to={"/"} />}
+          />
           <Route path="*" element={<NotPage />} />
 
           <Route

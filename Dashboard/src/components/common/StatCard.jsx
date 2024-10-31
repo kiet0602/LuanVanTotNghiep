@@ -12,7 +12,9 @@ const StatCard = ({ name, icon: Icon, value, color }) => {
           {name}
         </span>
         <p className="mt-1 text-3xl font-semibold dark:text-gray-100 light:text-gray-800">
-          {value.toLocaleString()}
+          {value !== undefined && value !== null
+            ? value.toLocaleString()
+            : "N/A"}
         </p>
       </div>
     </motion.div>

@@ -21,7 +21,7 @@ const LineReviewShop = () => {
         justify="center"
         align="center"
         mb={2}
-        color={useColorModeValue("green.600", "yellow.100")}
+        color={useColorModeValue("orange.400", "yellow.100")}
       >
         <Heading
           as="h2"

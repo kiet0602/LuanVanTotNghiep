@@ -43,3 +43,15 @@ export const updateUser = async (updateData, file = null) => {
     throw error;
   }
 };
+
+export const getAllUsersWithOrderStatus = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/user/UsersOrderedAndNoOrder"
+    );
+    return response.data; // Trả về danh sách người dùng (không bao gồm mật khẩu)
+  } catch (error) {
+    console.error("Lỗi lấy danh sách người dùng:", error);
+    throw error;
+  }
+};

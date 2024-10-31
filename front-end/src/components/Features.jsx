@@ -60,18 +60,36 @@ const Features = () => {
           >
             Tại sao chọn chúng tôi?
           </chakra.h3>
-          <Text fontSize="lg" mb={5} lineHeight="35px">
+          <Text
+            fontStyle={"italic"}
+            fontSize="lg"
+            mb={5}
+            lineHeight="35px"
+            color={useColorModeValue("gray.500", "green.200")}
+          >
             Chất lượng sản phẩm luôn là ưu tiên hàng đầu của chúng tôi. Các sản
             phẩm được chọn lựa kỹ lưỡng từ những giống cây tốt nhất, đảm bảo mỗi
             sản phẩm đến tay bạn đều trong trạng thái hoàn hảo và lâu bền.
           </Text>
-          <Text fontSize="lg" mb={5} lineHeight="35px">
+          <Text
+            fontStyle={"italic"}
+            fontSize="lg"
+            mb={5}
+            lineHeight="35px"
+            color={useColorModeValue("gray.500", "green.200")}
+          >
             Chúng tôi hiểu rằng mỗi khách hàng đều cần sự hỗ trợ riêng biệt, vì
             vậy đội ngũ của chúng tôi luôn sẵn sàng lắng nghe và tư vấn cho bạn
             từ việc chọn lựa đến chăm sóc cây tại nhà. Sự hài lòng của bạn là
             niềm vui của chúng tôi.
           </Text>
-          <Text fontSize="lg" mb={5} lineHeight="35px">
+          <Text
+            fontStyle={"italic"}
+            fontSize="lg"
+            mb={5}
+            lineHeight="35px"
+            color={useColorModeValue("gray.500", "green.200")}
+          >
             Với dịch vụ giao hàng tận nơi, chúng tôi cam kết mang đến trải
             nghiệm mua sắm tiện lợi và nhanh chóng. Bạn có thể yên tâm nhận sản
             phẩm tại nhà trong thời gian ngắn nhất mà vẫn đảm bảo an toàn và
