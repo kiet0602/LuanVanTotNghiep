@@ -68,7 +68,7 @@ export const checkout = async (req, res) => {
         discount = (totalPrice * coupon.discountPercentage) / 100;
 
         // Cập nhật số lần sử dụng của mã giảm giá
-        coupon.usageCount += 1;
+
         coupon.maxUsage -= 1; // Giảm maxUsage mỗi khi mã được sử dụng
         if (coupon.usageCount >= coupon.maxUsage) {
           coupon.isActive = false; // Vô hiệu hóa mã khuyến mãi nếu đã sử dụng đủ số lần
@@ -103,7 +103,7 @@ export const checkout = async (req, res) => {
       status: "Chờ xử lý", // Trạng thái đơn hàng
     });
     await order.save();
-    // await sendOrderConfirmationEmail(user.email, order);
+    await sendOrderConfirmationEmail(user.email, order);
     // 4. Xóa các mục đã được chọn trong giỏ hàng
     for (const item of items) {
       await cartModel.findOneAndUpdate(

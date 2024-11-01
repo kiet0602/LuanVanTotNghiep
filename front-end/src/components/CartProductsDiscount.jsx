@@ -45,7 +45,6 @@ const CartProductsDiscount = () => {
     try {
       const products = await getAllDiscountProducts();
       setProductsDiscounts(products);
-      console.log(products);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách yêu thích:", error);
     }
@@ -264,13 +263,7 @@ const CartProductsDiscount = () => {
 
                 {/* Nội dung thẻ */}
                 <NavLink to={`/${productsDiscount?.productName}`}>
-                  <Box
-                    borderWidth="1px"
-                    shadow="md"
-                    rounded="lg"
-                    overflow="hidden"
-                    position="relative"
-                  >
+                  <Box rounded="lg" overflow="hidden" position="relative">
                     <Image
                       src={`http://localhost:2000/images/${productsDiscount.image[0]}`}
                       alt="Product image"

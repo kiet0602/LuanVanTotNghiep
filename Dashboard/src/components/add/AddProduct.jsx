@@ -141,7 +141,9 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
       setIsOpen(false);
     } catch (error) {
       console.error("Failed to add product:", error);
-      toast.error("Đã có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
+      const errorMessage =
+        error.response?.data?.error || "Đã có lỗi xảy ra khi thêm sản phẩm.";
+      toast.error(errorMessage);
     }
   };
 

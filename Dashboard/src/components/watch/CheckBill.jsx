@@ -1,8 +1,11 @@
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import pdfMake from "pdfmake/build/pdfmake";
+import vfsFonts from "pdfmake/build/vfs_fonts";
 import { toast } from "react-toastify";
 import { Dialog } from "@headlessui/react";
 import { LeafyGreen } from "lucide-react";
+
+// Chỉ cần import vfsFonts mà không cần định nghĩa font
+pdfMake.vfs = vfsFonts.pdfMake.vfs;
 
 export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
   if (!order) return null;
@@ -26,45 +29,144 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
       return;
     }
 
-    // Ẩn tất cả hình ảnh trước khi tạo canvas
-    const images = element.querySelectorAll("img");
-    images.forEach((img) => {
-      img.style.display = "none";
-    });
-
     try {
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
+      // Lấy ảnh từ nội dung hóa đơn
 
-      const margin = 10; // Thêm lề
-      const imgWidth = 210 - 2 * margin; // Chiều rộng A4 trừ lề (mm)
-      const pageHeight = 297 - 2 * margin; // Chiều cao A4 trừ lề (mm)
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = margin;
+      // Định nghĩa tài liệu PDF
+      const docDefinition = {
+        content: [
+          {
+            text: "HÓA ĐƠN",
+            style: "header",
+            alignment: "center",
+            margin: [0, 20],
+          },
+          {
+            text: "Cửa hàng Plant Paradise",
+            style: "subheader",
+            alignment: "center",
+          },
+          {
+            text: "Địa chỉ: 3/2 quận Xuân Khánh, Ninh Kiều, Cần thơ",
+            style: "address",
+            alignment: "center",
+          },
+          {
+            text: "Số điện thoại: [0123456789]",
+            style: "address",
+            alignment: "center",
+          },
+          {
+            text:
+              "Ngày đặt hàng: " +
+              new Date(createdAt).toLocaleDateString("vi-VN"),
+            style: "info",
+            margin: [0, 10],
+          },
+          {
+            text: "Thông tin người mua:",
+            style: "subheader",
+            margin: [0, 10],
+          },
+          {
+            table: {
+              body: [
+                ["Tên người dùng", user?.username],
+                [
+                  "Địa chỉ giao hàng",
+                  `${shippingAddress?.street}, ${shippingAddress?.ward}, ${shippingAddress?.district}, ${shippingAddress?.province}`,
+                ],
+                ["Phương thức thanh toán", paymentMethod],
+                ["Mã hóa đơn", order?._id],
+              ],
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 20],
+          },
+          {
+            text: "Chi tiết sản phẩm:",
+            style: "subheader",
+            margin: [0, 10],
+          },
+          {
+            table: {
+              widths: ["*", "auto", "auto"],
+              body: [
+                ["Tên sản phẩm", "Giá (VND)", "Số lượng"],
+                ...items.map((item) => [
+                  item.product.productName,
+                  item.price,
+                  item.quantity,
+                ]),
+                [
+                  { text: "Tổng cộng", bold: true },
+                  { text: `${totalPrice} VND`, bold: true },
+                  { text: "", bold: true },
+                ],
+                [
+                  { text: "Phí vận chuyển", bold: true },
+                  { text: `${shippingFee} VND`, bold: true },
+                  { text: "", bold: true },
+                ],
+                [
+                  { text: "Giảm giá", bold: true },
+                  { text: `${discount} VND`, bold: true },
+                  { text: "", bold: true },
+                ],
+                [
+                  { text: "Tổng thanh toán", bold: true },
+                  { text: `${finalPrice} VND`, bold: true },
+                  { text: "", bold: true },
+                ],
+              ],
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 20],
+          },
+          {
+            text: "Cảm ơn bạn đã mua hàng!",
+            style: "footer",
+            alignment: "center",
+            margin: [0, 20],
+          },
+        ],
+        styles: {
+          header: {
+            fontSize: 24,
+            bold: true,
+            margin: [0, 20],
+          },
+          subheader: {
+            fontSize: 14,
+            bold: true,
+            margin: [0, 5],
+          },
+          address: {
+            fontSize: 12,
+            margin: [0, 5],
+          },
+          info: {
+            fontSize: 12,
+            italics: true,
+            margin: [0, 5],
+          },
+          footer: {
+            fontSize: 12,
+            italics: true,
+            margin: [0, 20],
+          },
+        },
+        defaultStyle: {
+          // Không cần chỉ định font chữ, mặc định sẽ là Helvetica
+        },
+      };
 
-      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Nếu hình ảnh cao hơn chiều dài trang, cần chia nhỏ
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight + margin;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save("bill.pdf");
+      // Tạo và xuất PDF
+      pdfMake.createPdf(docDefinition).download("bill.pdf");
       toast.success("Xuất PDF thành công!");
     } catch (error) {
       console.error("Lỗi khi xuất PDF:", error);
       toast.error("Có lỗi xảy ra khi xuất PDF.");
-    } finally {
-      // Hiển thị lại hình ảnh sau khi đã xuất PDF
-      images.forEach((img) => {
-        img.style.display = "block";
-      });
     }
   };
 
@@ -116,22 +218,20 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                     <div className="mt-1 grid grid-cols-2 gap-2">
                       <span className="font-semibold text-gray-700">
                         Đường:
-                      </span>{" "}
-                      {/* Màu đậm cho tên trường */}
-                      <span className="">{shippingAddress?.street}</span>{" "}
-                      {/* Dữ liệu với màu mờ */}
+                      </span>
+                      <span>{shippingAddress?.street}</span>
                       <span className="font-semibold text-gray-700">
                         Phường, xã:
                       </span>
-                      <span className="">{shippingAddress?.ward}</span>
+                      <span>{shippingAddress?.ward}</span>
                       <span className="font-semibold text-gray-700">
                         Quận, huyện:
                       </span>
-                      <span className="">{shippingAddress?.district}</span>
+                      <span>{shippingAddress?.district}</span>
                       <span className="font-semibold text-gray-700">
                         Tỉnh, thành phố:
                       </span>
-                      <span className="">{shippingAddress?.province}</span>
+                      <span>{shippingAddress?.province}</span>
                     </div>
                   </div>
 

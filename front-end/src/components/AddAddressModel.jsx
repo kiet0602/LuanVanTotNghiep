@@ -138,8 +138,8 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                         mt="5px"
                         px="50px"
                         borderRadius="none"
-                        bg="white"
-                        color="black"
+                        bg="blue.300"
+                        color="white"
                         fontWeight="300"
                         boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
                       >
@@ -150,7 +150,7 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
                         mt="5px"
                         px="50px"
                         borderRadius="none"
-                        bg="white"
+                        bg="red.200"
                         color="black"
                         fontWeight="300"
                         boxShadow="sm" // Thêm bóng đổ nhẹ cho nút

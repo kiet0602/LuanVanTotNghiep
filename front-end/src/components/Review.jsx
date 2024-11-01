@@ -65,6 +65,7 @@ const Review = ({ productId }) => {
       }
       await addComment(productId, parentId, content, rating);
       onClose();
+      onReplyClose();
       setContent("");
       setRating(0);
       setParentId(null);
@@ -267,7 +268,7 @@ const Review = ({ productId }) => {
               <Stack spacing={4}>
                 <Box>
                   <Text fontSize="lg" mb={2}>
-                    Nhận Xét:
+                    Trả lời:
                   </Text>
                   <Input
                     value={content}

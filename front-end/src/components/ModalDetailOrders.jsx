@@ -16,16 +16,16 @@ import {
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import { text } from "@fortawesome/fontawesome-svg-core";
+import vfsFonts from "pdfmake/build/vfs_fonts";
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// Cấu hình virtual file system
 
+pdfMake.vfs = vfsFonts.pdfMake.vfs;
 const ModalDetailOrders = ({ isOpen, onClose, order }) => {
   if (!order) {
     return;
   }
-  console.log(order);
+
   const exportPDF = () => {
     if (!order) {
       toast.error("Không có dữ liệu để xuất PDF");
@@ -34,9 +34,13 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
 
     const docDefinition = {
       content: [
-        { text: "Cửa hàng Plant Paradise", style: "shopName" }, // Tên shop
         {
-          text: "ĐƠN HÀNG",
+          text: "Cửa hàng Plant Paradise",
+          style: "shopName",
+          alignment: "center",
+        }, // Tên shop
+        {
+          text: "HÓA ĐƠN ĐƠN HÀNG",
           style: "name",
           margin: [0, 10, 0, 0],
           alignment: "center",
@@ -44,124 +48,48 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
         {
           text: "Chi tiết đơn hàng",
           style: "header",
-          margin: [0, 0, 0, 0],
+          margin: [0, 10, 0, 10],
           alignment: "center",
         },
         {
-          text: "Thông tin",
-          fontSize: 20,
-          margin: [0, 0, 0, 0],
+          text: "Thông tin khách hàng",
+          style: "subheader",
+          margin: [0, 20, 0, 5],
         },
-
         {
           table: {
             widths: ["*", "*"], // Chiều rộng của các cột
             body: [
+              [{ text: "ID đơn hàng:", bold: true }, order._id],
               [
-                {
-                  text: "ID đơn hàng:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 0, 0, 0],
-                },
-                {
-                  text: order._id,
-                  alignment: "justify",
-                  margin: [0, 0, 0, 0],
-                },
+                { text: "Ngày lập:", bold: true },
+                order ? format(new Date(order.createdAt), "dd-MM-yyyy") : "N/A",
               ],
               [
-                {
-                  text: "Ngày lập:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-                {
-                  text: order
-                    ? format(new Date(order.createdAt), "dd-MM-yyyy")
-                    : "N/A",
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
+                { text: "Tên khách hàng:", bold: true },
+                order?.user?.username || "N/A",
               ],
               [
-                {
-                  text: "Tên khách hàng:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-                {
-                  text: order?.user?.username,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
+                { text: "Địa chỉ email:", bold: true },
+                order?.user?.email || "N/A",
               ],
               [
-                {
-                  text: "Địa chỉ email:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-                {
-                  text: order?.user?.email,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
+                { text: "Số điện thoại:", bold: true },
+                order?.user?.numberPhone || "N/A",
               ],
               [
-                {
-                  text: "Số điện thoại:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-                {
-                  text: order?.user?.numberPhone,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-              ],
-              [
-                {
-                  text: "Địa chỉ giao hàng:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
+                { text: "Địa chỉ giao hàng:", bold: true },
                 {
                   text: `Đường: ${order?.shippingAddress?.street}, Xã ${order?.shippingAddress?.ward}, Quận/Huyện ${order?.shippingAddress?.district}, Tỉnh/Thành phố ${order?.shippingAddress?.province}`,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
                 },
               ],
               [
-                {
-                  text: "Phương thức thanh toán:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-                {
-                  text: order.paymentMethod,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
+                { text: "Phương thức thanh toán:", bold: true },
+                order.paymentMethod,
               ],
               [
-                {
-                  text: "Khuyến mãi:",
-                  bold: true,
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
-                {
-                  text: order.discount.toLocaleString("vi-VN") + " đ",
-                  alignment: "justify",
-                  margin: [0, 5, 0, 0],
-                },
+                { text: "Khuyến mãi:", bold: true },
+                `${order.discount.toLocaleString("vi-VN")} đ`,
               ],
             ],
           },
@@ -169,22 +97,18 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
         },
         {
           text: "Sản phẩm",
-          fontSize: 20,
-          margin: [0, 20, 0, 0],
+          style: "subheader",
+          margin: [0, 20, 0, 10],
         },
-
-        // Thêm bảng sản phẩm
         {
           table: {
             widths: ["*", "auto", "auto"], // Chiều rộng của các cột
             body: [
-              // Header của bảng sản phẩm
               [
                 { text: "Tên sản phẩm", style: "tableHeader" },
-                { text: "Số lượng", style: "tableHeader" },
-                { text: "Giá", style: "tableHeader" },
+                { text: "Số lượng", style: "tableHeader", alignment: "center" },
+                { text: "Giá (VND)", style: "tableHeader", alignment: "right" },
               ],
-              // Duyệt qua các sản phẩm trong items
               ...order.items.map((item) => [
                 {
                   text: item.product.productName,
@@ -194,7 +118,7 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
                   alignment: "center",
                 },
                 {
-                  text: `${item.price.toLocaleString("vi-VN")} đ`, // Giá sau khuyến mãi
+                  text: `${item.price.toLocaleString("vi-VN")} đ`,
                   alignment: "right",
                 },
               ]),
@@ -202,41 +126,34 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
           },
           layout: "lightHorizontalLines", // Layout của bảng
         },
-        //  {
-        //   table: {
-        //     widths: ["*", "*"], // Chiều rộng của các cột
-        //         body: [
-        //           [
-
-        //             {
-
-        //             }
-        //           ]
-        //         ]
-        //   }
-        //  }
         {
-          text: "Thuế: 20.000đ",
-          margin: [400, 20, 0, 0],
+          text: "Thuế: 20.000 đ",
+          margin: [0, 10, 0, 0],
+          alignment: "right",
         },
         {
-          text: `Tổng tiền: ${order.finalPrice.toLocaleString("vi-VN")}đ`,
-          margin: [400, 0, 0, 0],
+          text: `Tổng tiền: ${order.finalPrice.toLocaleString("vi-VN")} đ`,
+          margin: [0, 5, 0, 0],
+          bold: true,
+          alignment: "right",
+        },
+        {
+          text: "Cảm ơn bạn đã mua hàng tại Plant Paradise!",
+          margin: [0, 20, 0, 0],
+          alignment: "center",
+          italics: true,
         },
       ],
 
       styles: {
-        shopName: { fontSize: 10, bold: false },
-        name: { fontSize: 30, bold: true },
-        subheader: { fontSize: 12, bold: true, margin: [0, 5, 0, 5] },
-        sectionHeader: { fontSize: 14, bold: true, color: "green" },
-        normalText: { fontSize: 12, margin: [0, 2, 0, 2] },
-        tableHeader: { fontSize: 12, bold: true, fillColor: "#eeeeee" },
+        shopName: { fontSize: 16, margin: [0, 10, 0, 0], bold: true },
+        name: { fontSize: 24, margin: [0, 10, 0, 0], bold: true },
+        subheader: { fontSize: 14, margin: [0, 5, 0, 5], bold: true },
+        header: { fontSize: 18, margin: [0, 5, 0, 5], bold: true },
+        tableHeader: { fontSize: 12, fillColor: "#eeeeee", bold: true },
       },
 
-      defaultStyle: {
-        font: "Roboto",
-      },
+      defaultStyle: {},
     };
 
     pdfMake.createPdf(docDefinition).download("bill.pdf");
