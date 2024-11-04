@@ -43,7 +43,7 @@ export default function SendVoucher({
     setIsLoading(true); // Đặt trạng thái loading thành true khi bắt đầu gửi
     try {
       const response = await sendVoucherEmail(user._id, selectedCouponId); // Gọi hàm gửi voucher
-      toast.success("Mã khuyến mãi đã gửi đến Email của bạn"); // Hiển thị thông báo thành công
+      toast.success("Mã khuyến mãi đã gửi đến Email của người dùng"); // Hiển thị thông báo thành công
       setIsOpenSendVoucher(false); // Đóng modal sau khi gửi thành công
     } catch (error) {
       toast.error(response.msg); // Hiển thị thông báo lỗi

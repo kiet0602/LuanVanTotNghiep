@@ -41,7 +41,10 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ error: "Tên sản phẩm đã tồn tại" });
     }
 
-    const images = req.files ? req.files.map((file) => file.filename) : [];
+    const images = req.files.image
+      ? req.files.image.map((file) => file.filename)
+      : [];
+    const video = req.files.video ? req.files.video[0].filename : null;
 
     const newProduct = new productModel({
       productName,
@@ -55,6 +58,7 @@ const addProduct = async (req, res) => {
       quantity, // Thêm trường quantity
       care, // Thêm trường care
       image: images,
+      video,
     });
 
     await newProduct.save();
@@ -109,10 +113,17 @@ const updateProduct = async (req, res) => {
       updatedAt: Date.now(),
     };
 
-    if (req.files && req.files.length > 0) {
-      updatedData.image = req.files.map((file) => file.filename);
+    if (req.files.image && req.files.image.length > 0) {
+      updatedData.image = req.files.image.map((file) => file.filename);
     } else {
       updatedData.image = existingProduct.image;
+    }
+
+    // Xử lý cập nhật video
+    if (req.files.video && req.files.video.length > 0) {
+      updatedData.video = req.files.video[0].filename;
+    } else {
+      updatedData.video = existingProduct.video;
     }
 
     const updatedProduct = await productModel.findByIdAndUpdate(

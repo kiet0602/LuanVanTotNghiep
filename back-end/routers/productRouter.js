@@ -14,12 +14,24 @@ import {
 
 const productRouter = express.Router();
 
-productRouter.post("/addProduct", upload.array("image", 5), addProduct);
+productRouter.post(
+  "/addProduct",
+  upload.fields([
+    { name: "image", maxCount: 5 }, // Tối đa 5 ảnh
+    { name: "video", maxCount: 1 }, // Tối đa 1 video
+  ]),
+  addProduct
+);
+
 productRouter.put(
   "/updateProduct/:id",
-  upload.array("image", 5),
+  upload.fields([
+    { name: "image", maxCount: 5 }, // Tối đa 5 ảnh
+    { name: "video", maxCount: 1 }, // Tối đa 1 video
+  ]),
   updateProduct
 );
+
 productRouter.delete("/deleteProduct/:id", deleteProduct);
 productRouter.get("/getAllProducts", getAllProducts);
 productRouter.get("/getAllProductsDiscount", getAllProductsDiscount);

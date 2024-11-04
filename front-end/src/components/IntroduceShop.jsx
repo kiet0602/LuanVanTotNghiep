@@ -1,16 +1,22 @@
 import React from "react";
+
 import {
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  Flex,
+  useColorModeValue,
   Text,
   SimpleGrid,
   Box,
   Image,
-  Flex,
   Stack,
   Container,
   Button,
-  useColorModeValue,
 } from "@chakra-ui/react";
 import ImageIntroduceShop from "../assets/data/image/Senda/Who_We_Are_2160x.jpg";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 const IntroduceShop = () => {
   return (
@@ -21,9 +27,12 @@ const IntroduceShop = () => {
         <Stack minH="60vh" py="60px" direction={{ base: "column", md: "row" }}>
           <Flex flex={1}>
             <Image
-              alt="Cover image"
+              // alt="Cover image"
               objectFit="cover"
+              width="100%" // đảm bảo ảnh không bị kéo dài
               src={ImageIntroduceShop}
+              height="auto" // điều chỉnh chiều cao tự động dựa trên chiều rộng
+              maxHeight="500px" // giới hạn chiều cao tối đa, có thể thay đổi tùy theo thiết kế
             />
           </Flex>
           <Flex p={8} flex={1} align="center" justifyContent="center">
@@ -96,6 +105,74 @@ const IntroduceShop = () => {
               >
                 Cửa hàng của chúng tôi
               </Button>
+              <Flex
+                mt={"30px"}
+                align={"center"}
+                justify={"center"}
+                bg={useColorModeValue("gray.50", "gray.800")}
+              >
+                <Container>
+                  <Accordion allowMultiple width="100%" maxW="lg" rounded="lg">
+                    <AccordionItem>
+                      <AccordionButton
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        p={4}
+                      >
+                        <Text fontSize="md">What is Chakra UI?</Text>
+                        <ChevronDownIcon fontSize="24px" />
+                      </AccordionButton>
+                      <AccordionPanel pb={4}>
+                        <Text color="gray.600">
+                          Chakra UI is a simple and modular component library
+                          that gives developers the building blocks they need to
+                          create web applications.
+                        </Text>
+                      </AccordionPanel>
+                    </AccordionItem>
+                    <AccordionItem>
+                      <AccordionButton
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        p={4}
+                      >
+                        <Text fontSize="md">What advantages to use?</Text>
+                        <ChevronDownIcon fontSize="24px" />
+                      </AccordionButton>
+                      <AccordionPanel pb={4}>
+                        <Text color="gray.600">
+                          Chakra UI offers a variety of advantages including
+                          ease of use, accessibility, and customization options.
+                          It also provides a comprehensive set of UI components
+                          and is fully compatible with React.
+                        </Text>
+                      </AccordionPanel>
+                    </AccordionItem>
+                    <AccordionItem>
+                      <AccordionButton
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        p={4}
+                      >
+                        <Text fontSize="md">How to start using Chakra UI?</Text>
+                        <ChevronDownIcon fontSize="24px" />
+                      </AccordionButton>
+                      <AccordionPanel pb={4}>
+                        <Text color="gray.600">
+                          To get started with Chakra UI, you can install it via
+                          npm or yarn, and then import the components you need
+                          in your project. The Chakra UI documentation is also a
+                          great resource for getting started and learning more
+                          about the library.
+                        </Text>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </Container>
+              </Flex>
             </Flex>
           </Flex>
         </Stack>

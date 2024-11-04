@@ -17,6 +17,7 @@ const HomePage = () => {
         <Hero />
         <LineReviewShop />
         <CartProductsDiscount />
+
         <IntroduceShop />
         <Features />
       </Layout>

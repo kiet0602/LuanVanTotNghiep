@@ -32,6 +32,7 @@ import { addToCart } from "../service/cartService.js";
 import userAtom from "../Atom/userAtom.js";
 import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
+import ProductViewerModal from "./ProductViewerModal.jsx";
 
 const CardProductDetail = ({ product }) => {
   const [mainImage, setMainImage] = useState(null);
@@ -126,6 +127,7 @@ const CardProductDetail = ({ product }) => {
                     />
                   ))}
                 </Flex>
+                <ProductViewerModal product={product} />
               </Stack>
 
               <Stack spacing={{ base: 6, md: 10 }}>
@@ -277,21 +279,19 @@ const CardProductDetail = ({ product }) => {
                     </Box>
                   </Flex>
                 </Box>
-
                 <Button
                   onClick={() => handleAddToCart(product?._id)}
-                  bgColor={"gray.300"}
-                  rounded={"10"}
-                  w={"full"}
+                  py="30px"
+                  borderRadius="none"
+                  bg="green.300"
+                  color="white"
+                  fontWeight="300"
+                  boxShadow="md" // Thêm bóng đổ nhẹ cho nút
                   size={"lg"}
-                  textTransform={"uppercase"}
-                  _hover={{
-                    transform: "translateY(5px)",
-                    boxShadow: "lg",
-                  }}
                 >
                   Thêm vào giỏ hàng
                 </Button>
+
                 <AccordionDetailProduct description={product?.description} />
                 <Stack
                   direction="row"

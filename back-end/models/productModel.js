@@ -35,6 +35,10 @@ const productSchema = new mongoose.Schema({
       required: true,
     },
   ],
+  video: {
+    type: String, // Nếu mỗi sản phẩm có một video, dùng String; hoặc đổi thành Array nếu có nhiều video
+    required: false, // Đặt là false để video không bắt buộc
+  },
   originalPrice: {
     type: Number,
     required: true,
