@@ -190,7 +190,7 @@ const InfoCartCheckout = ({ items, total }) => {
         totalPrice: total,
         shippingFee: shippingFee,
         discountedTotal: calculateTotal(),
-        selectedShippingMethod: "Giao hàng",
+        selectedShippingMethod: "Giao hàng hỏa tốc",
         selectedPaymentMethod,
         couponCode,
         addressId,

@@ -5,6 +5,7 @@ import ListOrderUser from "../components/ListOrderUser";
 import Features from "../components/Features";
 import CartinfoUser from "../components/CartinfoUser";
 import ListCouponUser from "../components/ListCouponUser";
+import ListOrderUserUpdate from "../components/ListOrderUserUpdate";
 
 ///
 const PageUser = () => {
@@ -13,7 +14,8 @@ const PageUser = () => {
       <Layout>
         <CartinfoUser />
         <Divider />
-        <ListOrderUser />
+        {/* <ListOrderUser /> */}
+        <ListOrderUserUpdate />
         <ListCouponUser />
         <Divider />
         <Features />

@@ -103,7 +103,7 @@ const CardProductDetail = ({ product }) => {
                   h={{ base: "100%", sm: "400px", lg: "500px" }}
                   bgColor={bgColor}
                 />
-
+                <ProductViewerModal product={product} />
                 <Flex mt={4}>
                   {product?.image.map((img, idx) => (
                     <Image
@@ -127,7 +127,6 @@ const CardProductDetail = ({ product }) => {
                     />
                   ))}
                 </Flex>
-                <ProductViewerModal product={product} />
               </Stack>
 
               <Stack spacing={{ base: 6, md: 10 }}>
@@ -250,41 +249,46 @@ const CardProductDetail = ({ product }) => {
                   </VStack>
                 </Stack>
                 <Box mt={4}>
-                  <Flex alignItems="center">
-                    <Text fontSize={"xl"} fontWeight="bold" mr={4}>
-                      Số lượng:
-                    </Text>
-                    <NumberInput
-                      defaultValue={1}
-                      min={1}
-                      max={product?.quantity} // Ensure quantity does not exceed available stock
-                      value={quantity}
-                      onChange={(valueString) =>
-                        setQuantity(parseInt(valueString))
-                      }
-                      size="md"
-                      maxW="150px"
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                    <Box mx={5} display={"flex"}>
-                      Tạm tính:
-                      <Text color={"red"}>
-                        {totalPriceProduct.toLocaleString("vi-VN")} Đ
+                  {product?.quantity === 0 ? (
+                    <Text textAlign={"center"}>Sản phẩm đã hết</Text>
+                  ) : (
+                    <Flex alignItems="center">
+                      <Text fontSize={"xl"} fontWeight="bold" mr={4}>
+                        Số lượng:
                       </Text>
-                    </Box>
-                  </Flex>
+
+                      <NumberInput
+                        defaultValue={1}
+                        min={1}
+                        max={product?.quantity} // Ensure quantity does not exceed available stock
+                        value={quantity}
+                        onChange={(valueString) =>
+                          setQuantity(parseInt(valueString))
+                        }
+                        size="md"
+                        maxW="150px"
+                      >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                      <Box mx={5} display={"flex"}>
+                        Tạm tính:
+                        <Text color={"red"}>
+                          {totalPriceProduct.toLocaleString("vi-VN")} Đ
+                        </Text>
+                      </Box>
+                    </Flex>
+                  )}
                 </Box>
                 <Button
                   onClick={() => handleAddToCart(product?._id)}
                   py="30px"
                   borderRadius="none"
-                  bg="green.300"
-                  color="white"
+                  bg="orange.200"
+                  color="black"
                   fontWeight="300"
                   boxShadow="md" // Thêm bóng đổ nhẹ cho nút
                   size={"lg"}

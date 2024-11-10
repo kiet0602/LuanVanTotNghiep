@@ -198,7 +198,7 @@ const CartFavoritesProductsUser = () => {
                         }
                       />
                     </Tooltip>
-                    <NavLink to={`/${favoriteProduct?.productName}`}>
+                    <NavLink to={`/products/${favoriteProduct?.productName}`}>
                       <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                         <IconButton
                           icon={<FaEye />}
@@ -218,7 +218,7 @@ const CartFavoritesProductsUser = () => {
                     </NavLink>
                   </Box>
 
-                  <NavLink to={`/${favoriteProduct?.productName}`}>
+                  <NavLink to={`/products/${favoriteProduct?.productName}`}>
                     <Box rounded="lg" overflow="hidden" position="relative">
                       <Image
                         src={`http://localhost:2000/images/${favoriteProduct.image[0]}`}

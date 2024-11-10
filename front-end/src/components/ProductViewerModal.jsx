@@ -36,7 +36,7 @@ const ProductViewerModal = ({ product }) => {
       </Button>
 
       {/* Modal Chakra UI */}
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader> Video sản phẩm </ModalHeader>
@@ -57,6 +57,14 @@ const ProductViewerModal = ({ product }) => {
                     src={`http://localhost:2000/images/${product.video}`}
                   />
                 </Box>
+                <Text
+                  mt={"20px"}
+                  fontFamily="'Playfair Display', serif"
+                  fontSize={"xl"}
+                >
+                  Mô tả chi tiết
+                </Text>
+                <Text pb={"20px"}>{product?.description} </Text>
               </>
             ) : (
               <p>Không có video để hiển thị</p>
@@ -68,8 +76,8 @@ const ProductViewerModal = ({ product }) => {
               onClick={onClose}
               px="50px"
               borderRadius="none"
-              bg="white"
-              color="black"
+              bg="black"
+              color="white"
               fontWeight="300"
               boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
             >

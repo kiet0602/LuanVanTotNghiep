@@ -178,6 +178,60 @@ export const updateItemQuantity = async (req, res) => {
 };
 
 // Hàm lấy giỏ hàng của người dùng
+// export const getCartById = async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     const cart = await cartModel
+//       .findOne({ user: userId })
+//       .populate("items.product");
+
+//     if (!cart) {
+//       return res.status(404).json({ message: "Giỏ hàng không tồn tại" });
+//     }
+
+//     const updatedItems = cart.items
+//       .filter((item) => item.product && item.product.quantity > 0) // Chỉ giữ lại các sản phẩm còn tồn kho
+//       .map((item) => {
+//         const product = item.product;
+
+//         if (!product || !product.originalPrice) {
+//           return item;
+//         }
+
+//         const discount = product.discount || 0;
+//         const finalPrice =
+//           product.originalPrice - (product.originalPrice * discount) / 100;
+
+//         const totalItemPrice = finalPrice * item.quantity;
+
+//         return {
+//           ...item._doc,
+//           product: {
+//             ...product._doc,
+//             finalPrice,
+//           },
+//           totalItemPrice,
+//         };
+//       });
+
+//     cart.items = updatedItems;
+//     cart.totalPrice = updatedItems.reduce(
+//       (acc, item) => acc + item.totalItemPrice,
+//       0
+//     );
+//     cart.shippingFee = calculateShippingFee(cart.totalPrice);
+//     cart.finalPrice = cart.totalPrice + cart.shippingFee;
+
+//     // Lưu giỏ hàng sau khi cập nhật các sản phẩm hết hàng
+//     await cart.save();
+
+//     res.status(200).json(cart);
+//   } catch (error) {
+//     res.status(500).json({ message: "Lỗi server", error });
+//   }
+// };
+
 export const getCartById = async (req, res) => {
   const { userId } = req.params;
 
@@ -190,30 +244,38 @@ export const getCartById = async (req, res) => {
       return res.status(404).json({ message: "Giỏ hàng không tồn tại" });
     }
 
-    const updatedItems = cart.items
-      .filter((item) => item.product && item.product.quantity > 0) // Chỉ giữ lại các sản phẩm còn tồn kho
-      .map((item) => {
-        const product = item.product;
+    const warnings = []; // Mảng lưu các thông báo cảnh báo
 
-        if (!product || !product.originalPrice) {
-          return item;
-        }
+    const updatedItems = cart.items.map((item) => {
+      const product = item.product;
+      if (!product || !product.originalPrice) {
+        return item; // Giữ lại sản phẩm với dữ liệu gốc nếu không có giá trị chính xác
+      }
 
-        const discount = product.discount || 0;
-        const finalPrice =
-          product.originalPrice - (product.originalPrice * discount) / 100;
+      let adjustedQuantity = item.quantity; // Giữ nguyên số lượng ban đầu
+      if (product.quantity === 0) {
+        warnings.push(`Sản phẩm "${product.name}" hiện đã hết hàng.`);
+      } else if (item.quantity > product.quantity) {
+        // Nếu số lượng giỏ hàng lớn hơn số lượng tồn kho
+        warnings.push(
+          `Sản phẩm "${product.name}" chỉ còn ${product.quantity} sản phẩm trong kho.`
+        );
+      }
 
-        const totalItemPrice = finalPrice * item.quantity;
+      const discount = product.discount || 0;
+      const finalPrice =
+        product.originalPrice - (product.originalPrice * discount) / 100;
+      const totalItemPrice = finalPrice * adjustedQuantity;
 
-        return {
-          ...item._doc,
-          product: {
-            ...product._doc,
-            finalPrice,
-          },
-          totalItemPrice,
-        };
-      });
+      return {
+        ...item._doc,
+        product: {
+          ...product._doc,
+          finalPrice,
+        },
+        totalItemPrice,
+      };
+    });
 
     cart.items = updatedItems;
     cart.totalPrice = updatedItems.reduce(
@@ -223,10 +285,13 @@ export const getCartById = async (req, res) => {
     cart.shippingFee = calculateShippingFee(cart.totalPrice);
     cart.finalPrice = cart.totalPrice + cart.shippingFee;
 
-    // Lưu giỏ hàng sau khi cập nhật các sản phẩm hết hàng
+    // Lưu giỏ hàng sau khi cập nhật
     await cart.save();
 
-    res.status(200).json(cart);
+    res.status(200).json({
+      cart,
+      warnings, // Trả về danh sách cảnh báo
+    });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });
   }

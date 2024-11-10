@@ -55,8 +55,8 @@ const ItemCart = () => {
   const fetchCart = async () => {
     if (!userId) return;
     try {
-      const cartData = await getCartById(userId);
-      setCart(cartData);
+      const response = await getCartById(userId);
+      setCart(response.cart);
 
       setLoading(false);
     } catch (error) {
@@ -65,10 +65,10 @@ const ItemCart = () => {
   };
 
   useEffect(() => {
-    if (userId && (!cart || (cart && cart.items.length === 0))) {
+    if (userId) {
       fetchCart();
     }
-  }, [userId, cart]);
+  }, [userId]);
 
   // Thay đổi số lượng sản phẩm trong giỏ hàng
   const handleQuantityChange = async (productId, value) => {
@@ -143,10 +143,13 @@ const ItemCart = () => {
 
   return (
     <Container maxW="7xl" p={{ base: 5, md: 12 }}>
-      {cart?.items.length > 0 ? (
-        <>
-          <VStack spacing={4} marginBottom={6} align="left" mx={[0, 0, 6]}>
-            {cart.items.map((item) => (
+      {cart && cart.items && cart.items.length > 0 ? (
+        <VStack spacing={4} marginBottom={6} align="left" mx={[0, 0, 6]}>
+          {cart.items.map((item) => {
+            const isOutOfStock = item?.product?.quantity === 0;
+            const isExceedStock = item?.quantity > item?.product?.quantity;
+
+            return (
               <Box
                 key={item?._id}
                 px={4}
@@ -160,18 +163,19 @@ const ItemCart = () => {
               >
                 <Flex
                   justifyContent="space-between"
-                  alignItems="center" // Căn giữa theo chiều dọc
+                  alignItems="center"
                   p={4}
-                  w="100%" // Đảm bảo độ rộng full
+                  w="100%"
                 >
                   <Checkbox
                     isChecked={selectedItems.includes(item?.product?._id)}
-                    onChange={() => handleSelectItem(item?.product?._id)} // Chọn/bỏ chọn sản phẩm
+                    isDisabled={isOutOfStock || isExceedStock}
+                    onChange={() => handleSelectItem(item?.product?._id)}
                   />
                   <Flex
                     direction={{ base: "column", md: "row" }}
                     align="center"
-                    justifyContent="center" // Căn giữa nội dung hình ảnh và tên sản phẩm theo chiều ngang
+                    justifyContent="center"
                   >
                     <Image
                       rounded="full"
@@ -189,6 +193,13 @@ const ItemCart = () => {
                       >
                         {item?.product?.productName}
                       </Heading>
+                      {(isOutOfStock || isExceedStock) && (
+                        <Text color="red.500" fontSize="xs">
+                          {isOutOfStock
+                            ? "Sản phẩm này đã hết hàng"
+                            : `Chỉ còn ${item?.product?.quantity} sản phẩm trong kho`}
+                        </Text>
+                      )}
                     </Stack>
                   </Flex>
                   <Stack spacing={2} align="center" justifyContent="center">
@@ -199,6 +210,7 @@ const ItemCart = () => {
                       size="sm"
                       maxW="150px"
                       value={item?.quantity}
+                      isDisabled={isOutOfStock || isExceedStock}
                       onChange={(valueString) =>
                         handleQuantityChange(item?.product._id, valueString)
                       }
@@ -223,11 +235,11 @@ const ItemCart = () => {
                   />
                 </Flex>
               </Box>
-            ))}
-          </VStack>
+            );
+          })}
           <Link
             as={NavLink}
-            to="/shop"
+            to="/products"
             textDecoration="none"
             fontStyle="italic"
             _hover={{ textDecoration: "underline" }}
@@ -260,13 +272,13 @@ const ItemCart = () => {
               bg="white"
               color="black"
               fontWeight="300"
-              boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+              boxShadow="sm"
               onClick={handleCheckout}
             >
               Mua Ngay
             </Button>
           </Flex>
-        </>
+        </VStack>
       ) : (
         <Flex direction="column" align="center">
           <Heading fontSize="xl" color="red.500">

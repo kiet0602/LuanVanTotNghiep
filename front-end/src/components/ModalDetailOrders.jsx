@@ -80,7 +80,7 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
               [
                 { text: "Địa chỉ giao hàng:", bold: true },
                 {
-                  text: `Đường: ${order?.shippingAddress?.street}, Xã ${order?.shippingAddress?.ward}, Quận/Huyện ${order?.shippingAddress?.district}, Tỉnh/Thành phố ${order?.shippingAddress?.province}`,
+                  text: `Đường: ${order?.shippingAddress?.street}, Xã: ${order?.shippingAddress?.ward}, Quận/Huyện: ${order?.shippingAddress?.district}, Tỉnh/Thành phố: ${order?.shippingAddress?.province}`,
                 },
               ],
               [

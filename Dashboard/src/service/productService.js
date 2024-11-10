@@ -34,7 +34,7 @@ export const getProducts = async () => {
 };
 
 // Hàm cập nhật sản phẩm
-export const updateProduct = async (productId, productData, images) => {
+export const updateProduct = async (productId, productData, images, video) => {
   try {
     const formData = new FormData();
 
@@ -48,6 +48,11 @@ export const updateProduct = async (productId, productData, images) => {
       images.forEach((image) => {
         formData.append("image", image);
       });
+    }
+
+    // Thêm video nếu có
+    if (video) {
+      formData.append("video", video);
     }
 
     const response = await axios.put(

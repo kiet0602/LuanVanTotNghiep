@@ -37,6 +37,7 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Chờ xử lý",
     },
+
     paypalOrderId: { type: String }, // Thêm trường lưu orderId của PayPal
   },
   { timestamps: true }

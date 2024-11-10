@@ -543,3 +543,33 @@ export const receiveOrder = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const resetOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Tìm kiếm đơn hàng theo ID
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    }
+
+    // Kiểm tra trạng thái đơn hàng có thể được đặt lại hay không
+    const resettableStatuses = [
+      "Đã hủy", // Chỉ cho phép đặt lại đơn hàng từ trạng thái "Đã hủy"
+    ];
+    if (!resettableStatuses.includes(order.status)) {
+      return res
+        .status(400)
+        .json({ message: "Không thể đặt lại đơn hàng trong trạng thái này" });
+    }
+
+    // Cập nhật trạng thái đơn hàng thành trạng thái mong muốn, ví dụ: "Chờ xử lý"
+    order.status = "Chờ xử lý"; // Reset lại trạng thái đơn hàng về "Chờ xử lý"
+    await order.save();
+
+    res.status(200).json({ message: "Đặt lại đơn hàng thành công", order });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

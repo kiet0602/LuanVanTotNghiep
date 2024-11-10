@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { PhotoIcon } from "@heroicons/react/24/solid";
+import { PhotoIcon, VideoCameraIcon } from "@heroicons/react/24/solid";
 import { ShoppingBag } from "lucide-react";
 import { getAllCategories } from "../../service/categoryService";
 import { getAllEnvironments } from "../../service/eviomentService";
@@ -27,6 +27,8 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [video, setVideo] = useState(null);
+  const [videoPreview, setVideoPreview] = useState(null);
 
   // Hàm để lấy danh sách danh mục, môi trường và màu sắc
   const fetchData = async () => {
@@ -50,6 +52,14 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setVideo(file);
+      setVideoPreview(URL.createObjectURL(file)); // Tạo URL tạm thời cho video
+    }
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -121,6 +131,10 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
       formData.append("image", image);
     });
 
+    if (video) {
+      formData.append("video", video);
+    }
+
     try {
       const newProduct = await addProduct(formData);
       toast.success("Sản phẩm đã được thêm thành công!");
@@ -139,6 +153,8 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
       setDiscount("");
       // Đóng modal nếu cần
       setIsOpen(false);
+      setVideo(null);
+      setVideoPreview(null);
     } catch (error) {
       console.error("Failed to add product:", error);
       const errorMessage =
@@ -275,26 +291,83 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                       </div>
                     </div>
                   </div>
+                  <div className="mt-4 flex gap-4 flex-wrap">
+                    {imagePreviews.map((image, index) => (
+                      <div key={index} className="relative inline-block">
+                        <img
+                          src={image}
+                          alt={`Preview ${index}`}
+                          className="h-20 w-20 object-cover rounded-md"
+                        />
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                        >
+                          X
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="col-span-full">
+                    <label
+                      htmlFor="video-upload"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Thêm video
+                    </label>
+                    <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                      <div className="text-center">
+                        {videoPreview ? (
+                          <div>
+                            <video
+                              src={videoPreview}
+                              controls
+                              className="mx-auto h-40 w-auto"
+                            />
+                            <button
+                              onClick={() => {
+                                setVideo(null);
+                                setVideoPreview(null);
+                              }}
+                              className="mt-4 cursor-pointer text-indigo-600 hover:text-indigo-500"
+                            >
+                              Chọn video khác
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <VideoCameraIcon
+                              aria-hidden="true"
+                              className="mx-auto h-12 w-12 text-gray-300"
+                            />
+                            <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                              <label
+                                htmlFor="video-upload"
+                                className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                              >
+                                <span>Upload a video</span>
+                                <input
+                                  id="video-upload"
+                                  name="video-upload"
+                                  type="file"
+                                  accept="video/*"
+                                  className="sr-only"
+                                  onChange={handleVideoChange}
+                                />
+                              </label>
+                              <p className="pl-1">Tối đa 1 video</p>
+                            </div>
+                            <p className="text-xs leading-5 text-gray-600">
+                              MP4, MOV, AVI up to 50MB
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Xem Ảnh */}
-              <div className="mt-4 flex gap-4 flex-wrap">
-                {imagePreviews.map((image, index) => (
-                  <div key={index} className="relative inline-block">
-                    <img
-                      src={image}
-                      alt={`Preview ${index}`}
-                      className="h-20 w-20 object-cover rounded-md"
-                    />
-                    <button
-                      onClick={() => removeImage(index)}
-                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                    >
-                      X
-                    </button>
-                  </div>
-                ))}
-              </div>
 
               <div className="border-b border-gray-900/10 pb-12">
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

@@ -92,7 +92,8 @@ const ProductsPage = () => {
       const filteredByCategory =
         selectedCategory !== ""
           ? filteredByPrice.filter(
-              (product) => product.category._id === selectedCategory
+              (product) =>
+                product.category && product.category._id === selectedCategory // Thêm điều kiện kiểm tra category
             )
           : filteredByPrice;
 

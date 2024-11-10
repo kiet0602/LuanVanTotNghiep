@@ -241,7 +241,7 @@ const CartProductsDiscount = () => {
                       }
                     />
                   </Tooltip>
-                  <NavLink to={`/${productsDiscount?.productName}`}>
+                  <NavLink to={`/products/${productsDiscount?.productName}`}>
                     <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                       <IconButton
                         icon={<FaEye />}
@@ -262,7 +262,7 @@ const CartProductsDiscount = () => {
                 </Box>
 
                 {/* Nội dung thẻ */}
-                <NavLink to={`/${productsDiscount?.productName}`}>
+                <NavLink to={`/products/${productsDiscount?.productName}`}>
                   <Box rounded="lg" overflow="hidden" position="relative">
                     <Image
                       src={`http://localhost:2000/images/${productsDiscount.image[0]}`}

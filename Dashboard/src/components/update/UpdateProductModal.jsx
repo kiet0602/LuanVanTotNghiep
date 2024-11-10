@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
-import { ShoppingBag } from "lucide-react";
+import {
+  PhotoIcon,
+  UserCircleIcon,
+  VideoCameraIcon,
+} from "@heroicons/react/24/solid";
+import { ShoppingBag, Text } from "lucide-react";
 import { getAllCategories } from "../../service/categoryService";
 import { getAllEnvironments } from "../../service/eviomentService";
 import { getAllColors } from "../../service/colorService";
@@ -31,7 +35,9 @@ export default function UpdateProductModal({
   const [quantity, setQuantity] = useState("");
   const [care, setCare] = useState("");
   const [discount, setDiscount] = useState("");
-
+  const [video, setVideo] = useState(null);
+  const [videoOldPreview, setVideoOldPreview] = useState("");
+  const [videoNewPreview, setVideoNewPreview] = useState("");
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
@@ -61,18 +67,33 @@ export default function UpdateProductModal({
       setCare(product.care);
       setDiscount(product.discount);
       setSize(product.size);
-
       const imageUrls = product.image.map(
         (img) => `http://localhost:2000/images/${img}`
       );
       setImages(imageUrls); // Giữ lại tên tệp để gửi đi
       setImagePreviews(imageUrls); // Thiết lập để xem trước
-
       setSelectedCategory(product.category._id);
       setSelectedEnvironment(product.environment._id);
       setSelectedColor(product.color._id);
+      if (product.video) {
+        setVideoOldPreview(`http://localhost:2000/images/${product.video}`);
+      } else {
+        setVideoOldPreview(null); // Hoặc không thiết lập gì nếu không có video
+      }
     }
   }, [product]);
+
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      setVideo(file); // Cập nhật video mới
+      setVideoNewPreview(URL.createObjectURL(file)); // Hiển thị xem trước video mới tải lên
+    } else {
+      // Nếu không có file nào được chọn, bạn có thể reset videoNewPreview
+      setVideoNewPreview(null);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -125,14 +146,9 @@ export default function UpdateProductModal({
       };
 
       // Gọi hàm updateProduct từ service
-      const updatedProduct = await updateProduct(
-        product._id,
-        productData,
-        images
-      );
+      await updateProduct(product._id, productData, images, video);
       setIsUpdateOpen(false);
-
-      console.log("Sản phẩm đã được cập nhật:", updatedProduct);
+      setVideoNewPreview("");
       fetchProducts();
       toast.success("Cập nhật sản phẩm thành công!");
     } catch (error) {
@@ -291,6 +307,62 @@ export default function UpdateProductModal({
                       </button>
                     </div>
                   ))}
+                </div>
+                <div className="col-span-full">
+                  <label
+                    htmlFor="cover-video"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Thêm video
+                  </label>
+                  <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                    <div className="text-center">
+                      <VideoCameraIcon
+                        aria-hidden="true"
+                        className="mx-auto h-12 w-12 text-gray-300"
+                      />
+                      <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                        <label
+                          htmlFor="video-upload"
+                          className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                        >
+                          <span>Upload a video</span>
+                          <input
+                            id="video-upload"
+                            name="video-upload"
+                            type="file"
+                            accept="video/*"
+                            onChange={handleVideoChange}
+                            className="sr-only"
+                          />
+                        </label>
+                        <p className="pl-1">chỉ 1 video</p>
+                      </div>
+                      <p className="text-xs leading-5 text-gray-600">
+                        MP4, MOV, AVI up to 50MB
+                      </p>
+                    </div>
+                  </div>
+                  <h3>Video hiện có:</h3>
+                  {/* Phần xem trước video hiện có */}
+                  {videoOldPreview && (
+                    <div className="mt-4 flex justify-center">
+                      <video width="300" height="200" controls>
+                        <source src={videoOldPreview} type="video/mp4" />
+                        Trình duyệt của bạn không hỗ trợ video.
+                      </video>
+                    </div>
+                  )}
+                  <h3>Video cập nhật:</h3>
+                  {/* Phần xem trước video mới */}
+                  {videoNewPreview && (
+                    <div className="mt-4 flex justify-center">
+                      <video width="300" height="200" controls>
+                        <source src={videoNewPreview} type="video/mp4" />
+                        Trình duyệt của bạn không hỗ trợ video.
+                      </video>
+                    </div>
+                  )}
                 </div>
               </div>
 

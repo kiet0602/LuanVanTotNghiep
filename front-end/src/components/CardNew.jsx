@@ -222,7 +222,7 @@ const CardNew = ({ products }) => {
                     color={isFavorite(product._id) ? "red.500" : "black"}
                   />
                 </Tooltip>
-                <NavLink to={`/${product?.productName}`}>
+                <NavLink to={`/products/${product?.productName}`}>
                   <Tooltip label="Xem chi tiết" aria-label="Xem chi tiết">
                     <IconButton
                       icon={<FaEye />}
@@ -243,7 +243,7 @@ const CardNew = ({ products }) => {
               </Box>
 
               {/* Nội dung thẻ */}
-              <NavLink to={`/${product?.productName}`}>
+              <NavLink to={`/products/${product?.productName}`}>
                 <Box
                   // borderWidth="1px"
 

@@ -48,12 +48,10 @@ const ListOrderUser = () => {
       console.log(error);
     }
   };
-
   const openModal = (order) => {
     setSelectedOrder(order);
     onOpen();
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case "Chờ xử lý":
@@ -70,7 +68,6 @@ const ListOrderUser = () => {
         return "gray.500";
     }
   };
-
   const receiveOrder = async (orderId) => {
     try {
       await axios.put(`http://localhost:2000/api/checkout/${orderId}/receive`);
@@ -91,7 +88,6 @@ const ListOrderUser = () => {
       }
     }
   };
-
   const removeOrder = async (orderId) => {
     const confirmDelete = window.confirm("Bạn có muốn xóa đơn hàng?");
     if (confirmDelete) {

@@ -22,6 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { addComment, getCommentsByProduct } from "../service/commnetService.js";
 import { VscComment, VscCommentDiscussion } from "react-icons/vsc";
+import { TbPencilPlus } from "react-icons/tb";
 
 const Review = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -160,7 +161,7 @@ const Review = ({ productId }) => {
             textAlign="left"
             mb={{ base: "4", md: "2" }}
           >
-            Đánh giá gần đây
+            Đánh giá gần đây ({comments.length} đánh giá)
           </Heading>
         </Flex>
         <Flex
@@ -209,8 +210,19 @@ const Review = ({ productId }) => {
           </Stack>
         )}
         {showComment && (
-          <Button onClick={onOpen} colorScheme="blue">
-            Đánh giá
+          <Button
+            gap={1}
+            onClick={onOpen}
+            mt="5px"
+            px="50px"
+            borderRadius="none"
+            bg="yellow.100"
+            color="black"
+            fontWeight="300"
+            boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+          >
+            <TbPencilPlus />
+            Viết đánh giá
           </Button>
         )}
 
@@ -250,11 +262,31 @@ const Review = ({ productId }) => {
               </Stack>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="blue" onClick={handleAddComment}>
-                Gửi
+              <Button
+                onClick={handleAddComment}
+                mt="5px"
+                px="50px"
+                borderRadius="none"
+                bg="yellow.300"
+                color="black"
+                fontWeight="300"
+                boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+              >
+                Gửi đánh giá
               </Button>
-              <Button variant="outline" ml={3} onClick={onClose}>
-                Hủy
+
+              <Button
+                onClick={onClose}
+                ml={3}
+                mt="5px"
+                px="50px"
+                borderRadius="none"
+                bg="black"
+                color="white"
+                fontWeight="300"
+                boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+              >
+                Đóng
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -280,11 +312,31 @@ const Review = ({ productId }) => {
               </Stack>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="blue" onClick={handleAddComment}>
-                Gửi
+              <Button
+                onClick={handleAddComment}
+                mt="5px"
+                px="50px"
+                borderRadius="none"
+                bg="yellow.300"
+                color="black"
+                fontWeight="300"
+                boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+              >
+                Gửi phản hồi
               </Button>
-              <Button variant="outline" ml={3} onClick={onReplyClose}>
-                Hủy
+
+              <Button
+                onClick={onReplyClose}
+                ml={3}
+                mt="5px"
+                px="50px"
+                borderRadius="none"
+                bg="black"
+                color="white"
+                fontWeight="300"
+                boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
+              >
+                Đóng
               </Button>
             </ModalFooter>
           </ModalContent>

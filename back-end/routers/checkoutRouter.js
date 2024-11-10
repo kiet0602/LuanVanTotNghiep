@@ -15,6 +15,7 @@ import {
   getRevenue,
   getSoldProductCountByCategory,
   receiveOrder,
+  resetOrder,
   updateOrder,
 } from "../controller/orderController.js";
 
@@ -42,5 +43,6 @@ checkoutRouter.get("/getOrderCountByDate", getOrderCountByDate);
 checkoutRouter.put("/:orderId/cancel", cancelOrder);
 checkoutRouter.put("/:orderId/receive", receiveOrder);
 // checkoutRouter.post("/paypalCheckout", paypalCheckout);
+checkoutRouter.put("/:orderId/reset", resetOrder);
 
 export default checkoutRouter;

@@ -20,7 +20,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 
 const IntroduceShop = () => {
   return (
-    <Box bg={useColorModeValue("teal.50", "teal.800")}>
+    <Box bg={useColorModeValue("teal.50", "teal.900")}>
       {" "}
       <Container maxW="7xl">
         {" "}
@@ -99,7 +99,7 @@ const IntroduceShop = () => {
                 px={"50px"}
                 borderRadius={"none"}
                 color={"black"}
-                bg={useColorModeValue("white", "green.50")}
+                bg={useColorModeValue("green.50", "white")}
                 mx="auto"
                 fontWeight="300" // Giảm độ đậm của chữ
               >
@@ -109,10 +109,15 @@ const IntroduceShop = () => {
                 mt={"30px"}
                 align={"center"}
                 justify={"center"}
-                bg={useColorModeValue("gray.50", "gray.800")}
+                bg={useColorModeValue("teal.50", "teal.900")}
               >
                 <Container>
-                  <Accordion allowMultiple width="100%" maxW="lg" rounded="lg">
+                  <Accordion
+                    allowMultiple
+                    width="100%"
+                    maxW="full"
+                    rounded="lg"
+                  >
                     <AccordionItem>
                       <AccordionButton
                         display="flex"
@@ -120,14 +125,16 @@ const IntroduceShop = () => {
                         justifyContent="space-between"
                         p={4}
                       >
-                        <Text fontSize="md">What is Chakra UI?</Text>
+                        <Text fontSize="sm">
+                          Cây này có phù hợp để đặt ở ban công hoặc sân vườn
+                          không?
+                        </Text>
                         <ChevronDownIcon fontSize="24px" />
                       </AccordionButton>
-                      <AccordionPanel pb={4}>
+                      <AccordionPanel>
                         <Text color="gray.600">
-                          Chakra UI is a simple and modular component library
-                          that gives developers the building blocks they need to
-                          create web applications.
+                          Có, cây phù hợp cho cả ban công và sân vườn nếu có ánh
+                          sáng tự nhiên vừa phải.
                         </Text>
                       </AccordionPanel>
                     </AccordionItem>
@@ -138,7 +145,7 @@ const IntroduceShop = () => {
                         justifyContent="space-between"
                         p={4}
                       >
-                        <Text fontSize="md">What advantages to use?</Text>
+                        <Text fontSize="sm">What advantages to use?</Text>
                         <ChevronDownIcon fontSize="24px" />
                       </AccordionButton>
                       <AccordionPanel pb={4}>
@@ -157,10 +164,10 @@ const IntroduceShop = () => {
                         justifyContent="space-between"
                         p={4}
                       >
-                        <Text fontSize="md">How to start using Chakra UI?</Text>
+                        <Text fontSize="sm">How to start using Chakra UI?</Text>
                         <ChevronDownIcon fontSize="24px" />
                       </AccordionButton>
-                      <AccordionPanel pb={4}>
+                      <AccordionPanel>
                         <Text color="gray.600">
                           To get started with Chakra UI, you can install it via
                           npm or yarn, and then import the components you need

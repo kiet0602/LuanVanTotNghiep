@@ -87,11 +87,33 @@ const updateProduct = async (req, res) => {
 
     const { id } = req.params;
 
+    // Kiểm tra sản phẩm có tồn tại
     const existingProduct = await productModel.findById(id);
     if (!existingProduct) {
       return res.status(404).json({ error: "Sản phẩm không tìm thấy" });
     }
 
+    // Kiểm tra từng trường bắt buộc
+    const missingFields = [];
+    if (!category && !existingProduct.category) missingFields.push("category");
+    if (!environment && !existingProduct.environment)
+      missingFields.push("environment");
+    if (!color && !existingProduct.color) missingFields.push("color");
+    if (!size && !existingProduct.size) missingFields.push("size");
+    if (!originalPrice && !existingProduct.originalPrice)
+      missingFields.push("originalPrice");
+    if (quantity === undefined && existingProduct.quantity === undefined)
+      missingFields.push("quantity");
+    if (!care && !existingProduct.care) missingFields.push("care");
+
+    // Nếu có trường thiếu, trả về thông báo lỗi cụ thể
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: "Thiếu trường bắt buộc: " + missingFields.join(", "),
+      });
+    }
+
+    // Kiểm tra trùng tên sản phẩm
     if (productName) {
       const productWithSameName = await productModel.findOne({ productName });
       if (productWithSameName && productWithSameName._id.toString() !== id) {
@@ -99,6 +121,7 @@ const updateProduct = async (req, res) => {
       }
     }
 
+    // Tạo dữ liệu cập nhật
     const updatedData = {
       productName: productName || existingProduct.productName,
       category: category || existingProduct.category,
@@ -108,18 +131,18 @@ const updateProduct = async (req, res) => {
       originalPrice: originalPrice || existingProduct.originalPrice,
       discount: discount || existingProduct.discount,
       size: size || existingProduct.size,
-      quantity: quantity !== undefined ? quantity : existingProduct.quantity, // Cập nhật quantity nếu có
-      care: care || existingProduct.care, // Cập nhật care nếu có
+      quantity: quantity !== undefined ? quantity : existingProduct.quantity,
+      care: care || existingProduct.care,
       updatedAt: Date.now(),
     };
 
+    // Cập nhật ảnh và video nếu có
     if (req.files.image && req.files.image.length > 0) {
       updatedData.image = req.files.image.map((file) => file.filename);
     } else {
       updatedData.image = existingProduct.image;
     }
 
-    // Xử lý cập nhật video
     if (req.files.video && req.files.video.length > 0) {
       updatedData.video = req.files.video[0].filename;
     } else {

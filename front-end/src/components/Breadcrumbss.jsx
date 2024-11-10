@@ -29,6 +29,10 @@ function Breadcrumbss() {
                     decodedValue.slice(1) ===
                   "ProfileUser"
                 ? "Hồ sơ cá nhân"
+                : decodedValue.charAt(0).toUpperCase() +
+                    decodedValue.slice(1) ===
+                  "Products"
+                ? "Sản phẩm"
                 : decodedValue.charAt(0).toUpperCase() + decodedValue.slice(1)}
             </BreadcrumbLink>
           </BreadcrumbItem>
