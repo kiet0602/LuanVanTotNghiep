@@ -92,7 +92,7 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
             table: {
               widths: ["*", "auto", "auto"],
               body: [
-                ["Tên sản phẩm", "Giá (VND)", "Số lượng"],
+                ["Tên sản phẩm", "Giá (đ)", "Số lượng"],
                 ...items.map((item) => [
                   item.product.productName,
                   item.price,
@@ -100,22 +100,27 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                 ]),
                 [
                   { text: "Tổng cộng", bold: true },
-                  { text: `${totalPrice} VND`, bold: true },
+                  { text: `${totalPrice} đ`, bold: true },
                   { text: "", bold: true },
                 ],
                 [
                   { text: "Phí vận chuyển", bold: true },
-                  { text: `${shippingFee} VND`, bold: true },
+                  { text: `${shippingFee} đ`, bold: true },
+                  { text: "", bold: true },
+                ],
+                [
+                  { text: "Thuế", bold: true },
+                  { text: `20000 đ`, bold: true },
                   { text: "", bold: true },
                 ],
                 [
                   { text: "Giảm giá", bold: true },
-                  { text: `${discount} VND`, bold: true },
+                  { text: `${discount} đ`, bold: true },
                   { text: "", bold: true },
                 ],
                 [
                   { text: "Tổng thanh toán", bold: true },
-                  { text: `${finalPrice} VND`, bold: true },
+                  { text: `${finalPrice} đ`, bold: true },
                   { text: "", bold: true },
                 ],
               ],

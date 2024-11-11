@@ -7,7 +7,7 @@ import { deleteColorById, getAllColors } from "../../service/colorService.js";
 import UpdateColorModal from "../update/UpdateColorModal.jsx";
 import { toast } from "react-toastify";
 
-const PRODUCTS_PER_PAGE = 5;
+const PRODUCTS_PER_PAGE = 10;
 
 const ColorTable = () => {
   const [searchTerm, setSearchTerm] = useState("");

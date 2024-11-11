@@ -14,6 +14,7 @@ import ColorsPage from "./pages/ColorsPage";
 import FamilyPage from "./pages/FamilyPage";
 import EviomentPage from "./pages/EviomentPage";
 import PouponPage from "./pages/PouponPage";
+import ImportPage from "./pages/ImportPage";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="/family" element={<FamilyPage />} />
         <Route path="/evioment" element={<EviomentPage />} />
         <Route path="/poupons" element={<PouponPage />} />
+        <Route path="/GoodsReceipt" element={<ImportPage />} />
       </Routes>
     </div>
   );
