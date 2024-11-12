@@ -12,8 +12,10 @@ import {
   IconButton,
   useDisclosure,
   useColorModeValue,
+  Spinner,
   Image,
 } from "@chakra-ui/react";
+
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiChevronDown } from "react-icons/bi";
@@ -27,20 +29,53 @@ import AvatarUser from "./AvatarUser";
 // Data
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 import { navLinks, dropdownLinks } from "../assets/data/datalink/datalink.js";
-import userAtom from "../Atom/userAtom.js";
+
 // Hook custom
 import useNavigateCustom from "../Hook/useNavigateCustom.js";
 import Search from "./Search.jsx";
 import Fillter from "./Fillter.jsx";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useRecoilValue } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 const Navbar = () => {
   // Use React
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
   // Use Custom Hook
   const { goHome, goLogin } = useNavigateCustom();
   // Lấy dữ liệu từ localStorage
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
+
+  const [userCurrent, setuserCurrent] = useState(null);
+
+  const token = useRecoilValue(userTokenAtom);
+
+  const fetchUser = async () => {
+    if (!token) return;
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:2000/api/user/getUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
+      setuserCurrent(response.data);
+    } catch (error) {
+      console.log(error.message);
+      // toast.error("Không thể lấy dữ liệu người dùng."); // Uncomment if you have a toast function
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    fetchUser();
+  }, []);
+
   const favoritesCount = localStorage.getItem("favoritesCount");
   const favorites = favoritesCount ? JSON.parse(favoritesCount) : 0;
   // Style
@@ -108,7 +143,7 @@ const Navbar = () => {
                           color: "blue.200",
                         }}
                       >
-                        Cửa hàng
+                        Sản phẩm
                       </Text>
                       <Icon
                         as={BiChevronDown}
@@ -152,12 +187,14 @@ const Navbar = () => {
         <Flex alignItems="center" gap={3} wrap="nowrap">
           <Search />
           <Box display="flex" alignItems="center" gap={2}>
-            {userCurrent ? (
+            {loading ? (
+              <Spinner color="green.500" size="md" />
+            ) : userCurrent ? (
               <Flex
                 alignItems="center"
                 bg={useColorModeValue("black", "white")}
-                borderRadius="full" // Bo góc
-                pl="1" // Khoảng trống giữa nội dung và viền
+                borderRadius="full"
+                pl="1"
               >
                 <AvatarUser userCurrent={userCurrent} />
                 <Text
@@ -168,19 +205,19 @@ const Navbar = () => {
                   display="inline-block"
                   whiteSpace="nowrap"
                   bg={useColorModeValue("green.100", "green.800")}
-                  borderRadius="full" // Bo góc
+                  borderRadius="full"
                   p="2"
-                  cursor={"pointer"}
+                  cursor="pointer"
                   ml={2}
                 >
-                  <NavLink to={"/profileUser"}>{userCurrent?.username}</NavLink>
+                  <NavLink to="/profileUser">{userCurrent?.username}</NavLink>
                 </Text>
               </Flex>
             ) : (
               <Flex
                 alignItems="center"
-                backgroundColor="green.200" // Nền xanh lá cho chữ ĐĂNG NHẬP
-                borderRadius="full" // Bo góc
+                backgroundColor="green.200"
+                borderRadius="full"
                 pl="1"
               >
                 <Text
@@ -189,10 +226,10 @@ const Navbar = () => {
                   fontSize="15px"
                   display="inline-block"
                   whiteSpace="nowrap"
-                  backgroundColor="green.200" // Nền xanh lá nhạt cho tên và avatar
-                  borderRadius="full" // Bo góc
+                  backgroundColor="green.200"
+                  borderRadius="full"
                   p="2"
-                  cursor={"pointer"}
+                  cursor="pointer"
                   onClick={goLogin}
                 >
                   ĐĂNG NHẬP
@@ -279,7 +316,7 @@ const Navbar = () => {
                 color: "blue.200",
               }}
             >
-              Cửa hàng
+              Sản phẩm
             </Text>
 
             <Stack pl={2} spacing={1} mt={"0 !important"}>

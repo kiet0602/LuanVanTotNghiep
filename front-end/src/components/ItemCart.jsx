@@ -37,8 +37,9 @@ import {
 } from "../Atom/cartCountProductAtom.js";
 
 const ItemCart = () => {
-  const user = useRecoilValue(userAtom);
-  const userId = user?._id;
+  // const user = useRecoilValue(userAtom);
+  // const userId = user?._id;
+
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]); // Thêm state để lưu các sản phẩm được chọn
@@ -53,22 +54,20 @@ const ItemCart = () => {
   const boxBorderColor = useColorModeValue("gray.200", "gray.600");
 
   const fetchCart = async () => {
-    if (!userId) return;
+    // if (!userId) return;
     try {
-      const response = await getCartById(userId);
+      const response = await getCartById();
       setCart(response.cart);
-
       setLoading(false);
     } catch (error) {
       setLoading(false);
     }
   };
+  console.log(cart);
 
   useEffect(() => {
-    if (userId) {
-      fetchCart();
-    }
-  }, [userId]);
+    fetchCart();
+  }, []);
 
   // Thay đổi số lượng sản phẩm trong giỏ hàng
   const handleQuantityChange = async (productId, value) => {
@@ -82,7 +81,7 @@ const ItemCart = () => {
       return;
     }
     try {
-      await updateItemQuantity(userId, productId, quantity);
+      await updateItemQuantity(productId, quantity);
       fetchCart();
     } catch (error) {
       console.log(`Lỗi khi cập nhật số lượng: ${error.message}`);
@@ -92,7 +91,7 @@ const ItemCart = () => {
   // Xóa sản phẩm khỏi giỏ hàng
   const handleRemoveFromCart = async (productId) => {
     try {
-      await removeFromCart(userId, productId);
+      await removeFromCart(productId);
       // Hiển thị thông báo thành công
       toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
 

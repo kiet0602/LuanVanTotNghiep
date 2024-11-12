@@ -21,22 +21,28 @@ import {
 } from "@chakra-ui/react"; // Import Chakra UI components
 import ModalDetailOrders from "./ModalDetailOrders";
 import { useRecoilValue } from "recoil";
-import userAtom from "../Atom/userAtom";
+import userTokenAtom from "../Atom/userAtom.js";
+
 import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
-import { FaEye, FaTimes } from "react-icons/fa";
 
 const ListOrderUserUpdate = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [ordersByUserId, setOrdersByUserId] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const user = useRecoilValue(userAtom);
+
+  const token = useRecoilValue(userTokenAtom);
 
   const fetchOrdersByUser = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:2000/api/checkout/getAllcheckOutbyIdUser/${user?._id}`
+        `http://localhost:2000/api/checkout/getAllcheckOutbyIdUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setOrdersByUserId(res.data);
     } catch (error) {
@@ -102,7 +108,7 @@ const ListOrderUserUpdate = () => {
 
   useEffect(() => {
     fetchOrdersByUser();
-  }, [user]);
+  }, [token]);
 
   // Function to filter orders by status
   const filterOrdersByStatus = (status) => {

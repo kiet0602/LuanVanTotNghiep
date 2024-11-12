@@ -16,7 +16,8 @@ import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 
 //Atom
-import userAtom from "../Atom/userAtom.js";
+
+import userTokenAtom from "../Atom/userAtom.js";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
 //service
@@ -29,27 +30,27 @@ import {
 
 const CardProduct = ({ products }) => {
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
-  const textColor = useColorModeValue("black", "white"); // Text color
+
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
-  const user = useRecoilValue(userAtom);
+
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
 
+  const token = useRecoilValue(userTokenAtom);
+
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (!user?._id) return; // If userId is not available, exit early
+      if (!token) return; // If userId is not available, exit early
       try {
-        const userId = user._id;
-        const favorites = await getAllFavoriteProducts(userId);
+        const favorites = await getAllFavoriteProducts();
         setFavoriteProducts(favorites);
         setFavoritesCount(favorites.length);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách yêu thích:", error);
       }
     };
-
     fetchFavorites();
   }, []); // Dependency on user
 
@@ -58,20 +59,18 @@ const CardProduct = ({ products }) => {
 
   //Hàm sử lý
   const handleAddToCart = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
-
     try {
       const product = products.find((prod) => prod._id === productId);
       if (!product || product.quantity <= 0) {
         toast.error("Sản phẩm này đã hết hàng!");
         return;
       }
-
       const quantity = 1;
-      await addToCart(user._id, productId, quantity);
+      await addToCart(productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
     } catch (error) {
       toast.error("Lỗi thêm sản phẩm!");
@@ -79,13 +78,13 @@ const CardProduct = ({ products }) => {
   };
 
   const handleAddFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào yêu thích");
       return;
     }
 
     try {
-      await addFavoriteProduct(user._id, productId);
+      await addFavoriteProduct(productId);
       toast.success("Đã thích sản phẩm");
       setFavoriteProducts((prevFavorites) => [
         ...prevFavorites,
@@ -102,13 +101,13 @@ const CardProduct = ({ products }) => {
   };
 
   const handleRemoveFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
       return;
     }
 
     try {
-      await removeFavoriteProduct(user._id, productId);
+      await removeFavoriteProduct(productId);
       toast.success("Đã bỏ thích sản phẩm");
       setFavoriteProducts((prevFavorites) =>
         prevFavorites.filter((fav) => fav._id !== productId)

@@ -37,7 +37,7 @@ userRouter.post("/authenticate", verifyUser, authenticate);
 userRouter.post("/login", verifyUser, login);
 
 //GET
-userRouter.get("/getUser/:id", getUser);
+userRouter.get("/getUser", Auth, getUser);
 userRouter.get("/generateOTP", verifyUser, localVariables, generateOTP);
 userRouter.get("/verifyOTP", verifyOTP);
 userRouter.get("/createResetSession", createResetSession);

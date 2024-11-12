@@ -2,7 +2,8 @@ import AddressModel from "../models/addressModel.js";
 import userModel from "../models/userModel.js"; // Đảm bảo người dùng tồn tại
 
 export const createAddress = async (req, res) => {
-  const { userId, street, ward, district, province, isDefault } = req.body;
+  const { street, ward, district, province, isDefault } = req.body;
+  const { userId } = req.user; // Lấy userId từ req.user sau khi đã xác thực
 
   try {
     // Kiểm tra người dùng có tồn tại không
@@ -43,7 +44,7 @@ export const createAddress = async (req, res) => {
 };
 
 export const getAddresses = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user; // Lấy userId từ req.user sau khi đã xác thực
 
   try {
     // Kiểm tra người dùng có tồn tại không
@@ -63,23 +64,29 @@ export const getAddresses = async (req, res) => {
 export const updateAddress = async (req, res) => {
   const { addressId } = req.params;
   const { street, ward, district, province, isDefault } = req.body;
+  const { userId } = req.user; // Lấy userId từ người dùng đã đăng nhập
 
   try {
-    // Cập nhật địa chỉ
-    const address = await AddressModel.findById(addressId);
+    // Tìm địa chỉ theo ID và quyền sở hữu
+    const address = await AddressModel.findOne({
+      _id: addressId,
+      user: userId,
+    });
     if (!address) {
-      return res.status(404).json({ message: "Địa chỉ không tồn tại" });
+      return res.status(404).json({
+        message: "Địa chỉ không tồn tại hoặc không thuộc về người dùng",
+      });
     }
 
-    // Nếu isDefault = true, cập nhật các địa chỉ khác của người dùng để không còn là mặc định
+    // Nếu `isDefault` = true, cập nhật các địa chỉ khác của người dùng để không còn là mặc định
     if (isDefault) {
       await AddressModel.updateMany(
-        { user: address.user, isDefault: true },
+        { user: userId, isDefault: true },
         { isDefault: false }
       );
     }
 
-    // Cập nhật thông tin
+    // Cập nhật thông tin địa chỉ
     address.street = street || address.street;
     address.ward = ward || address.ward;
     address.district = district || address.district;
@@ -96,17 +103,23 @@ export const updateAddress = async (req, res) => {
 
 export const deleteAddress = async (req, res) => {
   const { addressId } = req.params;
+  const { userId } = req.user; // Lấy userId từ người dùng đã đăng nhập
 
   try {
-    // Tìm địa chỉ theo ID
-    const address = await AddressModel.findById(addressId);
+    // Tìm địa chỉ theo ID và kiểm tra quyền sở hữu
+    const address = await AddressModel.findOne({
+      _id: addressId,
+      user: userId,
+    });
 
     // Kiểm tra xem địa chỉ có tồn tại hay không
     if (!address) {
-      return res.status(404).json({ message: "Địa chỉ không tồn tại" });
+      return res.status(404).json({
+        message: "Địa chỉ không tồn tại hoặc không thuộc về người dùng",
+      });
     }
 
-    // Kiểm tra nếu địa chỉ là mặc định (isDefault là true)
+    // Kiểm tra nếu địa chỉ là mặc định
     if (address.isDefault) {
       return res
         .status(400)
@@ -123,7 +136,7 @@ export const deleteAddress = async (req, res) => {
 };
 
 export const getDefaultAddress = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user; // Lấy userId từ req.user sau khi đã xác thực
 
   try {
     const address = await AddressModel.findOne({

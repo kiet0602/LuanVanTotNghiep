@@ -18,7 +18,7 @@ import { FaEye, FaHandPointRight } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 //thư viện
 import axios from "axios";
-import { useRecoilState, useSetRecoilState } from "recoil";
+
 import { toast } from "react-toastify";
 //Hook custom
 import useNavigateCustom from "../Hook/useNavigateCustom";
@@ -26,8 +26,10 @@ import useNavigateCustom from "../Hook/useNavigateCustom";
 import ButtonSighIn from "./ButtonSignIn";
 //data
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
-import userAtom from "../Atom/userAtom";
+
 import { NavLink } from "react-router-dom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const SignIn = () => {
   //khai báo
@@ -40,7 +42,7 @@ const SignIn = () => {
 
   //khai báo useCustom
   const { goRegister, goHome } = useNavigateCustom();
-  const setResetUserCurrent = useSetRecoilState(userAtom);
+  const setResetUserCurrent = useSetRecoilState(userTokenAtom);
 
   //handle
   const validateEmail = (email) => {
@@ -52,7 +54,6 @@ const SignIn = () => {
 
   const handleLogin = async () => {
     let isValid = true;
-
     setEmailError("");
     setPasswordError("");
 
@@ -76,8 +77,7 @@ const SignIn = () => {
       );
 
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userCurrent", JSON.stringify(response.data));
-      setResetUserCurrent(response.data);
+      setResetUserCurrent(response.data.token);
       toast.success("Đăng nhập thành công!");
 
       // Kiểm tra vai trò của người dùng
@@ -91,7 +91,8 @@ const SignIn = () => {
           goHome(); // Điều hướng đến trang chính cho người dùng thường
         }
       } else {
-        goHome(); // Điều hướng đến trang chính cho người dùng thường
+        goHome();
+        window.location.reload(); // Điều hướng đến trang chính cho người dùng thường
       }
     } catch (error) {
       toast.error("Đăng nhập thất bại, vui lòng kiểm tra lại thông tin!");
@@ -110,7 +111,7 @@ const SignIn = () => {
               bgGradient="linear(to-l, #0ea5e9, #2563eb)"
               fontSize={"2xl"}
             >
-              Tài khoảng đăng nhập của bạn
+              Tài khoản đăng nhập của bạn
             </Heading>
             <FormControl id="email" isInvalid={!!emailError}>
               <FormLabel>Địa chỉ Email</FormLabel>

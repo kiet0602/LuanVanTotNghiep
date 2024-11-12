@@ -5,14 +5,15 @@ import {
   removeFromCart,
   updateItemQuantity,
 } from "../controller/cartController.js";
+import { Auth } from "../middleware/auth.js";
 
 const cartRouter = express.Router();
 
 // Route cho Color
 //cartRouter.get("/getAllcolor", getAllColors);
-cartRouter.get("/getProductFromCart/:userId", getCartById);
-cartRouter.post("/AddToCart", addToCart);
-cartRouter.post("/updateProductFromCart", updateItemQuantity);
-cartRouter.post("/deleteProductFromCart", removeFromCart);
+cartRouter.get("/getProductFromCart", Auth, getCartById);
+cartRouter.post("/AddToCart", Auth, addToCart);
+cartRouter.post("/updateProductFromCart", Auth, updateItemQuantity);
+cartRouter.post("/deleteProductFromCart", Auth, removeFromCart);
 
 export default cartRouter;

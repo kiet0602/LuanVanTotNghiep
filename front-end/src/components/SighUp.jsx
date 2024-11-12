@@ -99,15 +99,12 @@ const SighUp = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:2000/api/user/register",
-        {
-          username,
-          email,
-          password,
-          numberPhone,
-        }
-      );
+      await axios.post("http://localhost:2000/api/user/register", {
+        username,
+        email,
+        password,
+        numberPhone,
+      });
       toast.success("Đăng kí thành công!");
       goLogin();
     } catch (error) {

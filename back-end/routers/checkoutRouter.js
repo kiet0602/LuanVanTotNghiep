@@ -18,13 +18,14 @@ import {
   resetOrder,
   updateOrder,
 } from "../controller/orderController.js";
+import { Auth } from "../middleware/auth.js";
 
 const checkoutRouter = express.Router();
 
 // Route cho Color
 //cartRouter.get("/getAllcolor", getAllColors);
-checkoutRouter.post("/checkOut", checkout);
-checkoutRouter.get("/getAllcheckOutbyIdUser/:userId", getOrders);
+checkoutRouter.post("/checkOut", Auth, checkout);
+checkoutRouter.get("/getAllcheckOutbyIdUser", Auth, getOrders);
 checkoutRouter.get("/checkOutByIdOrder/:orderId", getOrderById);
 checkoutRouter.put("/updateCheckOut/:orderId", updateOrder);
 checkoutRouter.delete("/deleteCheckOut/:orderId", deleteOrder);

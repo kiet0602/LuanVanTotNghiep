@@ -18,8 +18,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 
 //Atom
-import userAtom from "../Atom/userAtom.js";
-import { useRecoilState, useRecoilValue } from "recoil";
+
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
 //service
 import { addToCart } from "../service/cartService.js";
@@ -30,6 +29,10 @@ import {
 } from "../service/favoritesService.js";
 import Layout from "../components/Layout.jsx";
 import TitlleCustom from "../components/TitlleCustom.jsx";
+
+//Atom
+import { useRecoilState, useRecoilValue } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -44,17 +47,18 @@ const SearchPage = () => {
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
   //Atom
-  const user = useRecoilValue(userAtom);
+
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
 
+  const token = useRecoilValue(userTokenAtom);
+
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (!user?._id) return; // If userId is not available, exit early
+      if (!token) return; // If userId is not available, exit early
       try {
-        const userId = user._id;
-        const favorites = await getAllFavoriteProducts(userId);
+        const favorites = await getAllFavoriteProducts();
         setFavoriteProducts(favorites);
         setFavoritesCount(favorites.length);
       } catch (error) {
@@ -70,14 +74,13 @@ const SearchPage = () => {
 
   //Hàm sử lý
   const handleAddToCart = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
-
     try {
       const quantity = 1;
-      await addToCart(user._id, productId, quantity);
+      await addToCart(productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
     } catch (error) {
       toast.error("Lỗi thêm sản phẩm!");
@@ -85,13 +88,13 @@ const SearchPage = () => {
   };
 
   const handleAddFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào yêu thích");
       return;
     }
 
     try {
-      await addFavoriteProduct(user._id, productId);
+      await addFavoriteProduct(productId);
       toast.success("Đã thích sản phẩm");
       setFavoriteProducts((prevFavorites) => [
         ...prevFavorites,
@@ -108,13 +111,13 @@ const SearchPage = () => {
   };
 
   const handleRemoveFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
       return;
     }
 
     try {
-      await removeFavoriteProduct(user._id, productId);
+      await removeFavoriteProduct(productId);
       toast.success("Đã bỏ thích sản phẩm");
       setFavoriteProducts((prevFavorites) =>
         prevFavorites.filter((fav) => fav._id !== productId)
@@ -266,7 +269,7 @@ const SearchPage = () => {
                             }
                           />
                         </Tooltip>
-                        <NavLink to={`/${product?.productName}`}>
+                        <NavLink to={`/products/${product?.productName}`}>
                           <Tooltip
                             label="Xem chi tiết"
                             aria-label="Xem chi tiết"
@@ -293,7 +296,7 @@ const SearchPage = () => {
                       </Box>
 
                       {/* Nội dung thẻ */}
-                      <NavLink to={`/${product?.productName}`}>
+                      <NavLink to={`/products/${product?.productName}`}>
                         <Box
                           // borderWidth="1px"
 

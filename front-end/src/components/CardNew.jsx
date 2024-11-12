@@ -16,9 +16,8 @@ import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 
 //Atom
-import userAtom from "../Atom/userAtom.js";
-
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
 import {
   cartItemProducts,
@@ -39,7 +38,8 @@ const CardNew = ({ products }) => {
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
   //Atom
-  const user = useRecoilValue(userAtom);
+
+  const token = useRecoilValue(userTokenAtom);
 
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const setFavoritesCount = useSetRecoilState(favoritesCountAtom);
@@ -48,10 +48,9 @@ const CardNew = ({ products }) => {
   const setItemsCartCount = useSetRecoilState(cartItemProductsCount);
 
   const fetchFavorites = async () => {
-    if (!user?._id) return; // If userId is not available, exit early
+    if (!token) return; // If userId is not available, exit early
     try {
-      const userId = user._id;
-      const favorites = await getAllFavoriteProducts(userId);
+      const favorites = await getAllFavoriteProducts();
       setFavoriteProducts(favorites);
       setFavoritesCount(favorites.length);
     } catch (error) {
@@ -64,7 +63,7 @@ const CardNew = ({ products }) => {
 
   //Hàm sử lý
   const handleAddToCart = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
@@ -75,7 +74,7 @@ const CardNew = ({ products }) => {
         return;
       }
       const quantity = 1;
-      await addToCart(user._id, productId, quantity);
+      await addToCart(productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
     } catch (error) {
       toast.error("Lỗi thêm sản phẩm!");
@@ -83,13 +82,13 @@ const CardNew = ({ products }) => {
   };
 
   const handleAddFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào yêu thích");
       return;
     }
 
     try {
-      await addFavoriteProduct(user._id, productId);
+      await addFavoriteProduct(productId);
       toast.success("Đã thích sản phẩm");
       setFavoriteProducts((prevFavorites) => [
         ...prevFavorites,
@@ -106,12 +105,12 @@ const CardNew = ({ products }) => {
   };
 
   const handleRemoveFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
       return;
     }
     try {
-      await removeFavoriteProduct(user._id, productId);
+      await removeFavoriteProduct(productId);
       toast.success("Đã bỏ thích sản phẩm");
       setFavoriteProducts((prevFavorites) =>
         prevFavorites.filter((fav) => fav._id !== productId)
@@ -137,6 +136,7 @@ const CardNew = ({ products }) => {
   useEffect(() => {
     fetchFavorites();
   }, []); // Dependency on user
+
   return (
     <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
       <SimpleGrid columns={[1, 2, 3]} spacing="15px">

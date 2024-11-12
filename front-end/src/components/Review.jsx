@@ -23,6 +23,8 @@ import {
 import { addComment, getCommentsByProduct } from "../service/commnetService.js";
 import { VscComment, VscCommentDiscussion } from "react-icons/vsc";
 import { TbPencilPlus } from "react-icons/tb";
+import userTokenAtom from "../Atom/userAtom.js";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 const Review = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,9 +40,7 @@ const Review = ({ productId }) => {
   const [error, setError] = useState(null);
   const [parentId, setParentId] = useState(null);
 
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
-  const token = userCurrent?.token;
+  const token = useRecoilValue(userTokenAtom);
 
   useEffect(() => {
     const fetchComments = async () => {

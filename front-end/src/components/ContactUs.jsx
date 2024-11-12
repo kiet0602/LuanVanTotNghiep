@@ -20,6 +20,7 @@ import { GoLocation } from "react-icons/go";
 import { BsPhone } from "react-icons/bs";
 import { HiOutlineMail } from "react-icons/hi";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const contactOptions = [
   {
@@ -38,13 +39,12 @@ const contactOptions = [
     icon: HiOutlineMail,
   },
 ];
-import { toast } from "react-toastify";
+
 const ContactUs = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const toast = useToast();
 
   const createContact = async (e) => {
     e.preventDefault(); // Ngăn chặn form gửi mặc định

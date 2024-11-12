@@ -21,18 +21,18 @@ import {
   Input,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useRecoilState } from "recoil";
-import userAtom from "../Atom/userAtom";
+
 import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
   const [street, setStreet] = useState("");
   const [ward, setWard] = useState("");
   const [district, setDistrict] = useState("");
   const [province, setProvince] = useState("");
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null; // Chuyển đổi chuỗi JSON thành đối tượng
-  const userId = userCurrent ? userCurrent._id : null; // Lấy _id từ đối tượng
+
+  const token = useRecoilValue(userTokenAtom);
 
   const handleUpdateUser = async () => {
     if (!street || !ward || !district || !province) {
@@ -41,7 +41,6 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
     }
     try {
       const addAddress = {
-        userId,
         street,
         ward,
         district,
@@ -49,7 +48,12 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
       };
       const response = await axios.post(
         "http://localhost:2000/api/address/addresses",
-        addAddress
+        addAddress,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       const newAddress = response.data;
       toast.success("Thêm địa chỉ thành công!");

@@ -6,18 +6,19 @@ import {
   deleteAddress,
   getDefaultAddress,
 } from "../controller/addressController.js";
+import { Auth } from "../middleware/auth.js";
 
 const addressRouter = express.Router();
 
 // Tạo địa chỉ mới
-addressRouter.post("/addresses", createAddress);
+addressRouter.post("/addresses", Auth, createAddress);
 // Lấy danh sách địa chỉ theo userId
-addressRouter.get("/addresses/:userId", getAddresses);
+addressRouter.get("/addresses", Auth, getAddresses);
 // Cập nhật địa chỉ theo addressId
-addressRouter.put("/addresses/:addressId", updateAddress);
+addressRouter.put("/addresses/:addressId", Auth, updateAddress);
 // Xóa địa chỉ theo addressId
-addressRouter.delete("/addresses/:addressId", deleteAddress);
+addressRouter.delete("/addresses/:addressId", Auth, deleteAddress);
 // Lấy địa chỉ mặc định
-addressRouter.get("/addresses/default/:userId", getDefaultAddress);
+addressRouter.get("/addresses/default", Auth, getDefaultAddress);
 
 export default addressRouter;

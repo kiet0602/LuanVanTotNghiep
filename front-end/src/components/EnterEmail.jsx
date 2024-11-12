@@ -8,7 +8,6 @@ import {
   Stack,
   Image,
   Button,
-  Text,
 } from "@chakra-ui/react";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 import axios from "axios";

@@ -22,17 +22,17 @@ import {
 } from "@chakra-ui/react"; // Import Stack từ Chakra UI
 import ModalDetailOrders from "./ModalDetailOrders";
 import { useRecoilValue } from "recoil";
-import userAtom from "../Atom/userAtom";
 import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
-import { color } from "framer-motion";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const ListOrderUser = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [ordersByUserId, setOrdersByUserId] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const user = useRecoilValue(userAtom);
+
+  const token = useRecoilValue(userTokenAtom);
 
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,7 +41,12 @@ const ListOrderUser = () => {
   const fetchOrdersByUser = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:2000/api/checkout/getAllcheckOutbyIdUser/${user._id}`
+        `http://localhost:2000/api/checkout/getAllcheckOutbyIdUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setOrdersByUserId(res.data);
     } catch (error) {
@@ -105,7 +110,7 @@ const ListOrderUser = () => {
 
   useEffect(() => {
     fetchOrdersByUser();
-  }, [user]);
+  }, []);
 
   // Xử lý phân trang
   const indexOfLastOrder = currentPage * ordersPerPage;

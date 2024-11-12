@@ -134,14 +134,12 @@ const login = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  const { id } = req.params;
-
+  const { userId } = req.user;
   try {
-    if (!id) {
-      return res.status(400).send({ error: "Chưa nhập id người dùng vào" });
-    }
-
-    const user = await userModel.findById(id);
+    // if (!id) {
+    //   return res.status(400).send({ error: "Chưa nhập id người dùng vào" });
+    // }
+    const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).send({ error: "Không tìm thấy người dùng" });
     }

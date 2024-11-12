@@ -1,10 +1,11 @@
 import userModel from "../models/userModel.js";
 import productModel from "../models/productModel.js";
 
-// Controller để thêm sản phẩm vào danh sách yêu thích
+// Sửa addFavoriteProduct để lấy userId từ req.user
 export const addFavoriteProduct = async (req, res) => {
   try {
-    const { userId, productId } = req.params;
+    const { productId } = req.params;
+    const { userId } = req.user; // Lấy userId từ req.user sau khi qua Auth
 
     // Tìm kiếm user
     const user = await userModel.findById(userId);
@@ -31,9 +32,11 @@ export const addFavoriteProduct = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
 export const removeFavoriteProduct = async (req, res) => {
   try {
-    const { userId, productId } = req.params;
+    const { productId } = req.params;
+    const { userId } = req.user; // Lấy userId từ req.user
 
     // Tìm kiếm user
     const user = await userModel.findById(userId);
@@ -68,7 +71,7 @@ export const removeFavoriteProduct = async (req, res) => {
 // Controller để lấy tất cả sản phẩm yêu thích
 export const getAllFavoriteProducts = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user; // Lấy userId từ req.user
 
     // Tìm kiếm user và populate các sản phẩm yêu thích,
     // đồng thời populate đầy đủ các trường có ObjectId: category, color, environment

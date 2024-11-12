@@ -12,21 +12,15 @@ import {
 } from "@chakra-ui/react";
 //thư viện
 import { NavLink, useNavigate } from "react-router-dom";
-import userAtom from "../Atom/userAtom";
-import { useResetRecoilState } from "recoil";
 
 //hooks Custom
 const AvatarUser = ({ userCurrent }) => {
   const navigate = useNavigate();
-  const resetUser = useResetRecoilState(userAtom);
 
   const handleLogout = () => {
     // Xóa token và thông tin người dùng từ localStorage
     localStorage.removeItem("favoritesCount"); // Xóa favorites count
     localStorage.removeItem("token"); // Xóa token
-    localStorage.removeItem("userCurrent"); // Xóa thông tin người dùng
-
-    resetUser(null); // Reset state người dùng
     navigate("/signIn"); // Chuyển hướng đến trang đăng nhập
     window.location.reload(); // Reload lại trang
   };

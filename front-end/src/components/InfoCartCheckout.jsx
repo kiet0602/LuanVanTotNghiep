@@ -22,16 +22,15 @@ import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const InfoCartCheckout = ({ items, total }) => {
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
   const [user, setUser] = useState(null);
-  const userId = userCurrent?._id;
+  const userId = user?._id;
+  const token = useRecoilValue(userTokenAtom);
 
   const bgColor = useColorModeValue("gray.50", "whiteAlpha.50");
   const textColor = useColorModeValue("gray.600", "whiteAlpha.600");
-
   const navigate = useNavigate(); // Khởi tạo hook navigate
   const [couponCode, setCouponCode] = useState("");
   const [discountedTotal, setDiscountedTotal] = useState(total);
@@ -76,7 +75,12 @@ const InfoCartCheckout = ({ items, total }) => {
   const fetchUser = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:2000/api/user/getUser/${userId}`
+        `http://localhost:2000/api/user/getUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setUser(response.data);
     } catch (error) {
@@ -105,7 +109,12 @@ const InfoCartCheckout = ({ items, total }) => {
   const fetchDataAdressDefautUser = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:2000/api/address/addresses/default/${userId}`
+        `http://localhost:2000/api/address/addresses/default`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       if (!response.data) {
         console.log("Không có địa chỉ mặc định");
@@ -123,7 +132,6 @@ const InfoCartCheckout = ({ items, total }) => {
 
     // Kiểm tra dữ liệu đầu vào
     if (
-      !userId ||
       !items.length ||
       total <= 0 ||
       shippingFee < 0 ||
@@ -151,7 +159,6 @@ const InfoCartCheckout = ({ items, total }) => {
 
     try {
       const orderData = {
-        userId,
         items, // Danh sách sản phẩm từ frontend
         totalPrice: total,
         shippingFee: shippingFee,
@@ -166,7 +173,12 @@ const InfoCartCheckout = ({ items, total }) => {
         // Gửi dữ liệu đến API checkout cho phương thức thanh toán khác (như COD)
         await axios.post(
           "http://localhost:2000/api/checkout/checkOut", // Gửi dữ liệu đến API checkout
-          orderData
+          orderData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
         );
 
         navigate("/success");
@@ -182,6 +194,7 @@ const InfoCartCheckout = ({ items, total }) => {
       setIsLoading(false);
     }
   };
+
   const createOrder = async () => {
     try {
       const orderData = {
@@ -229,10 +242,10 @@ const InfoCartCheckout = ({ items, total }) => {
         throw new Error("Order ID is undefined");
       }
 
-      const captureResponse = await axios.post(
-        "http://localhost:2000/api/paypal/capture-order",
-        { orderId: data.orderID, orderData }
-      );
+      await axios.post("http://localhost:2000/api/paypal/capture-order", {
+        orderId: data.orderID,
+        orderData,
+      });
 
       //  window.location.reload();
       navigate("/success");
@@ -243,7 +256,6 @@ const InfoCartCheckout = ({ items, total }) => {
   };
 
   useEffect(() => {
-    if (!userId) return;
     fetchUser();
     fetchDataAdressDefautUser(); // Gọi hàm lấy địa chỉ mặc định
   }, []);

@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 //Atom
-import userAtom from "./Atom/userAtom";
+import userTokenAtom from "./Atom/userAtom";
 //components
 import ButtonIconModeColor from "./components/ButtonIconModeColor";
 //pages
@@ -27,9 +27,10 @@ import ProductsPage from "./pages/ProductsPage.jsx";
 import NotPage from "./pages/NotPage.jsx";
 import SuccessOrderPage from "./pages/SuccessOrderPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
+import DiscountProductsPage from "./pages/DiscountProductsPage.jsx";
 
 function App() {
-  const user = useRecoilValue(userAtom);
+  const token = useRecoilValue(userTokenAtom);
   return (
     <>
       {/* Set the position to fixed to keep the button in place on scroll */}
@@ -41,31 +42,31 @@ function App() {
           {/*------------------------------------------ User page----------------------------------- */}
           <Route
             path="/profileUser"
-            element={user ? <PageUser /> : <Navigate to={"/signIn"} />}
+            element={token ? <PageUser /> : <Navigate to={"/signIn"} />}
           />
           <Route
             path="/checkOut"
-            element={user ? <CheckoutPage /> : <Navigate to={"/signIn"} />}
+            element={token ? <CheckoutPage /> : <Navigate to={"/signIn"} />}
           />
           <Route
             path="/signIn"
-            element={!user ? <SignInPage /> : <Navigate to={"/"} />}
+            element={!token ? <SignInPage /> : <Navigate to={"/"} />}
           />
           <Route
             path="/signUp"
-            element={!user ? <SignUpPage /> : <Navigate to={"/"} />}
+            element={!token ? <SignUpPage /> : <Navigate to={"/"} />}
           />
           <Route
             path="/cart"
-            element={user ? <CartPage /> : <Navigate to={"/signIn"} />}
+            element={token ? <CartPage /> : <Navigate to={"/signIn"} />}
           />
           <Route
             path="/favirotesProduct"
-            element={user ? <FavoritesPage /> : <Navigate to={"/signIn"} />}
+            element={token ? <FavoritesPage /> : <Navigate to={"/signIn"} />}
           />
           <Route
             path="/success"
-            element={user ? <SuccessOrderPage /> : <Navigate to={"/"} />}
+            element={token ? <SuccessOrderPage /> : <Navigate to={"/"} />}
           />
           {/* -------------------------------- Not User ---------------------------------------------- */}
           <Route
@@ -74,21 +75,23 @@ function App() {
           />
           <Route
             path="/enterEmail"
-            element={!user ? <EnterEmailPage /> : <Navigate to={"/"} />}
+            element={!token ? <EnterEmailPage /> : <Navigate to={"/"} />}
           />
           <Route
             path="/submitOTP"
-            element={!user ? <SubmitCodeOTPPage /> : <Navigate to={"/"} />}
+            element={!token ? <SubmitCodeOTPPage /> : <Navigate to={"/"} />}
           />
           <Route
             path="/resetPassword"
-            element={!user ? <ResetPasswordPage /> : <Navigate to={"/"} />}
+            element={!token ? <ResetPasswordPage /> : <Navigate to={"/"} />}
           />
           <Route path="/" element={<HomePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/DiscountProducts" element={<DiscountProductsPage />} />
+
           <Route
             path="/category/:categoryId"
             element={<ProductsCategoryPage />}

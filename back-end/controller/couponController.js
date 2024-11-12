@@ -86,7 +86,7 @@ export const getAllCoupons = async (req, res) => {
   }
 };
 export const getUserCoupons = async (req, res) => {
-  const { userId } = req.params; // Lấy userId từ tham số URL
+  const userId = req.user._id; // Lấy userId từ thông tin người dùng đã xác thực trong Auth middleware
 
   try {
     // Tìm người dùng
@@ -111,6 +111,7 @@ export const getUserCoupons = async (req, res) => {
     res.status(500).json({ message: "Error fetching user coupons.", error });
   }
 };
+
 // Lấy một mã khuyến mãi theo ID
 export const getCouponById = async (req, res) => {
   const { id } = req.params;

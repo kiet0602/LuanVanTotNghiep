@@ -9,7 +9,6 @@ import { sendOrderConfirmationEmail } from "./mailer.js";
 // Hàm xử lý checkout
 export const checkout = async (req, res) => {
   const {
-    userId,
     items, // Nhận items đã được truyền từ frontend
     totalPrice,
     shippingFee,
@@ -20,6 +19,7 @@ export const checkout = async (req, res) => {
     addressId,
   } = req.body;
 
+  const { userId } = req.user;
   try {
     // 1. Lấy thông tin người dùng
     const user = await userModel.findById(userId);
@@ -245,7 +245,7 @@ export const getAllOrders = async (req, res) => {
 //Service
 // Hàm lấy danh sách đơn hàng của người dùng
 export const getOrders = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
 
   try {
     // Lấy tất cả đơn hàng của người dùng, populate toàn bộ thông tin người dùng và sản phẩm

@@ -25,11 +25,11 @@ import {
   selectedPaymentMethodState,
   selectedShippingMethodState,
 } from "../Atom/methoShipAtom";
-import { useRecoilState } from "recoil";
+
+import { useRecoilState, useRecoilValue } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const InfoUserCheckout = () => {
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
   const [user, setUser] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [shippingMethods, setShippingMethods] = useState([]);
@@ -40,17 +40,23 @@ const InfoUserCheckout = () => {
     selectedShippingMethodState
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const userId = userCurrent?._id;
+
+  const token = useRecoilValue(userTokenAtom);
 
   const textColor = useColorModeValue("black", "black");
 
   const [addressDefaut, setAddressDefaut] = useState(null);
 
   const fetchUser = async () => {
-    if (!userId) return;
+    if (!token) return;
     try {
       const response = await axios.get(
-        `http://localhost:2000/api/user/getUser/${userId}`
+        `http://localhost:2000/api/user/getUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setUser(response.data);
     } catch (error) {
@@ -61,10 +67,14 @@ const InfoUserCheckout = () => {
   const fetchDataAdressDefautUser = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:2000/api/address/addresses/default/${userId}`
+        `http://localhost:2000/api/address/addresses/default`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       if (!response.data) {
-        console.log("Không có địa chỉ mặc định");
         return; // Thoát hàm nếu không có dữ liệu
       }
       setAddressDefaut(response.data); // Cập nhật địa chỉ mặc định nếu có
@@ -90,7 +100,7 @@ const InfoUserCheckout = () => {
   useEffect(() => {
     fetchUser();
     fetchDataAdressDefautUser();
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     // Fetch payment and shipping methods (replace with actual API calls if available)

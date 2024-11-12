@@ -29,13 +29,13 @@ import AddAddressModel from "./AddAddressModel.jsx";
 
 import { toast } from "react-toastify";
 import axios from "axios";
+import userTokenAtom from "../Atom/userAtom.js";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 const CartinfoUser = () => {
   //khai báo
 
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
-  const userId = userCurrent?._id;
+  const token = useRecoilValue(userTokenAtom);
 
   const [user, setUser] = useState(null);
   const [addresses, setAddresses] = useState([]);
@@ -68,7 +68,12 @@ const CartinfoUser = () => {
       let defaultAddress = null;
       try {
         const response = await axios.get(
-          `http://localhost:2000/api/address/addresses/default/${userId}`
+          `http://localhost:2000/api/address/addresses/default`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
         );
         defaultAddress = response.data;
       } catch (error) {
@@ -91,7 +96,12 @@ const CartinfoUser = () => {
 
       // Xóa địa chỉ
       await axios.delete(
-        `http://localhost:2000/api/address/addresses/${addressId}`
+        `http://localhost:2000/api/address/addresses/${addressId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Gửi token JWT để xác thực
+          },
+        }
       );
 
       // Cập nhật danh sách địa chỉ
@@ -117,7 +127,12 @@ const CartinfoUser = () => {
   const fetchUser = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:2000/api/user/getUser/${userId}`
+        `http://localhost:2000/api/user/getUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setUser(response.data);
     } catch (error) {
@@ -128,10 +143,16 @@ const CartinfoUser = () => {
     }
   };
   //Lấy dữ liệu Địa chỉ
+
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:2000/api/address/addresses/${userId}`
+        `http://localhost:2000/api/address/addresses`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setAddresses(response.data);
     } catch (error) {
@@ -167,7 +188,12 @@ const CartinfoUser = () => {
     try {
       await axios.put(
         `http://localhost:2000/api/address/addresses/${selectedAddress}`,
-        updatedAddress
+        updatedAddress,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
 
       // Nếu địa chỉ được cập nhật không phải là mặc định, cập nhật địa chỉ khác
@@ -181,7 +207,6 @@ const CartinfoUser = () => {
         // Nếu không có địa chỉ nào khác là mặc định, chuyển địa chỉ này thành mặc định
         toast.success("Cập nhật địa chỉ thành công và đã đặt làm mặc định!");
       }
-
       fetchAddresses(); // Tải lại danh sách địa chỉ sau khi cập nhật
     } catch (error) {
       console.log(error.message);
@@ -199,10 +224,9 @@ const CartinfoUser = () => {
   const hasAllData = addresses.length > 0;
 
   useEffect(() => {
-    if (!userId) return;
     fetchUser();
     fetchAddresses();
-  }, [userId]);
+  }, []);
   return (
     <>
       {" "}

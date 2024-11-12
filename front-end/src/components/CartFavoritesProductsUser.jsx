@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 // Services
 import { addToCart } from "../service/cartService.js";
 // Atom
-import userAtom from "../Atom/userAtom.js";
+import userTokenAtom from "../Atom/userAtom.js";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
 import {
@@ -30,21 +30,19 @@ const CartFavoritesProductsUser = () => {
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
   // Atom
-  const user = useRecoilValue(userAtom);
-
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
 
+  const token = useRecoilValue(userTokenAtom);
   //Dữ liệu lấy từ back-end
   const [favoriteProductofUser, setFavoriteProductofUser] = useState([]);
   //Thêm giỏ hàng
   const handleAddToCart = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
-
     try {
       const product = favoriteProducts.find((prod) => prod._id === productId);
       if (!product || product.quantity <= 0) {
@@ -53,7 +51,7 @@ const CartFavoritesProductsUser = () => {
       }
 
       const quantity = 1;
-      await addToCart(user._id, productId, quantity);
+      await addToCart(productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
     } catch (error) {
       toast.error("Lỗi thêm sản phẩm!");
@@ -61,12 +59,12 @@ const CartFavoritesProductsUser = () => {
   };
   //Xóa thích sản phẩm
   const handleRemoveFavorite = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
       return;
     }
     try {
-      await removeFavoriteProduct(user._id, productId);
+      await removeFavoriteProduct(productId);
       toast.success("Đã bỏ thích sản phẩm");
       setFavoriteProductofUser((prevFavorites) =>
         prevFavorites.filter((fav) => fav._id !== productId)
@@ -89,10 +87,9 @@ const CartFavoritesProductsUser = () => {
   //Lấy sản phẩm từ back-end
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (!user?._id) return;
+      if (!token) return;
       try {
-        const userId = user._id;
-        const favorites = await getAllFavoriteProducts(userId);
+        const favorites = await getAllFavoriteProducts();
         setFavoriteProducts(favorites);
         setFavoritesCount(favorites.length);
 

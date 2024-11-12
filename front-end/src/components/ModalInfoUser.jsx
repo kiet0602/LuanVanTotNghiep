@@ -21,8 +21,8 @@ import {
   Input,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useRecoilState } from "recoil";
-import userAtom from "../Atom/userAtom";
+import { useRecoilState, useRecoilValue } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
 import { toast } from "react-toastify";
 
 const ModalInfoUser = ({ user, isOpen, onClose }) => {
@@ -31,13 +31,9 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
   const [numberPhone, setNumberPhone] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null); // Thêm trạng thái cho ảnh xem trước
-  const [resetUserCurrent, setResetUserCurrent] = useRecoilState(userAtom);
-  const userData = localStorage.getItem("userCurrent");
-  const userCurrent = userData ? JSON.parse(userData) : null;
-  // const userCurrent = useRecoilValue(userAtom);
-  const token = userCurrent?.token;
-  //  const token = resetUserCurrent?.token;
+
   const fileInputRef = useRef(null);
+  const token = useRecoilValue(userTokenAtom);
 
   useEffect(() => {
     if (user) {
@@ -88,22 +84,18 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Thêm token vào header
           },
         }
       );
-      toast.success("Cập nhật thành công!");
-      setResetUserCurrent((prev) => {
-        const updatedUserData = { ...prev, ...response.data.updatedUser };
-        localStorage.setItem("userCurrent", JSON.stringify(updatedUserData));
-        return updatedUserData;
-      });
       onClose();
       window.location.reload();
+      toast.success("Cập nhật thành công!");
     } catch (error) {
       toast.error(
         "Có lỗi xảy ra: " + (error.response?.data.error || error.message)
       );
+      console.log(error.response?.data.error || error.message);
     }
   };
 

@@ -29,15 +29,16 @@ import AccordionDetailProduct from "./AccordionDetailProduct";
 //services
 import { addToCart } from "../service/cartService.js";
 //Atom
-import userAtom from "../Atom/userAtom.js";
-import { useRecoilValue } from "recoil";
+import userTokenAtom from "../Atom/userAtom.js";
+import { useRecoilState, useRecoilValue } from "recoil";
+
 import { toast } from "react-toastify";
 import ProductViewerModal from "./ProductViewerModal.jsx";
 
 const CardProductDetail = ({ product }) => {
+  const token = useRecoilValue(userTokenAtom);
   const [mainImage, setMainImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
-
   const borderColor = useColorModeValue("teal.500", "teal.300"); // Light and dark mode colors
   const bgColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.800", "white");
@@ -55,10 +56,8 @@ const CardProductDetail = ({ product }) => {
   const priceToDisplay = displayPrice ?? 0;
   const totalPriceProduct = product.finalPrice * quantity;
 
-  const user = useRecoilValue(userAtom);
-
   const handleAddToCart = async (productId) => {
-    if (!user?._id) {
+    if (!token) {
       toast.error("Bạn cần đăng nhập để thêm vào giỏ hàng");
       return;
     }
@@ -67,9 +66,7 @@ const CardProductDetail = ({ product }) => {
         toast.error("Sản phẩm này đã hết hàng!");
         return;
       }
-
-      const userId = user._id;
-      const response = await addToCart(userId, productId, quantity);
+      await addToCart(productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
     } catch (error) {
       toast.error("Lỗi thêm sản phẩm!");
