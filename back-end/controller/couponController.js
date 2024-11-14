@@ -86,7 +86,7 @@ export const getAllCoupons = async (req, res) => {
   }
 };
 export const getUserCoupons = async (req, res) => {
-  const userId = req.user._id; // Lấy userId từ thông tin người dùng đã xác thực trong Auth middleware
+  const { userId } = req.user; // Lấy userId từ thông tin người dùng đã xác thực trong Auth middleware
 
   try {
     // Tìm người dùng

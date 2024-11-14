@@ -28,6 +28,7 @@ import NotPage from "./pages/NotPage.jsx";
 import SuccessOrderPage from "./pages/SuccessOrderPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import DiscountProductsPage from "./pages/DiscountProductsPage.jsx";
+import ReturnShipingPage from "./pages/ReturnShipingPage.jsx";
 
 function App() {
   const token = useRecoilValue(userTokenAtom);
@@ -91,6 +92,7 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/DiscountProducts" element={<DiscountProductsPage />} />
+          <Route path="/returnShiping" element={<ReturnShipingPage />} />
 
           <Route
             path="/category/:categoryId"

@@ -1,4 +1,10 @@
-import { CheckCircle, Clock, DollarSign, ShoppingBag } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  DollarSign,
+  ShoppingBag,
+  Trash,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -8,6 +14,7 @@ import OrdersTable from "../components/orders/OrdersTable";
 import { useEffect, useState } from "react";
 import {
   getAllOrders,
+  getAllOrdersByCancel,
   getAllOrdersByCompleted,
   getAllOrdersByPending,
   getRevenue,
@@ -18,6 +25,7 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState(0);
   const [ordersPending, setOrdersPending] = useState(0);
   const [ordersCompleted, setOrdersCompleted] = useState(0);
+  const [ordersCancels, setOrdersCancels] = useState(0);
 
   const fetchRevenue = async () => {
     try {
@@ -44,6 +52,15 @@ const OrdersPage = () => {
       console.error("Failed to fetch orders pending", error);
     }
   };
+  const fetchOrdersCancel = async () => {
+    try {
+      const OrdersCancels = await getAllOrdersByCancel();
+      setOrdersCancels(OrdersCancels?.length || 0);
+    } catch (error) {
+      setOrdersCancels(0);
+      console.error("Failed to fetch orders pending", error);
+    }
+  };
   const fetchOrdersCompleted = async () => {
     try {
       const OrdersCompleted = await getAllOrdersByCompleted();
@@ -63,7 +80,8 @@ const OrdersPage = () => {
     fetchOrders();
     fetchOrdersPending();
     fetchOrdersCompleted();
-  }, [totalRevenue, orders, ordersPending, ordersCompleted]);
+    fetchOrdersCancel();
+  }, [totalRevenue, orders, ordersPending, ordersCompleted, ordersCancels]);
 
   return (
     <div className="flex-1 relative z-10 overflow-auto">
@@ -95,9 +113,9 @@ const OrdersPage = () => {
             color="#10B981"
           />
           <StatCard
-            name="Tổng doanh thu"
-            icon={DollarSign}
-            value={`${totalRevenue.toLocaleString()} Đ`}
+            name="Đơn hàng đã hủy"
+            icon={Trash}
+            value={ordersCancels}
             color="#EF4444"
           />
         </motion.div>

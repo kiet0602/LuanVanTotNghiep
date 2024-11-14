@@ -5,6 +5,7 @@ import {
   checkout,
   deleteOrder,
   getAllOrders,
+  getCancels,
   getCompleted,
   getMonthlyRevenue,
   getOrderById,
@@ -38,6 +39,7 @@ checkoutRouter.get(
   getSoldProductCountByCategory
 );
 checkoutRouter.get("/getCompleted", getCompleted);
+checkoutRouter.get("/getCancels", getCancels);
 checkoutRouter.get("/getPending", getPending);
 checkoutRouter.get("/getOrderCountByStatus", getOrderCountByStatus);
 checkoutRouter.get("/getOrderCountByDate", getOrderCountByDate);
@@ -45,5 +47,7 @@ checkoutRouter.put("/:orderId/cancel", cancelOrder);
 checkoutRouter.put("/:orderId/receive", receiveOrder);
 // checkoutRouter.post("/paypalCheckout", paypalCheckout);
 checkoutRouter.put("/:orderId/reset", resetOrder);
+
+getCancels;
 
 export default checkoutRouter;

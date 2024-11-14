@@ -67,7 +67,7 @@ const SearchPage = () => {
     };
 
     fetchFavorites();
-  }, [user, setFavoriteProducts, setFavoritesCount]); // Dependency on user
+  }, [setFavoriteProducts, setFavoritesCount]); // Dependency on user
 
   const isFavorite = (productId) =>
     favoriteProducts.some((fav) => fav._id === productId);

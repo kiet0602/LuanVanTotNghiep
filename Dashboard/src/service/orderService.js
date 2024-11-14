@@ -101,6 +101,21 @@ export const getAllOrdersByPending = async () => {
     );
   }
 };
+export const getAllOrdersByCancel = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:2000/api/checkout/getCancels"
+    );
+
+    // Nếu không có dữ liệu, trả về mảng trống
+    return response.data || [];
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+        "Lỗi lấy danh sách đơn hàng đang chờ xử lý"
+    );
+  }
+};
 //Hàm lấy các đơn hàng đã xử lý xong
 export const getAllOrdersByCompleted = async () => {
   try {

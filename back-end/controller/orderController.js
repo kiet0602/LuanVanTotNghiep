@@ -403,6 +403,27 @@ export const getPending = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const getCancels = async (req, res) => {
+  try {
+    // Các trạng thái cần lấy: Pending và Completed
+    const statusList = ["Đã hủy"];
+
+    // Tìm đơn hàng có trạng thái thuộc danh sách trên và populate thông tin người dùng
+    const orders = await orderModel
+      .find({ status: { $in: statusList } })
+      .populate("user");
+
+    // Nếu không có đơn hàng, trả về mảng rỗng thay vì lỗi
+    if (orders.length === 0) {
+      return res.status(200).json([]); // Trả về mảng rỗng
+    }
+
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 //Lấy doanh số đơn hàng Đã hoàn thành
 export const getCompleted = async (req, res) => {
   try {
@@ -495,13 +516,20 @@ export const cancelOrder = async (req, res) => {
     }
 
     // Kiểm tra trạng thái đơn hàng có thể hủy hay không
-    const cancellableStatuses = [
-      "Chờ xử lý", // Chỉ cho phép hủy đơn hàng ở trạng thái này
-    ];
+    const cancellableStatuses = ["Chờ xử lý"]; // Chỉ cho phép hủy đơn hàng ở trạng thái này
     if (!cancellableStatuses.includes(order.status)) {
       return res
         .status(400)
         .json({ message: "Không thể hủy đơn hàng trong trạng thái này" });
+    }
+
+    // Phục hồi lại số lượng sản phẩm trong kho
+    for (const items of order.items) {
+      const product = await productModel.findById(items.product);
+      if (product) {
+        product.quantity += items.quantity; // Tăng số lượng trong kho theo số lượng đã đặt
+        await product.save();
+      }
     }
 
     // Cập nhật trạng thái đơn hàng thành "Đã hủy"
@@ -554,18 +582,37 @@ export const resetOrder = async (req, res) => {
       return res.status(404).json({ message: "Đơn hàng không tồn tại" });
     }
 
-    // Kiểm tra trạng thái đơn hàng có thể được đặt lại hay không
-    const resettableStatuses = [
-      "Đã hủy", // Chỉ cho phép đặt lại đơn hàng từ trạng thái "Đã hủy"
-    ];
-    if (!resettableStatuses.includes(order.status)) {
+    // Kiểm tra trạng thái đơn hàng để đảm bảo là đơn hàng đã bị hủy
+    if (order.status !== "Đã hủy") {
       return res
         .status(400)
-        .json({ message: "Không thể đặt lại đơn hàng trong trạng thái này" });
+        .json({ message: "Chỉ có thể đặt lại đơn hàng đã bị hủy" });
     }
 
-    // Cập nhật trạng thái đơn hàng thành trạng thái mong muốn, ví dụ: "Chờ xử lý"
-    order.status = "Chờ xử lý"; // Reset lại trạng thái đơn hàng về "Chờ xử lý"
+    // Kiểm tra số lượng sản phẩm hiện có trong kho
+    for (const item of order.items) {
+      const product = await productModel.findById(item.product);
+      if (!product) {
+        return res
+          .status(404)
+          .json({ message: `Sản phẩm với ID ${item.product} không tồn tại` });
+      }
+      if (product.quantity < item.quantity) {
+        return res.status(400).json({
+          message: `Số lượng sản phẩm ${product.name} không đủ, còn lại ${product.quantity}`,
+        });
+      }
+    }
+
+    // Giảm số lượng sản phẩm trong kho và đặt lại đơn hàng
+    for (const item of order.items) {
+      const product = await productModel.findById(item.product);
+      product.quantity -= item.quantity;
+      await product.save();
+    }
+
+    // Cập nhật trạng thái đơn hàng thành "Đang xử lý"
+    order.status = "Đang xử lý";
     await order.save();
 
     res.status(200).json({ message: "Đặt lại đơn hàng thành công", order });

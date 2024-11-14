@@ -77,6 +77,7 @@ const SignIn = () => {
       );
 
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("nameUser", response.data.username);
       setResetUserCurrent(response.data.token);
       toast.success("Đăng nhập thành công!");
 

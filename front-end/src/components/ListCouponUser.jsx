@@ -26,12 +26,13 @@ import userAtom from "../Atom/userAtom";
 import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
+import userTokenAtom from "../Atom/userAtom.js";
 
 const ListCouponUser = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [couponsByUserId, setCouponsByUserId] = useState([]); // Sửa từ ordersByUserId thành couponsByUserId
   const [selectedCoupon, setSelectedCoupon] = useState(null); // Sửa từ selectedOrder thành selectedCoupon
-  const user = useRecoilValue(userAtom);
+  const token = useRecoilValue(userTokenAtom);
 
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,7 +42,12 @@ const ListCouponUser = () => {
     // Sửa tên hàm từ fetchOrdersByUser thành fetchCouponsByUser
     try {
       const res = await axios.get(
-        `http://localhost:2000/api/coupon/getUserCoupons/${user._id}`
+        `http://localhost:2000/api/coupon/getUserCoupons`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
       setCouponsByUserId(res.data); // Sửa từ setOrdersByUserId thành setCouponsByUserId
     } catch (error) {
@@ -78,7 +84,7 @@ const ListCouponUser = () => {
 
   useEffect(() => {
     fetchCouponsByUser(); // Sửa từ fetchOrdersByUser thành fetchCouponsByUser
-  }, [user]);
+  }, []);
 
   // Xử lý phân trang
   const indexOfLastCoupon = currentPage * couponsPerPage; // Sửa từ ordersPerPage thành couponsPerPage
@@ -94,7 +100,7 @@ const ListCouponUser = () => {
     <>
       <Box bg={useColorModeValue("white", "black")}>
         <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-          <Flex justifyContent="left" mb={3}>
+          <Flex justifyContent="center" mb={3}>
             <chakra.h3 fontSize="2xl" fontWeight="bold" textAlign="center">
               Danh sách mã khuyến mãi
             </chakra.h3>
