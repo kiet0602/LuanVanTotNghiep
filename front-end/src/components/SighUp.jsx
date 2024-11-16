@@ -22,19 +22,12 @@ import axios from "axios";
 
 import useNavigateCustom from "../Hook/useNavigateCustom";
 //data
-/* const avatars = [
+const avatars = [
   {
     name: "Ryan Florence",
     url: "https://bit.ly/ryan-florence",
   },
-  {
-    name: "Ryan Florence",
-    url: "https://bit.ly/ryan-florence",
-  },
-  {
-    name: "Ryan Florence",
-    url: "https://bit.ly/ryan-florence",
-  },
+
   {
     name: "Segun Adebayo",
     url: "https://bit.ly/sage-adebayo",
@@ -51,7 +44,7 @@ import useNavigateCustom from "../Hook/useNavigateCustom";
     name: "Christian Nwamba",
     url: "https://bit.ly/code-beast",
   },
-]; */
+];
 
 const SighUp = () => {
   //khai báo
@@ -128,15 +121,21 @@ const SighUp = () => {
             <Heading
               fontSize={{ base: "3xl", sm: "4xl", md: "5xl", lg: "6xl" }}
             >
-              <Text bgGradient="linear(to-l, #0ea5e9,#2563eb)" bgClip="text">
+              <Text
+                bgGradient="linear(to-l, #0ea5e9,#2563eb)"
+                bgClip="text"
+                fontFamily="'Allura', cursive"
+              >
                 {" "}
-                Shop tree{" "}
+                Plant Paradise{" "}
               </Text>
               🌼
-              <Text as={"span"}>chào đón bạn</Text>
+              <Text as={"span"} fontFamily="'Quicksand', sans-serif">
+                chào đón bạn
+              </Text>
             </Heading>
             <Stack direction={"row"} spacing={4} align={"center"}>
-              {/*     <AvatarGroup>
+              <AvatarGroup>
                 {avatars.map((avatar, index) => (
                   <Avatar
                     key={index}
@@ -159,7 +158,7 @@ const SighUp = () => {
                     }}
                   />
                 ))}
-              </AvatarGroup> */}
+              </AvatarGroup>
               <Text
                 fontFamily={"heading"}
                 fontSize={{ base: "4xl", md: "6xl" }}

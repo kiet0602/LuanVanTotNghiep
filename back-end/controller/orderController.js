@@ -274,16 +274,18 @@ export const getRevenue = async (req, res) => {
     if (orders.length === 0) {
       return res.status(404).json({ message: "Không có đơn hàng nào" });
     }
-    // Tính tổng doanh thu bằng cách cộng dồn tất cả các giá trị đơn hàng
-    const totalRevenue = orders.reduce(
-      (acc, order) => acc + order.finalPrice,
-      0
-    );
+
+    // Tính tổng doanh thu, chỉ cộng đơn hàng không có trạng thái "Đã hủy"
+    const totalRevenue = orders.reduce((acc, order) => {
+      return order.status !== "Đã hủy" ? acc + order.finalPrice : acc;
+    }, 0);
+
     res.status(200).json({ totalRevenue });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 //hàm lấy doanh thu mỗi tháng
 export const getMonthlyRevenue = async (req, res) => {
   try {
@@ -385,15 +387,12 @@ export const getSoldProductCountByCategory = async (req, res) => {
 //Lấy doanh số đơn hàng đang chờ xử lý
 export const getPending = async (req, res) => {
   try {
-    // Các trạng thái cần lấy: Pending và Completed
-    const statusList = ["Chờ xử lý", "Đang xử lý", "Đang giao hàng"];
-
-    // Tìm đơn hàng có trạng thái thuộc danh sách trên và populate thông tin người dùng
+    // Tìm các đơn hàng không có trạng thái "Đã giao hàng" và populate thông tin người dùng
     const orders = await orderModel
-      .find({ status: { $in: statusList } })
+      .find({ status: { $ne: "Đã nhận hàng" } }) // $ne để loại trừ "Đã giao hàng"
       .populate("user");
 
-    // Nếu không có đơn hàng, trả về mảng rỗng thay vì lỗi
+    // Nếu không có đơn hàng, trả về mảng rỗng
     if (orders.length === 0) {
       return res.status(200).json([]); // Trả về mảng rỗng
     }
@@ -403,6 +402,7 @@ export const getPending = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const getCancels = async (req, res) => {
   try {
     // Các trạng thái cần lấy: Pending và Completed

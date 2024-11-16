@@ -32,11 +32,11 @@ const ButtonSighIn = ({ handleLogin, isLoading }) => {
           </Center>
         </Button> */}
         {/* Google */}
-        <Button w={"full"} variant={"outline"} leftIcon={<FcGoogle />}>
+        {/* <Button w={"full"} variant={"outline"} leftIcon={<FcGoogle />}>
           <Center>
             <Text>Tiếp tục với Google</Text>
           </Center>
-        </Button>
+        </Button> */}
       </Stack>
     </Center>
   );

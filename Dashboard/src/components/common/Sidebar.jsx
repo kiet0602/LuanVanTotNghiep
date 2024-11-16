@@ -190,7 +190,7 @@ const SIDEBAR_ITEMS = [
     name: "Tổng quan",
     icon: ChartLine,
     color: "#4F46E5",
-    href: "/",
+    href: "/overview",
   },
   {
     name: "Khuyến mãi",
@@ -244,6 +244,7 @@ const SIDEBAR_ITEMS = [
     ],
   },
   { name: "Người dùng", icon: Users, color: "#EC4899", href: "/users" },
+  { name: "Cài đặt", icon: Users, color: "#EC4899", href: "/profile" },
 ];
 
 const Sidebar = () => {

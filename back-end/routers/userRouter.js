@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  adminLogin,
   authenticate,
   createResetSession,
   generateOTP,
@@ -35,6 +36,7 @@ userRouter.post("/register", register);
 userRouter.post("/registerMail", registerMail);
 userRouter.post("/authenticate", verifyUser, authenticate);
 userRouter.post("/login", verifyUser, login);
+userRouter.post("/loginAdmin", adminLogin);
 
 //GET
 userRouter.get("/getUser", Auth, getUser);

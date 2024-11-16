@@ -101,7 +101,7 @@ const OrdersPage = () => {
             color="#6366F1"
           />
           <StatCard
-            name="Đơn hàng đang xử lý"
+            name="Đơn hàng chưa hoàn thành"
             icon={Clock}
             value={ordersPending}
             color="#F59E0B"

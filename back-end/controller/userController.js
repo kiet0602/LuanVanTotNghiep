@@ -133,6 +133,58 @@ const login = async (req, res) => {
   }
 };
 
+const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Tìm người dùng bằng email
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).send({ error: "Không tìm thấy người dùng" });
+    }
+
+    // Kiểm tra quyền admin
+    if (!user.role) {
+      return res
+        .status(403)
+        .send({ error: "Bạn không có quyền truy cập với tư cách admin" });
+    }
+
+    // Kiểm tra mật khẩu
+    const passwordCheck = await bcrypt.compare(password, user.password);
+    if (!passwordCheck) {
+      return res.status(400).send({ error: "Mật khẩu sai" });
+    }
+
+    // Tạo token JWT
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role, // Lưu vai trò vào token để kiểm tra sau
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // Chuẩn bị dữ liệu trả về
+    const responseData = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar || "",
+      numberPhone: user.numberPhone,
+      role: user.role,
+      token,
+    };
+
+    // Gửi phản hồi thành công
+    return res.status(200).json(responseData);
+  } catch (error) {
+    return res.status(500).send({ error: "Lỗi đăng nhập" });
+  }
+};
+
 const getUser = async (req, res) => {
   const { userId } = req.user;
   try {
@@ -347,6 +399,7 @@ export {
   updateUser,
   generateOTP,
   verifyOTP,
+  adminLogin,
   createResetSession,
   resetPassword,
   authenticate,
