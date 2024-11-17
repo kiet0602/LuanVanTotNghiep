@@ -36,7 +36,6 @@ const InfoCartCheckout = ({ items, total }) => {
   const [discountedTotal, setDiscountedTotal] = useState(total);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const [addressId, setAddressId] = useState("");
 
   const taxAmount = 20000; // Thuế
@@ -55,17 +54,22 @@ const InfoCartCheckout = ({ items, total }) => {
   // Hàm tính toán tổng tiền cuối cùng
   const calculateTotal = () => {
     const shippingFee =
-      total > shippingFeeThreshold
+      selectedPaymentMethod === "PayPal" // Kiểm tra phương thức thanh toán
+        ? 0
+        : total > shippingFeeThreshold
         ? 0
         : selectedShippingMethod === "Giao hàng hỏa tốc"
         ? expressShippingFeeAmount
         : standardShippingFeeAmount;
+
     const finalPrice = discountedTotal + shippingFee + taxAmount;
     return finalPrice;
   };
 
   const shippingFee =
-    total > shippingFeeThreshold
+    selectedPaymentMethod === "PayPal" // Kiểm tra phương thức thanh toán
+      ? 0
+      : total > shippingFeeThreshold
       ? 0
       : selectedShippingMethod === "Giao hàng hỏa tốc"
       ? expressShippingFeeAmount
@@ -90,6 +94,7 @@ const InfoCartCheckout = ({ items, total }) => {
 
   // Hàm gọi API áp dụng mã khuyến mãi
   const applyCoupon = async () => {
+    console.log("Coupon Code:", couponCode);
     try {
       const response = await axios.post(
         "http://localhost:2000/api/coupon/coupon-apply",
@@ -196,6 +201,9 @@ const InfoCartCheckout = ({ items, total }) => {
   };
 
   const createOrder = async () => {
+    const currentCouponCode = couponCode; // Lưu giá trị hiện tại của couponCode
+    console.log("Coupon Code trước khi gửi:", currentCouponCode);
+
     try {
       const orderData = {
         userId,
@@ -205,9 +213,10 @@ const InfoCartCheckout = ({ items, total }) => {
         discountedTotal: calculateTotal(),
         selectedShippingMethod: "Giao hàng hỏa tốc",
         selectedPaymentMethod,
-        couponCode,
+        couponCode: currentCouponCode, // Dùng biến tạm thời thay vì lấy trực tiếp từ state
         addressId,
       };
+
       const response = await axios.post(
         "http://localhost:2000/api/paypal/create-order",
         orderData
@@ -223,6 +232,7 @@ const InfoCartCheckout = ({ items, total }) => {
       throw error;
     }
   };
+
   // Định nghĩa hàm onApprove bên ngoài
   const onApprove = async (data) => {
     try {
@@ -232,7 +242,7 @@ const InfoCartCheckout = ({ items, total }) => {
         totalPrice: total,
         shippingFee: shippingFee,
         discountedTotal: calculateTotal(),
-        selectedShippingMethod: "Giao hàng",
+        selectedShippingMethod: "Giao hàng hỏa tốc",
         selectedPaymentMethod,
         couponCode,
         addressId,
@@ -309,7 +319,9 @@ const InfoCartCheckout = ({ items, total }) => {
             <HStack justifyContent="space-between">
               <Text color={textColor}>Tiền ship: </Text>
               <Heading size="sm">
-                {total > shippingFeeThreshold
+                {selectedPaymentMethod === "PayPal" // Kiểm tra phương thức thanh toán
+                  ? "Miễn phí"
+                  : total > shippingFeeThreshold
                   ? "Miễn phí"
                   : selectedShippingMethod === "Giao hàng hỏa tốc"
                   ? `${expressShippingFeeAmount.toLocaleString()} Đ`
@@ -323,14 +335,25 @@ const InfoCartCheckout = ({ items, total }) => {
           </VStack>
           <Divider />
           <Stack spacing={4}>
-            <HStack spacing={4}>
-              <Input
-                placeholder="Nhập mã khuyến mãi"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-              />
-              <Button onClick={applyCoupon}>Áp dụng</Button>
-            </HStack>
+            {selectedPaymentMethod === "Thanh toán khi nhận hàng" ? (
+              <HStack spacing={4}>
+                <Input
+                  placeholder="Nhập mã khuyến mãi"
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value);
+                  }}
+                />
+                <Button onClick={applyCoupon}>Áp dụng</Button>
+              </HStack>
+            ) : (
+              <HStack>
+                <Text>
+                  Do bạn thanh toán bằng phương thức Paypal nên bạn sẽ không
+                  được áp dụng mã khuyến mãi
+                </Text>
+              </HStack>
+            )}
 
             {/* Hiển thị thành công */}
           </Stack>

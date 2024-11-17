@@ -4,6 +4,7 @@ import cartModel from "../models/cartModel.js";
 import productModel from "../models/productModel.js";
 import AddressModel from "../models/addressModel.js";
 import couponModel from "../models/couponModel.js";
+import moment from "moment-timezone"; // Import thư viện moment-timezone
 
 // Hàm để lấy access token từ PayPal
 async function generateAccessToken() {
@@ -40,6 +41,7 @@ export async function capturePayment(orderId) {
 }
 
 export async function createOrder(orderData) {
+  console.log("Dữ liệu nhận từ frontend:", orderData); // Kiểm tra xem couponCode có được gửi lên không
   try {
     const accessToken = await generateAccessToken();
     console.log("AccessToken nhận được:", accessToken);
@@ -59,6 +61,8 @@ export async function createOrder(orderData) {
     let discount = 0;
     if (orderData.couponCode) {
       const coupon = await couponModel.findOne({ code: orderData.couponCode });
+      console.log(coupon);
+
       if (coupon) {
         if (
           !coupon.isActive ||
@@ -209,7 +213,7 @@ export async function saveOrderAfterPayment(orderId, orderData) {
     if (isNaN(finalPrice)) {
       throw new Error("Tính toán finalPrice không hợp lệ.");
     }
-
+    const orderCreatedAt = moment().tz("Asia/Ho_Chi_Minh").toDate();
     const newOrder = new orderModel({
       user: orderData.userId,
       items: orderData.items.map((item) => ({
@@ -232,6 +236,7 @@ export async function saveOrderAfterPayment(orderId, orderData) {
       paymentMethod: "PayPal",
       status: "Chờ xử lý",
       paypalOrderId: orderId,
+      createdAt: orderCreatedAt,
     });
 
     // Lưu đơn hàng vào cơ sở dữ liệu

@@ -238,8 +238,7 @@ const InfoUserCheckout = () => {
               </Stack>
             </FormControl>
           </GridItem>
-
-          {selectedPaymentMethod === "Thanh toán khi nhận hàng" && (
+          {selectedPaymentMethod === "Thanh toán khi nhận hàng" ? (
             <GridItem colSpan={2}>
               <FormControl>
                 <FormLabel
@@ -262,6 +261,11 @@ const InfoUserCheckout = () => {
                 </Stack>
               </FormControl>
             </GridItem>
+          ) : (
+            <Text fontSize="sm" color="gray.500" w={"310px"}>
+              (Thanh toán bằng PayPal được miễn phí vận chuyển và giao hàng hỏa
+              tốc)
+            </Text>
           )}
 
           <GridItem colSpan={1}>

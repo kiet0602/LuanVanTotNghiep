@@ -5,6 +5,7 @@ import productModel from "../models/productModel.js";
 import userModel from "../models/userModel.js";
 import AddressModel from "../models/addressModel.js";
 import { sendOrderConfirmationEmail } from "./mailer.js";
+import moment from "moment-timezone";
 
 // Hàm xử lý checkout
 export const checkout = async (req, res) => {
@@ -84,7 +85,7 @@ export const checkout = async (req, res) => {
         return res.status(400).json({ message: "Mã giảm giá không hợp lệ" });
       }
     }
-
+    const orderCreatedAt = moment().tz("Asia/Ho_Chi_Minh").toDate();
     // 3. Tạo đơn hàng
     const order = new orderModel({
       user: userId,
@@ -101,6 +102,7 @@ export const checkout = async (req, res) => {
       shippingAddress, // Lưu đối tượng thay vì chuỗi
       paymentMethod: selectedPaymentMethod, // Phương thức thanh toán
       status: "Chờ xử lý", // Trạng thái đơn hàng
+      createdAt: orderCreatedAt,
     });
     await order.save();
     await sendOrderConfirmationEmail(user.email, order);
@@ -389,7 +391,7 @@ export const getPending = async (req, res) => {
   try {
     // Tìm các đơn hàng không có trạng thái "Đã giao hàng" và populate thông tin người dùng
     const orders = await orderModel
-      .find({ status: { $ne: "Đã nhận hàng" } }) // $ne để loại trừ "Đã giao hàng"
+      .find({ status: { $nin: ["Đã nhận hàng", "Đã hủy"] } }) // Loại trừ nhiều trạng thái
       .populate("user");
 
     // Nếu không có đơn hàng, trả về mảng rỗng
