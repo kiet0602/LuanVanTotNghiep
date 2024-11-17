@@ -34,6 +34,7 @@ const AddAddressModel = ({ isOpen, onClose, onAdd }) => {
 
   const token = useRecoilValue(userTokenAtom);
 
+  // Hàm cập nhật địa chỉ
   const handleUpdateUser = async () => {
     if (!street || !ward || !district || !province) {
       toast.error("Vui lòng điền đầy đủ thông tin trước khi lưu!");

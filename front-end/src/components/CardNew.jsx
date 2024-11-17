@@ -140,7 +140,7 @@ const CardNew = ({ products }) => {
   return (
     <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 10 }}>
       <SimpleGrid columns={[1, 2, 3]} spacing="15px">
-        {products.map((product, index) => {
+        {products?.map((product, index) => {
           return (
             <Box
               borderRadius={"10px"}
@@ -189,7 +189,7 @@ const CardNew = ({ products }) => {
                   aria-label="Thêm vào giỏ hàng"
                 >
                   <IconButton
-                    onClick={() => handleAddToCart(product._id)}
+                    onClick={() => handleAddToCart(product?._id)}
                     icon={<FaShoppingCart />}
                     size="md"
                     variant="outline"
@@ -206,7 +206,7 @@ const CardNew = ({ products }) => {
                 </Tooltip>
                 <Tooltip label="Yêu thích" aria-label="Yêu thích">
                   <IconButton
-                    onClick={() => handleFavoriteToggle(product._id)}
+                    onClick={() => handleFavoriteToggle(product?._id)}
                     icon={<FaHeart />}
                     size="md"
                     variant="outline"
@@ -252,7 +252,7 @@ const CardNew = ({ products }) => {
                   position="relative"
                 >
                   <Image
-                    src={`http://localhost:2000/images/${product.image[0]}`}
+                    src={`http://localhost:2000/images/${product?.image[0]}`}
                     alt="Product image"
                     // Ensure the image covers the container
                   />
@@ -268,8 +268,8 @@ const CardNew = ({ products }) => {
                         color={"black"}
                       >
                         {product?.productName.length > 20
-                          ? `${product.productName.substring(0, 25)}...`
-                          : product.productName}
+                          ? `${product?.productName.substring(0, 25)}...`
+                          : product?.productName}
                       </Box>
                     </Box>
                     <Box>
@@ -291,7 +291,7 @@ const CardNew = ({ products }) => {
                           >
                             Giá:
                           </Text>
-                          {product.finalPrice !== product.originalPrice && (
+                          {product?.finalPrice !== product?.originalPrice && (
                             <>
                               <Badge
                                 bg={"gray.300"}
@@ -301,7 +301,8 @@ const CardNew = ({ products }) => {
                                 textDecoration="line-through"
                                 color="black"
                               >
-                                {product.originalPrice.toLocaleString("vi-VN")}Đ
+                                {product?.originalPrice.toLocaleString("vi-VN")}
+                                Đ
                               </Badge>
                               <Badge
                                 bg={"gray.300"}
@@ -311,12 +312,12 @@ const CardNew = ({ products }) => {
                                 mx="1"
                                 fontSize="sm"
                               >
-                                {product.finalPrice.toLocaleString("vi-VN")}Đ
+                                {product?.finalPrice.toLocaleString("vi-VN")}Đ
                               </Badge>
                             </>
                           )}
                           {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
-                          {product.finalPrice === product.originalPrice && (
+                          {product?.finalPrice === product?.originalPrice && (
                             <Badge
                               bg={"gray.300"}
                               color={"black"}
@@ -324,7 +325,7 @@ const CardNew = ({ products }) => {
                               px="3"
                               fontSize="sm"
                             >
-                              {product.originalPrice.toLocaleString("vi-VN")}Đ
+                              {product?.originalPrice.toLocaleString("vi-VN")}Đ
                             </Badge>
                           )}
                         </Box>

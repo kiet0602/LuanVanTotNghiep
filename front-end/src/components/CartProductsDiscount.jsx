@@ -33,7 +33,6 @@ import userTokenAtom from "../Atom/userAtom.js";
 
 const CartProductsDiscount = () => {
   const bgColor = useColorModeValue("whiteAlpha.800", "blackAlpha.800"); // Background overlay color
-
   const hoverBg = useColorModeValue("blue.50", "blue.600");
   const borderColor = useColorModeValue("blue.500", "blue.300");
 
@@ -41,8 +40,8 @@ const CartProductsDiscount = () => {
   const [favoritesCount, setFavoritesCount] =
     useRecoilState(favoritesCountAtom);
   const token = useRecoilValue(userTokenAtom);
-
   const [productsDiscounts, setProductsDiscounts] = useState([]);
+  // Lấy sản phẩm giảm giá
   const fetchProductsDiscount = async () => {
     try {
       const products = await getAllDiscountProducts();
@@ -68,10 +67,11 @@ const CartProductsDiscount = () => {
     fetchProductsDiscount();
   }, []); // Dependency on user
 
+  // Hàm đổi từ không thích và thích sản
   const isFavorite = (productId) =>
     favoriteProducts.some((fav) => fav._id === productId);
 
-  //Hàm sử lý
+  //Hàm sử lý thêm vào giỏ hàng
   const handleAddToCart = async (productId) => {
     if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
@@ -90,7 +90,7 @@ const CartProductsDiscount = () => {
       toast.error("Lỗi thêm sản phẩm!");
     }
   };
-
+  //Thêm sản phẩm thích vào danh sách thích
   const handleAddFavorite = async (productId) => {
     if (!token) {
       toast.error("Bạn cần đăng nhập để thêm sản phẩm vào yêu thích");
@@ -112,7 +112,7 @@ const CartProductsDiscount = () => {
       toast.error(error);
     }
   };
-
+  // Xóa khỏi danh sách thíc
   const handleRemoveFavorite = async (productId) => {
     if (!token) {
       toast.error("Bạn cần đăng nhập để bỏ yêu thích sản phẩm");
@@ -134,7 +134,7 @@ const CartProductsDiscount = () => {
       toast.error(error);
     }
   };
-
+  // đổi màu thích trái tym
   const handleFavoriteToggle = (productId) => {
     if (isFavorite(productId)) {
       handleRemoveFavorite(productId);
@@ -156,7 +156,7 @@ const CartProductsDiscount = () => {
           TOP SẢN PHẨM KHUYẾN MÃI (%)
         </Text>
         <SimpleGrid columns={[1, 2, 3]} spacing="15px">
-          {productsDiscounts.slice(0, 6).map((productsDiscount, index) => {
+          {productsDiscounts?.slice(0, 6).map((productsDiscount, index) => {
             return (
               <Box
                 borderRadius={"10px"}
@@ -206,7 +206,7 @@ const CartProductsDiscount = () => {
                     aria-label="Thêm vào giỏ hàng"
                   >
                     <IconButton
-                      onClick={() => handleAddToCart(productsDiscount._id)}
+                      onClick={() => handleAddToCart(productsDiscount?._id)}
                       icon={<FaShoppingCart />}
                       size="md"
                       variant="outline"
@@ -223,7 +223,9 @@ const CartProductsDiscount = () => {
                   </Tooltip>
                   <Tooltip label="Yêu thích" aria-label="Yêu thích">
                     <IconButton
-                      onClick={() => handleFavoriteToggle(productsDiscount._id)}
+                      onClick={() =>
+                        handleFavoriteToggle(productsDiscount?._id)
+                      }
                       icon={<FaHeart />}
                       size="md"
                       variant="outline"
@@ -265,7 +267,7 @@ const CartProductsDiscount = () => {
                 <NavLink to={`/products/${productsDiscount?.productName}`}>
                   <Box rounded="lg" overflow="hidden" position="relative">
                     <Image
-                      src={`http://localhost:2000/images/${productsDiscount.image[0]}`}
+                      src={`http://localhost:2000/images/${productsDiscount?.image[0]}`}
                       alt="Product image"
                       // Ensure the image covers the container
                     />
@@ -302,8 +304,8 @@ const CartProductsDiscount = () => {
                             >
                               Giá:
                             </Text>
-                            {productsDiscount.finalPrice !==
-                              productsDiscount.originalPrice && (
+                            {productsDiscount?.finalPrice !==
+                              productsDiscount?.originalPrice && (
                               <>
                                 <Badge
                                   bg={"gray.300"}
@@ -313,7 +315,7 @@ const CartProductsDiscount = () => {
                                   textDecoration="line-through"
                                   color="black"
                                 >
-                                  {productsDiscount.originalPrice.toLocaleString(
+                                  {productsDiscount?.originalPrice.toLocaleString(
                                     "vi-VN"
                                   )}
                                   Đ
@@ -326,7 +328,7 @@ const CartProductsDiscount = () => {
                                   fontSize="sm"
                                   bg={"gray.300"}
                                 >
-                                  {productsDiscount.finalPrice.toLocaleString(
+                                  {productsDiscount?.finalPrice.toLocaleString(
                                     "vi-VN"
                                   )}
                                   Đ
@@ -334,8 +336,8 @@ const CartProductsDiscount = () => {
                               </>
                             )}
                             {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
-                            {productsDiscount.finalPrice ===
-                              productsDiscount.originalPrice && (
+                            {productsDiscount?.finalPrice ===
+                              productsDiscount?.originalPrice && (
                               <Badge
                                 color="black"
                                 rounded="full"
@@ -343,7 +345,7 @@ const CartProductsDiscount = () => {
                                 fontSize="sm"
                                 bg={"gray.300"}
                               >
-                                {productsDiscount.originalPrice.toLocaleString(
+                                {productsDiscount?.originalPrice.toLocaleString(
                                   "vi-VN"
                                 )}
                                 Đ

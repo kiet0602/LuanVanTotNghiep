@@ -44,8 +44,8 @@ const CardProductDetail = ({ product }) => {
   const textColor = useColorModeValue("gray.800", "white");
 
   useEffect(() => {
-    if (product?.image && product.image.length > 0) {
-      setMainImage(`http://localhost:2000/images/${product.image[0]}`);
+    if (product?.image && product?.image.length > 0) {
+      setMainImage(`http://localhost:2000/images/${product?.image[0]}`);
     } else {
       setMainImage(null); // Default image handling or empty state
     }
@@ -152,7 +152,7 @@ const CardProductDetail = ({ product }) => {
                             fontSize="lg"
                             textDecoration="line-through"
                           >
-                            {product.originalPrice.toLocaleString("vi-VN")} Đ
+                            {product?.originalPrice.toLocaleString("vi-VN")} Đ
                           </Badge>
                           <Badge
                             rounded="full"
@@ -161,7 +161,7 @@ const CardProductDetail = ({ product }) => {
                             colorScheme="teal"
                             fontSize="lg"
                           >
-                            {product.finalPrice.toLocaleString("vi-VN")} Đ
+                            {product?.finalPrice.toLocaleString("vi-VN")} Đ
                           </Badge>
                         </>
                       ) : (
@@ -173,7 +173,7 @@ const CardProductDetail = ({ product }) => {
                           colorScheme="teal"
                           fontSize="lg"
                         >
-                          {product.originalPrice.toLocaleString("vi-VN")} Đ
+                          {product?.originalPrice.toLocaleString("vi-VN")} Đ
                         </Badge>
                       )}
                     </Flex>

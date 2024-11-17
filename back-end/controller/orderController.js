@@ -278,8 +278,11 @@ export const getRevenue = async (req, res) => {
     }
 
     // Tính tổng doanh thu, chỉ cộng đơn hàng không có trạng thái "Đã hủy"
+    const validStatuses = ["Đã nhận hàng"];
     const totalRevenue = orders.reduce((acc, order) => {
-      return order.status !== "Đã hủy" ? acc + order.finalPrice : acc;
+      return validStatuses.includes(order.status)
+        ? acc + order.finalPrice
+        : acc;
     }, 0);
 
     res.status(200).json({ totalRevenue });
@@ -555,9 +558,7 @@ export const receiveOrder = async (req, res) => {
     }
 
     // Kiểm tra trạng thái đơn hàng có thể nhận hay không
-    const receivableStatuses = [
-      "Đang giao hàng", // Chỉ cho phép nhận đơn hàng ở trạng thái này
-    ];
+    const receivableStatuses = ["Đang giao hàng"];
     if (!receivableStatuses.includes(order.status)) {
       return res
         .status(400)
@@ -566,11 +567,32 @@ export const receiveOrder = async (req, res) => {
 
     // Cập nhật trạng thái đơn hàng thành "Đã nhận hàng"
     order.status = "Đã nhận hàng";
+
+    // Tính toán tổng số tiền và số lượng sản phẩm từ đơn hàng
+    const totalAmount = order.finalPrice;
+    const totalProducts = order.items.reduce(
+      (acc, item) => acc + item.quantity,
+      0
+    );
+
+    // Cập nhật số tiền và số sản phẩm đã mua cho người dùng
+    await userModel.findByIdAndUpdate(
+      order.user,
+      {
+        $inc: {
+          totalAmountSpent: totalAmount, // Cộng thêm tổng tiền của đơn hàng
+          totalProductsPurchased: totalProducts, // Cộng thêm số sản phẩm đã mua
+        },
+      },
+      { new: true } // Trả về document đã được cập nhật
+    );
+
+    // Lưu đơn hàng sau khi cập nhật
     await order.save();
 
     res.status(200).json({ message: "Nhận đơn hàng thành công", order });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Lỗi: ${error.message}` });
   }
 };
 

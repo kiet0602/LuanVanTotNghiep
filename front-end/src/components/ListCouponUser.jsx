@@ -37,7 +37,7 @@ const ListCouponUser = () => {
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const [couponsPerPage] = useState(10); // Số coupon trên mỗi trang, sửa từ ordersPerPage thành couponsPerPage
-
+  // Hàm lấy mã khuyến mãi
   const fetchCouponsByUser = async () => {
     // Sửa tên hàm từ fetchOrdersByUser thành fetchCouponsByUser
     try {
@@ -60,12 +60,12 @@ const ListCouponUser = () => {
     setSelectedCoupon(coupon); // Sửa từ setSelectedOrder thành setSelectedCoupon
     onOpen();
   };
-
+  // Lấy trạng thái của mã giảm giá
   const getStatusColor = (isActive) => {
     // Sửa status thành isActive
     return isActive ? "green.500" : "red.500"; // Trả về màu sắc dựa trên isActive
   };
-
+  // Xóa mã khuyến mãi
   const removeCoupon = async (couponId) => {
     // Sửa từ removeOrder thành removeCoupon
     const confirmDelete = window.confirm("Bạn có muốn xóa mã khuyến mãi?"); // Sửa từ hủy đơn hàng thành xóa mã khuyến mãi
@@ -120,13 +120,13 @@ const ListCouponUser = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {currentCoupons.map(
+                {currentCoupons?.map(
                   (
                     coupon,
                     index // Sửa từ orders thành coupons
                   ) => (
                     <Tr key={index}>
-                      <Td>{coupon.code}</Td>{" "}
+                      <Td>{coupon?.code}</Td>{" "}
                       {/* Sửa từ order._id thành coupon.code */}
                       <Td>
                         <Box
@@ -136,7 +136,7 @@ const ListCouponUser = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {coupon.startDate}{" "}
+                          {coupon?.startDate}{" "}
                           {/* Sửa từ order.createdAt thành coupon.startDate */}
                         </Box>
                       </Td>
@@ -148,36 +148,36 @@ const ListCouponUser = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {coupon.expirationDate}{" "}
+                          {coupon?.expirationDate}{" "}
                           {/* Sửa từ order.discount thành coupon.expirationDate */}
                         </Box>
                       </Td>
-                      <Td>{coupon.discountPercentage}%</Td>{" "}
+                      <Td>{coupon?.discountPercentage}%</Td>{" "}
                       {/* Sửa từ order.discount thành coupon.discountPercentage */}
                       <Td>
                         <Box
                           as="span"
-                          bg={getStatusColor(coupon.isActive)} // Sửa từ order.status thành coupon.isActive
+                          bg={getStatusColor(coupon?.isActive)} // Sửa từ order.status thành coupon.isActive
                           color="white"
                           borderRadius="40px"
                           px={2}
                         >
-                          {coupon.isActive
+                          {coupon?.isActive
                             ? "Đang hoạt động"
                             : "Không hoạt động"}{" "}
                           {/* Sửa từ order.status thành coupon.isActive */}
                         </Box>
                       </Td>
-                      <Td>{coupon.maxUsage}</Td>{" "}
-                      <Td>{coupon.minimumPurchaseAmount}</Td>{" "}
+                      <Td>{coupon?.maxUsage}</Td>{" "}
+                      <Td>{coupon?.minimumPurchaseAmount}</Td>{" "}
                       <Td textAlign={"end"}>
-                        {(coupon.isActive === false || // Kiểm tra trạng thái là boolean
-                          coupon.usageCount < coupon.maxUsage || // Thay đổi từ <= thành < để kiểm tra sử dụng còn lại
-                          new Date(coupon.expirationDate) > new Date()) && ( // Kiểm tra hạn sử dụng
+                        {(coupon?.isActive === false || // Kiểm tra trạng thái là boolean
+                          coupon?.usageCount < coupon?.maxUsage || // Thay đổi từ <= thành < để kiểm tra sử dụng còn lại
+                          new Date(coupon?.expirationDate) > new Date()) && ( // Kiểm tra hạn sử dụng
                           <IconButton
                             aria-label="Xóa"
                             icon={<FaTrash />}
-                            onClick={() => removeCoupon(coupon._id)}
+                            onClick={() => removeCoupon(coupon?._id)}
                           />
                         )}
                       </Td>

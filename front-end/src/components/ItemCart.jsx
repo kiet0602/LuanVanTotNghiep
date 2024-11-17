@@ -63,7 +63,6 @@ const ItemCart = () => {
       setLoading(false);
     }
   };
-  console.log(cart);
 
   useEffect(() => {
     fetchCart();
@@ -142,7 +141,7 @@ const ItemCart = () => {
 
   return (
     <Container maxW="7xl" p={{ base: 5, md: 12 }}>
-      {cart && cart.items && cart.items.length > 0 ? (
+      {cart && cart?.items && cart?.items?.length > 0 ? (
         <VStack spacing={4} marginBottom={6} align="left" mx={[0, 0, 6]}>
           {cart.items.map((item) => {
             const isOutOfStock = item?.product?.quantity === 0;
@@ -227,7 +226,7 @@ const ItemCart = () => {
                   </Stack>
                   <FontAwesomeIcon
                     mx="20px"
-                    onClick={() => handleRemoveFromCart(item?.product._id)}
+                    onClick={() => handleRemoveFromCart(item?.product?._id)}
                     cursor="pointer"
                     icon={faTrash}
                     style={{ color: "#f01435", fontSize: "24px" }}
@@ -253,10 +252,10 @@ const ItemCart = () => {
                 {selectedItems.length > 0
                   ? cart.items
                       .filter((item) =>
-                        selectedItems.includes(item.product._id)
+                        selectedItems.includes(item?.product?._id)
                       )
                       .reduce(
-                        (total, item) => total + item.totalPriceItemCart,
+                        (total, item) => total + item?.totalPriceItemCart,
                         0
                       )
                       .toLocaleString()

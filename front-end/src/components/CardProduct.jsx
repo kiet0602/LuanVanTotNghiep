@@ -183,7 +183,7 @@ const CardProduct = ({ products }) => {
                   aria-label="Thêm vào giỏ hàng"
                 >
                   <IconButton
-                    onClick={() => handleAddToCart(product._id)}
+                    onClick={() => handleAddToCart(product?._id)}
                     icon={<FaShoppingCart />}
                     size="md"
                     variant="outline"
@@ -200,7 +200,7 @@ const CardProduct = ({ products }) => {
                 </Tooltip>
                 <Tooltip label="Yêu thích" aria-label="Yêu thích">
                   <IconButton
-                    onClick={() => handleFavoriteToggle(product._id)}
+                    onClick={() => handleFavoriteToggle(product?._id)}
                     icon={<FaHeart />}
                     size="md"
                     variant="outline"
@@ -245,7 +245,7 @@ const CardProduct = ({ products }) => {
                   position="relative"
                 >
                   <Image
-                    src={`http://localhost:2000/images/${product.image[0]}`}
+                    src={`http://localhost:2000/images/${product?.image[0]}`}
                     alt="Product image"
                   />
                   <Box p={{ base: 4, lg: 6 }}>
@@ -260,8 +260,8 @@ const CardProduct = ({ products }) => {
                         color={"black"}
                       >
                         {product?.productName.length > 20
-                          ? `${product.productName.substring(0, 25)}...`
-                          : product.productName}
+                          ? `${product?.productName.substring(0, 25)}...`
+                          : product?.productName}
                       </Box>
                     </Box>
                     <Box>
@@ -283,7 +283,7 @@ const CardProduct = ({ products }) => {
                           >
                             Giá:
                           </Text>
-                          {product.finalPrice !== product.originalPrice && (
+                          {product?.finalPrice !== product?.originalPrice && (
                             <>
                               <Badge
                                 bg={"gray.300"}
@@ -293,7 +293,8 @@ const CardProduct = ({ products }) => {
                                 textDecoration="line-through"
                                 color="black"
                               >
-                                {product.originalPrice.toLocaleString("vi-VN")}Đ
+                                {product?.originalPrice.toLocaleString("vi-VN")}
+                                Đ
                               </Badge>
                               <Badge
                                 color={"red"}
@@ -303,12 +304,12 @@ const CardProduct = ({ products }) => {
                                 fontSize="sm"
                                 bg={"gray.300"}
                               >
-                                {product.finalPrice.toLocaleString("vi-VN")}Đ
+                                {product?.finalPrice.toLocaleString("vi-VN")}Đ
                               </Badge>
                             </>
                           )}
                           {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
-                          {product.finalPrice === product.originalPrice && (
+                          {product?.finalPrice === product?.originalPrice && (
                             <Badge
                               color="black"
                               rounded="full"
@@ -316,7 +317,7 @@ const CardProduct = ({ products }) => {
                               fontSize="sm"
                               bg={"gray.300"}
                             >
-                              {product.originalPrice.toLocaleString("vi-VN")}Đ
+                              {product?.originalPrice.toLocaleString("vi-VN")}Đ
                             </Badge>
                           )}
                         </Box>

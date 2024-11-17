@@ -42,9 +42,9 @@ const AvatarUser = ({ userCurrent }) => {
           <NavLink _hover={{ textDecoration: "none" }} to={"/profileUser"}>
             <MenuItem>
               <VStack justifyContent="start" alignItems="left">
-                <Text fontWeight="500">{userCurrent.username}</Text>
+                <Text fontWeight="500">{userCurrent?.username}</Text>
                 <Text size="sm" color="gray.500" mt="0 !important">
-                  {userCurrent.email}
+                  {userCurrent?.email}
                 </Text>
               </VStack>
             </MenuItem>

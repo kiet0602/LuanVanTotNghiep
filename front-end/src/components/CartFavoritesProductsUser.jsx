@@ -49,7 +49,6 @@ const CartFavoritesProductsUser = () => {
         toast.error("Sản phẩm này đã hết hàng!");
         return;
       }
-
       const quantity = 1;
       await addToCart(productId, quantity);
       toast.success("Sản phẩm đã thêm vào giỏ hàng");
@@ -111,7 +110,7 @@ const CartFavoritesProductsUser = () => {
         <Container maxWidth="1200px" mx="auto" my="auto" p={{ base: 5, md: 8 }}>
           {favoriteProductofUser.length > 0 ? (
             <SimpleGrid columns={[1, 2, 3]} spacing="15px">
-              {favoriteProductofUser.map((favoriteProduct) => (
+              {favoriteProductofUser?.map((favoriteProduct) => (
                 <Box
                   borderRadius={"10px"}
                   bg={"white"}
@@ -158,7 +157,7 @@ const CartFavoritesProductsUser = () => {
                       aria-label="Thêm vào giỏ hàng"
                     >
                       <IconButton
-                        onClick={() => handleAddToCart(favoriteProduct._id)}
+                        onClick={() => handleAddToCart(favoriteProduct?._id)}
                         icon={<FaShoppingCart />}
                         size="md"
                         variant="outline"
@@ -176,7 +175,7 @@ const CartFavoritesProductsUser = () => {
                     <Tooltip label="Bỏ yêu thích" aria-label=" Bỏ yêu thích">
                       <IconButton
                         onClick={() =>
-                          handleFavoriteToggle(favoriteProduct._id)
+                          handleFavoriteToggle(favoriteProduct?._id)
                         }
                         icon={<FaTimes />} // Thay thế FaHeart bằng FaTimes
                         size="md"
@@ -218,7 +217,7 @@ const CartFavoritesProductsUser = () => {
                   <NavLink to={`/products/${favoriteProduct?.productName}`}>
                     <Box rounded="lg" overflow="hidden" position="relative">
                       <Image
-                        src={`http://localhost:2000/images/${favoriteProduct.image[0]}`}
+                        src={`http://localhost:2000/images/${favoriteProduct?.image[0]}`}
                         alt="Product image"
                       />
                       <Box p={{ base: 4, lg: 6 }}>
@@ -237,11 +236,11 @@ const CartFavoritesProductsUser = () => {
                             color={"black"}
                           >
                             {favoriteProduct?.productName.length > 20
-                              ? `${favoriteProduct.productName.substring(
+                              ? `${favoriteProduct?.productName.substring(
                                   0,
                                   25
                                 )}...`
-                              : favoriteProduct.productName}
+                              : favoriteProduct?.productName}
                           </Box>
                         </Box>
                         {/* Price centered */}
@@ -262,8 +261,8 @@ const CartFavoritesProductsUser = () => {
                             >
                               Giá:
                             </Text>
-                            {favoriteProduct.finalPrice !==
-                              favoriteProduct.originalPrice && (
+                            {favoriteProduct?.finalPrice !==
+                              favoriteProduct?.originalPrice && (
                               <>
                                 <Badge
                                   bg={"gray.300"}
@@ -273,7 +272,7 @@ const CartFavoritesProductsUser = () => {
                                   textDecoration="line-through"
                                   color="black"
                                 >
-                                  {favoriteProduct.originalPrice.toLocaleString(
+                                  {favoriteProduct?.originalPrice.toLocaleString(
                                     "vi-VN"
                                   )}
                                   Đ
@@ -286,7 +285,7 @@ const CartFavoritesProductsUser = () => {
                                   fontSize="sm"
                                   color="red"
                                 >
-                                  {favoriteProduct.finalPrice.toLocaleString(
+                                  {favoriteProduct?.finalPrice.toLocaleString(
                                     "vi-VN"
                                   )}
                                   Đ
@@ -294,8 +293,8 @@ const CartFavoritesProductsUser = () => {
                               </>
                             )}
                             {/* Nếu không có finalPrice, chỉ hiển thị originalPrice */}
-                            {favoriteProduct.finalPrice ===
-                              favoriteProduct.originalPrice && (
+                            {favoriteProduct?.finalPrice ===
+                              favoriteProduct?.originalPrice && (
                               <Badge
                                 rounded="full"
                                 bg={"gray.300"}
@@ -303,7 +302,7 @@ const CartFavoritesProductsUser = () => {
                                 px="3"
                                 fontSize="sm"
                               >
-                                {favoriteProduct.originalPrice.toLocaleString(
+                                {favoriteProduct?.originalPrice.toLocaleString(
                                   "vi-VN"
                                 )}
                                 Đ

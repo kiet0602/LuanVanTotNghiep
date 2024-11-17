@@ -9,6 +9,10 @@ import {
 } from "@chakra-ui/react";
 
 const AccordionDetailProduct = ({ description }) => {
+  if (!description) {
+    return;
+  }
+
   return (
     <>
       <Accordion defaultIndex={[0]} allowMultiple>

@@ -131,7 +131,7 @@ const InfoCartCheckout = ({ items, total }) => {
     }
   };
 
-  // Hàm thanh toán - gọi API checkout
+  // Hàm thanh toán - gọi API checkout khi nhận hàng
   const handlePayment = async () => {
     setIsLoading(true);
 
@@ -199,10 +199,9 @@ const InfoCartCheckout = ({ items, total }) => {
       setIsLoading(false);
     }
   };
-
+  // Hàm thanh toán paypal
   const createOrder = async () => {
     const currentCouponCode = couponCode; // Lưu giá trị hiện tại của couponCode
-    console.log("Coupon Code trước khi gửi:", currentCouponCode);
 
     try {
       const orderData = {
@@ -281,8 +280,8 @@ const InfoCartCheckout = ({ items, total }) => {
             <HStack spacing={6} alignItems="center" w="full" key={index}>
               <AspectRatio ratio={1} w={24}>
                 <Image
-                  src={`http://localhost:2000/images/${item.product.image[0]}`} // Đường dẫn hình ảnh
-                  alt={item.product.productName}
+                  src={`http://localhost:2000/images/${item?.product?.image[0]}`} // Đường dẫn hình ảnh
+                  alt={item?.product?.productName}
                   objectFit="cover" // Đảm bảo hình ảnh không bị kéo dãn
                 />
               </AspectRatio>
@@ -301,7 +300,7 @@ const InfoCartCheckout = ({ items, total }) => {
                 <HStack spacing={4} alignItems="center">
                   <Text fontSize="sm" marginRight="50px">
                     {" "}
-                    {item.quantity}
+                    {item?.quantity}
                   </Text>
                   <Heading size="sm">
                     {item.totalPriceItemCart.toLocaleString()}

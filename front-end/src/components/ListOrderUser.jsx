@@ -37,7 +37,7 @@ const ListOrderUser = () => {
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10); // Số đơn hàng trên mỗi trang
-
+  // Hàm lấy đơn hàng của khách hàng
   const fetchOrdersByUser = async () => {
     try {
       const res = await axios.get(
@@ -73,6 +73,7 @@ const ListOrderUser = () => {
         return "gray.500";
     }
   };
+
   const receiveOrder = async (orderId) => {
     try {
       await axios.put(`http://localhost:2000/api/checkout/${orderId}/receive`);
@@ -81,6 +82,7 @@ const ListOrderUser = () => {
       console.log(error.message);
     }
   };
+
   const cancelOrder = async (orderId) => {
     const confirmDelete = window.confirm("Bạn có muốn hủy đơn hàng?");
     if (confirmDelete) {
@@ -143,9 +145,9 @@ const ListOrderUser = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {currentOrders.map((order, index) => (
+                {currentOrders?.map((order, index) => (
                   <Tr key={index}>
-                    <Td>{order._id}</Td>
+                    <Td>{order?._id}</Td>
                     <Td>
                       <Box
                         as="span"
@@ -154,26 +156,26 @@ const ListOrderUser = () => {
                         borderRadius="40px"
                         px={2}
                       >
-                        {format(new Date(order.createdAt), "dd-MM-yyyy")}
+                        {format(new Date(order?.createdAt), "dd-MM-yyyy")}
                       </Box>
                     </Td>
                     <Td>
-                      {order.discount.toLocaleString("vi-VN") === "0"
+                      {order?.discount.toLocaleString("vi-VN") === "0"
                         ? "Không có"
-                        : `${order.discount.toLocaleString("vi-VN")} đ`}
+                        : `${order?.discount.toLocaleString("vi-VN")} đ`}
                     </Td>
                     <Td>
                       <Box
                         as="span"
-                        bg={getStatusColor(order.status)}
+                        bg={getStatusColor(order?.status)}
                         color="white"
                         borderRadius="40px"
                         px={2}
                       >
-                        {order.status}
+                        {order?.status}
                       </Box>
                     </Td>
-                    <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                    <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
                     <Td textAlign={"end"}>
                       <Flex
                         alignItems="center"
@@ -189,20 +191,11 @@ const ListOrderUser = () => {
                           <FaEye color="blue" />
                         </Box>
 
-                        {order.status === "Đã hủy" ? (
-                          <Box
-                            as="span"
-                            aria-label="Xóa"
-                            onClick={() => removeOrder(order._id)}
-                            cursor="pointer"
-                          >
-                            <FaTrash color="red" />
-                          </Box>
-                        ) : order.status === "Chờ xử lý" ? (
+                        {order?.status === "Chờ xử lý" ? (
                           <Box
                             as="span"
                             aria-label="Hủy đơn"
-                            onClick={() => cancelOrder(order._id)} // Gọi hàm hủy đơn
+                            onClick={() => cancelOrder(order?._id)} // Gọi hàm hủy đơn
                             cursor="pointer"
                             fontSize="sm" // Thay đổi kích thước chữ
                             display="flex" // Sử dụng flexbox
@@ -230,11 +223,11 @@ const ListOrderUser = () => {
 
                             {/* Chữ hủy đơn */}
                           </Box>
-                        ) : order.status === "Đang giao hàng" ? (
+                        ) : order?.status === "Đang giao hàng" ? (
                           <Box
                             as="span"
                             aria-label="Đã nhận"
-                            onClick={() => receiveOrder(order._id)} // Gọi hàm hủy đơn
+                            onClick={() => receiveOrder(order?._id)} // Gọi hàm hủy đơn
                             cursor="pointer"
                             fontSize="sm" // Thay đổi kích thước chữ
                             display="flex" // Sử dụng flexbox

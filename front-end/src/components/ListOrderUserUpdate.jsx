@@ -149,7 +149,7 @@ const ListOrderUserUpdate = () => {
                 <Tbody>
                   {filterOrdersByStatus("Chờ xử lý").map((order, index) => (
                     <Tr key={index}>
-                      <Td>{order._id}</Td>
+                      <Td>{order?._id}</Td>
                       <Td>
                         <Box
                           as="span"
@@ -158,13 +158,13 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {format(new Date(order.createdAt), "dd-MM-yyyy")}
+                          {format(new Date(order?.createdAt), "dd-MM-yyyy")}
                         </Box>
                       </Td>
                       <Td>
-                        {order.discount.toLocaleString("vi-VN") === "0"
+                        {order?.discount.toLocaleString("vi-VN") === "0"
                           ? "Không có"
-                          : `${order.discount.toLocaleString("vi-VN")} đ`}
+                          : `${order?.discount.toLocaleString("vi-VN")} đ`}
                       </Td>
                       <Td>
                         <Box
@@ -174,10 +174,10 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {order.status}
+                          {order?.status}
                         </Box>
                       </Td>
-                      <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                      <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
                       <Td textAlign={"end"}>
                         <Flex
                           alignItems="center"
@@ -199,7 +199,7 @@ const ListOrderUserUpdate = () => {
                           <Button
                             size="sm"
                             colorScheme="red"
-                            onClick={() => cancelOrder(order._id)}
+                            onClick={() => cancelOrder(order?._id)}
                             variant="outline"
                             aria-label="Hủy đơn"
                           >
@@ -230,7 +230,7 @@ const ListOrderUserUpdate = () => {
                 <Tbody>
                   {filterOrdersByStatus("Đang xử lý").map((order, index) => (
                     <Tr key={index}>
-                      <Td>{order._id}</Td>
+                      <Td>{order?._id}</Td>
                       <Td>
                         <Box
                           as="span"
@@ -239,13 +239,13 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {format(new Date(order.createdAt), "dd-MM-yyyy")}
+                          {format(new Date(order?.createdAt), "dd-MM-yyyy")}
                         </Box>
                       </Td>
                       <Td>
-                        {order.discount.toLocaleString("vi-VN") === "0"
+                        {order?.discount.toLocaleString("vi-VN") === "0"
                           ? "Không có"
-                          : `${order.discount.toLocaleString("vi-VN")} đ`}
+                          : `${order?.discount.toLocaleString("vi-VN")} đ`}
                       </Td>
                       <Td>
                         <Box
@@ -255,10 +255,10 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {order.status}
+                          {order?.status}
                         </Box>
                       </Td>
-                      <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                      <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
                       <Td textAlign={"end"}>
                         <Flex
                           alignItems="center"
@@ -301,7 +301,7 @@ const ListOrderUserUpdate = () => {
                   {filterOrdersByStatus("Đang giao hàng").map(
                     (order, index) => (
                       <Tr key={index}>
-                        <Td>{order._id}</Td>
+                        <Td>{order?._id}</Td>
                         <Td>
                           <Box
                             as="span"
@@ -310,13 +310,13 @@ const ListOrderUserUpdate = () => {
                             borderRadius="40px"
                             px={2}
                           >
-                            {format(new Date(order.createdAt), "dd-MM-yyyy")}
+                            {format(new Date(order?.createdAt), "dd-MM-yyyy")}
                           </Box>
                         </Td>
                         <Td>
-                          {order.discount.toLocaleString("vi-VN") === "0"
+                          {order?.discount.toLocaleString("vi-VN") === "0"
                             ? "Không có"
-                            : `${order.discount.toLocaleString("vi-VN")} đ`}
+                            : `${order?.discount.toLocaleString("vi-VN")} đ`}
                         </Td>
                         <Td>
                           <Box
@@ -326,10 +326,10 @@ const ListOrderUserUpdate = () => {
                             borderRadius="40px"
                             px={2}
                           >
-                            {order.status}
+                            {order?.status}
                           </Box>
                         </Td>
-                        <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                        <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
                         <Td textAlign={"end"}>
                           <Flex
                             alignItems="center"
@@ -351,7 +351,7 @@ const ListOrderUserUpdate = () => {
                             <Button
                               size="sm"
                               colorScheme="red"
-                              onClick={() => receiveOrder(order._id)}
+                              onClick={() => receiveOrder(order?._id)}
                               variant="outline"
                               aria-label="Hủy đơn"
                             >
@@ -383,7 +383,7 @@ const ListOrderUserUpdate = () => {
                 <Tbody>
                   {filterOrdersByStatus("Đã nhận hàng").map((order, index) => (
                     <Tr key={index}>
-                      <Td>{order._id}</Td>
+                      <Td>{order?._id}</Td>
                       <Td>
                         <Box
                           as="span"
@@ -392,13 +392,13 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {format(new Date(order.createdAt), "dd-MM-yyyy")}
+                          {format(new Date(order?.createdAt), "dd-MM-yyyy")}
                         </Box>
                       </Td>
                       <Td>
-                        {order.discount.toLocaleString("vi-VN") === "0"
+                        {order?.discount.toLocaleString("vi-VN") === "0"
                           ? "Không có"
-                          : `${order.discount.toLocaleString("vi-VN")} đ`}
+                          : `${order?.discount.toLocaleString("vi-VN")} đ`}
                       </Td>
                       <Td>
                         <Box
@@ -408,10 +408,10 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {order.status}
+                          {order?.status}
                         </Box>
                       </Td>
-                      <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                      <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
                       <Td textAlign={"end"}>
                         <Flex
                           alignItems="center"
@@ -430,15 +430,6 @@ const ListOrderUserUpdate = () => {
                           </Button>
 
                           {/* Delete button */}
-                          <Button
-                            size="sm"
-                            colorScheme="red"
-                            onClick={() => removeOrder(order._id)}
-                            variant="outline"
-                            aria-label="Hủy đơn"
-                          >
-                            Xóa
-                          </Button>
                         </Flex>
                       </Td>
                     </Tr>
@@ -464,7 +455,7 @@ const ListOrderUserUpdate = () => {
                 <Tbody>
                   {filterOrdersByStatus("Đã hủy").map((order, index) => (
                     <Tr key={index}>
-                      <Td>{order._id}</Td>
+                      <Td>{order?._id}</Td>
                       <Td>
                         <Box
                           as="span"
@@ -473,13 +464,13 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {format(new Date(order.createdAt), "dd-MM-yyyy")}
+                          {format(new Date(order?.createdAt), "dd-MM-yyyy")}
                         </Box>
                       </Td>
                       <Td>
-                        {order.discount.toLocaleString("vi-VN") === "0"
+                        {order?.discount.toLocaleString("vi-VN") === "0"
                           ? "Không có"
-                          : `${order.discount.toLocaleString("vi-VN")} đ`}
+                          : `${order?.discount.toLocaleString("vi-VN")} đ`}
                       </Td>
                       <Td>
                         <Box
@@ -489,10 +480,10 @@ const ListOrderUserUpdate = () => {
                           borderRadius="40px"
                           px={2}
                         >
-                          {order.status}
+                          {order?.status}
                         </Box>
                       </Td>
-                      <Td>{order.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                      <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
                       <Td textAlign={"end"}>
                         <Flex
                           alignItems="center"
@@ -500,21 +491,12 @@ const ListOrderUserUpdate = () => {
                           justifyContent="flex-end"
                         >
                           {/* View button */}
-                          <Button
-                            size="sm"
-                            colorScheme="blue"
-                            onClick={() => openModal(order)}
-                            variant="outline"
-                            aria-label="Xem chi tiết"
-                          >
-                            Xóa
-                          </Button>
 
                           {/* Delete button */}
                           <Button
                             size="sm"
                             colorScheme="red"
-                            onClick={() => resetOrder(order._id)}
+                            onClick={() => resetOrder(order?._id)}
                             variant="outline"
                             aria-label="Hủy đơn"
                           >

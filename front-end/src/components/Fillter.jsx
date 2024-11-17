@@ -116,14 +116,14 @@ function Filter() {
               onChange={(index) => handleTabChange(index)} // Đổi phân loại khi tab thay đổi
             >
               <TabList>
-                {classifications.length > 0 ? (
-                  classifications.map((classification, index) => (
+                {classifications?.length > 0 ? (
+                  classifications?.map((classification, index) => (
                     <Tab
                       color={useColorModeValue("green.800", "white")}
-                      key={classification._id}
+                      key={classification?._id}
                       onClick={() => handleTabChange(index)}
                     >
-                      {classification.classificationName}
+                      {classification?.classificationName}
                     </Tab>
                   ))
                 ) : (
@@ -132,16 +132,16 @@ function Filter() {
               </TabList>
               <Divider marginTop={"20px"} />
               <TabPanels>
-                {classifications.length > 0 ? (
-                  classifications.map((classification, index) => (
-                    <TabPanel key={classification._id}>
-                      {selectedClassification === classification._id ? (
+                {classifications?.length > 0 ? (
+                  classifications?.map((classification, index) => (
+                    <TabPanel key={classification?._id}>
+                      {selectedClassification === classification?._id ? (
                         <Flex wrap="wrap" gap={2} justify="center">
-                          {categories.length > 0 ? (
-                            categories.map((category) => (
+                          {categories?.length > 0 ? (
+                            categories?.map((category) => (
                               <NavLink
-                                key={category._id}
-                                to={`/category/${category._id}`} // Đường dẫn đến trang sản phẩm của danh mục
+                                key={category?._id}
+                                to={`/category/${category?._id}`} // Đường dẫn đến trang sản phẩm của danh mục
                                 onClick={handleMouseExit} // Tắt TabPanel sau khi click
                               >
                                 <Flex
@@ -154,8 +154,8 @@ function Filter() {
                                   direction="column"
                                 >
                                   <Image
-                                    src={`http://localhost:2000/images/${category.imageCategory}`} // Đường dẫn tới hình ảnh
-                                    alt={category.categoryName}
+                                    src={`http://localhost:2000/images/${category?.imageCategory}`} // Đường dẫn tới hình ảnh
+                                    alt={category?.categoryName}
                                     boxSize="100px"
                                     objectFit="cover"
                                     mb={2}
@@ -166,7 +166,7 @@ function Filter() {
                                     fontSize="lg"
                                     textAlign="center" // Căn giữa chữ trong Text
                                   >
-                                    {category.categoryName}
+                                    {category?.categoryName}
                                   </Text>
                                 </Flex>
                               </NavLink>

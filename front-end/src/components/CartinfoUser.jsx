@@ -58,11 +58,9 @@ const CartinfoUser = () => {
     const isConfirmed = window.confirm(
       "Bạn có chắc chắn muốn xóa địa chỉ này không?"
     );
-
     if (!isConfirmed) {
       return; // Nếu người dùng không xác nhận, thoát ra
     }
-
     try {
       // Gọi API để lấy địa chỉ mặc định, có thể trả về 404 nếu không có
       let defaultAddress = null;
@@ -114,7 +112,6 @@ const CartinfoUser = () => {
       toast.error("Có lỗi xảy ra khi xóa địa chỉ");
     }
   };
-
   //Cập nhật danh sách địa chỉ
   const handelAddAddress = async (newAddress) => {
     try {
@@ -143,7 +140,6 @@ const CartinfoUser = () => {
     }
   };
   //Lấy dữ liệu Địa chỉ
-
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
@@ -373,7 +369,7 @@ const CartinfoUser = () => {
                     {hasAllData ? (
                       addresses.map((address) => (
                         <Box
-                          key={address._id}
+                          key={address?._id}
                           mb={4}
                           borderRadius="full"
                           boxShadow="lg"
@@ -387,11 +383,11 @@ const CartinfoUser = () => {
                           position="relative"
                         >
                           <Radio
-                            value={address._id}
-                            isChecked={selectedAddress === address._id}
+                            value={address?._id}
+                            isChecked={selectedAddress === address?._id}
                             colorScheme={useColorModeValue(
-                              address.isDefault ? "green" : "red", // Màu cho chế độ sáng
-                              address.isDefault ? "red" : "white" // Màu cho chế độ tối
+                              address?.isDefault ? "green" : "red", // Màu cho chế độ sáng
+                              address?.isDefault ? "red" : "white" // Màu cho chế độ tối
                             )}
                           >
                             <Text>
@@ -418,7 +414,7 @@ const CartinfoUser = () => {
                                   fontWeight="normal"
                                   pr="20px"
                                 >
-                                  {address.street}
+                                  {address?.street}
                                 </Box>
                                 <Box
                                   color="red.700"
@@ -434,7 +430,7 @@ const CartinfoUser = () => {
                                   color={useColorModeValue("gray.600", "black")}
                                   pr="20px"
                                 >
-                                  {address.ward}
+                                  {address?.ward}
                                 </Box>
                                 <Box
                                   color="red.700"
@@ -450,7 +446,7 @@ const CartinfoUser = () => {
                                   pr="20px"
                                   color={useColorModeValue("gray.600", "black")}
                                 >
-                                  {address.district}
+                                  {address?.district}
                                 </Box>
                                 <Box
                                   color="red.700"
@@ -466,7 +462,7 @@ const CartinfoUser = () => {
                                   pr="20px"
                                   color={useColorModeValue("gray.600", "black")}
                                 >
-                                  {address.province}
+                                  {address?.province}
                                 </Box>
                               </Flex>
                             </Text>
@@ -476,7 +472,7 @@ const CartinfoUser = () => {
                             top="50%"
                             right="10px"
                             transform="translateY(-50%)"
-                            onClick={(e) => handleDeleteAddress(address._id)}
+                            onClick={(e) => handleDeleteAddress(address?._id)}
                           >
                             <Box
                               as="button"

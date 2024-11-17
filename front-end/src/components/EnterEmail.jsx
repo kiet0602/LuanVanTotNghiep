@@ -17,7 +17,7 @@ const EnterEmail = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsloading] = useState(false);
   const navigate = useNavigate();
-
+  // Gửi mã OTP
   const handleSendOTP = async () => {
     setIsloading(true);
 
@@ -47,7 +47,7 @@ const EnterEmail = () => {
       navigate("/submitOTP");
     }
   };
-
+  // lưu gmail vào localStorage
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
     setEmail(newEmail); // Cập nhật giá trị của atom

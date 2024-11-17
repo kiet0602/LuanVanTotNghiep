@@ -244,6 +244,7 @@ const SIDEBAR_ITEMS = [
     ],
   },
   { name: "Người dùng", icon: Users, color: "#EC4899", href: "/users" },
+
   { name: "Cài đặt", icon: Users, color: "#EC4899", href: "/profile" },
 ];
 
