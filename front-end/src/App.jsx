@@ -26,7 +26,7 @@ import SearchPage from "./pages/SearchPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
 import NotPage from "./pages/NotPage.jsx";
 import SuccessOrderPage from "./pages/SuccessOrderPage.jsx";
-import ContactPage from "./pages/ContactPage.jsx";
+// import ContactPage from "./pages/ContactPage.jsx";
 import DiscountProductsPage from "./pages/DiscountProductsPage.jsx";
 import ReturnShipingPage from "./pages/ReturnShipingPage.jsx";
 
@@ -90,7 +90,7 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          {/* <Route path="/contact" element={<ContactPage />} /> */}
           <Route path="/DiscountProducts" element={<DiscountProductsPage />} />
           <Route path="/returnShiping" element={<ReturnShipingPage />} />
 

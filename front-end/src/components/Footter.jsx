@@ -19,6 +19,7 @@ import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { BiMailSend } from "react-icons/bi";
 import imgSenda from "../assets/data/image/Senda/sen-da-chuoi-ngoc-dung.jpg";
 import useNavigateCustom from "../Hook/useNavigateCustom.js";
+import { Link } from "react-router-dom";
 
 const Logo = ({ props }) => {
   const { goHome } = useNavigateCustom();
@@ -99,9 +100,7 @@ export default function Footter() {
             <Box as="a" href={"#"}>
               Về chúng tôi
             </Box>
-            <Box as="a" href={"#"}>
-              Bài viết
-            </Box>
+
             <Box as="a" href={"#"}>
               Liên hệ với chúng tôi
             </Box>
@@ -117,32 +116,11 @@ export default function Footter() {
             <Box as="a" href={"#"}>
               Hỗ trợ chăm sóc
             </Box>
-            <Box as="a" href={"#"}>
+            <Box as={Link} to="/returnShiping">
               Giao hàng
             </Box>
           </Stack>
           <Stack align={"flex-start"}>
-            <ListHeader>Đăng kí Email</ListHeader>
-            <Stack direction={"row"}>
-              <Input
-                w={"350px"}
-                placeholder={"Email của bạn..."}
-                bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
-                border={0}
-                _focus={{
-                  bg: "whiteAlpha.300",
-                }}
-              />
-              <IconButton
-                bg={useColorModeValue("green.400", "green.800")}
-                color={useColorModeValue("white", "gray.800")}
-                _hover={{
-                  bg: "green.600",
-                }}
-                aria-label="Subscribe"
-                icon={<BiMailSend />}
-              />
-            </Stack>
             <ListHeader>Người tạo dự án:</ListHeader>
             <Text>Nguyễn Văn Kiệt</Text>
             <Text>Mã số sinh viên: B2003838</Text>
