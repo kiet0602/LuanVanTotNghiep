@@ -95,32 +95,33 @@ export default function CheckBill({ isOpenSeeBill, setIsOpenSeeBill, order }) {
                 ["Tên sản phẩm", "Giá (đ)", "Số lượng"],
                 ...items.map((item) => [
                   item.product.productName,
-                  item.price,
+                  item.price.toLocaleString(),
                   item.quantity,
                 ]),
                 [
-                  { text: "Tổng cộng", bold: true },
-                  { text: `${totalPrice} đ`, bold: true },
+                  { text: "Giá tổng tiền các sản phẩm", bold: true },
+                  { text: `${totalPrice.toLocaleString()} `, bold: true },
                   { text: "", bold: true },
                 ],
+
                 [
                   { text: "Phí vận chuyển", bold: true },
-                  { text: `${shippingFee} đ`, bold: true },
+                  { text: `${shippingFee.toLocaleString()} `, bold: true },
                   { text: "", bold: true },
                 ],
                 [
                   { text: "Thuế", bold: true },
-                  { text: `20000 đ`, bold: true },
+                  { text: `20,000`, bold: true },
                   { text: "", bold: true },
                 ],
                 [
                   { text: "Giảm giá", bold: true },
-                  { text: `${discount} đ`, bold: true },
+                  { text: `${discount.toLocaleString()} `, bold: true },
                   { text: "", bold: true },
                 ],
                 [
                   { text: "Tổng thanh toán", bold: true },
-                  { text: `${finalPrice} đ`, bold: true },
+                  { text: `${finalPrice.toLocaleString()} `, bold: true },
                   { text: "", bold: true },
                 ],
               ],

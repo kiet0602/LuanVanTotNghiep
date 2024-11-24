@@ -49,7 +49,7 @@ const ListOrderUserUpdate = () => {
       console.log(error);
     }
   };
-
+  console.log(ordersByUserId);
   const openModal = (order) => {
     setSelectedOrder(order);
     onOpen();
@@ -85,21 +85,6 @@ const ListOrderUserUpdate = () => {
         await axios.put(`http://localhost:2000/api/checkout/${orderId}/reset`);
         fetchOrdersByUser();
         toast.success("Bạn đã đặt lại đơn hàng thành công");
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
-  };
-
-  const removeOrder = async (orderId) => {
-    const confirmDelete = window.confirm("Bạn có muốn xóa đơn hàng?");
-    if (confirmDelete) {
-      try {
-        await axios.delete(
-          `http://localhost:2000/api/checkout/deleteCheckOut/${orderId}`
-        );
-        fetchOrdersByUser();
-        toast.success("Bạn đã xóa đơn hàng thành công");
       } catch (error) {
         console.log(error.message);
       }
@@ -177,7 +162,7 @@ const ListOrderUserUpdate = () => {
                           {order?.status}
                         </Box>
                       </Td>
-                      <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                      <Td>{order?.finalPrice?.toLocaleString("vi-VN")} đ</Td>
                       <Td textAlign={"end"}>
                         <Flex
                           alignItems="center"
@@ -411,7 +396,7 @@ const ListOrderUserUpdate = () => {
                           {order?.status}
                         </Box>
                       </Td>
-                      <Td>{order?.finalPrice.toLocaleString("vi-VN")} đ</Td>
+                      <Td>{order?.finalPrice?.toLocaleString("vi-VN")} đ</Td>
                       <Td textAlign={"end"}>
                         <Flex
                           alignItems="center"

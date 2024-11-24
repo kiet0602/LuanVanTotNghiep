@@ -34,13 +34,6 @@ const importSchema = new mongoose.Schema({
 });
 
 // Middleware tính toán totalCost trước khi lưu
-importSchema.pre("save", function (next) {
-  // Tính tổng chi phí dựa trên giá và số lượng từng sản phẩm
-  this.totalCost = this.items.reduce((sum, item) => {
-    return sum + item.cost * item.quantity;
-  }, 0);
-  next();
-});
 
 const ImportModel = mongoose.model("Import", importSchema);
 

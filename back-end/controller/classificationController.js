@@ -8,18 +8,19 @@ export const createClassification = async (req, res) => {
     // Loại bỏ khoảng trắng dư thừa ở đầu và cuối, đồng thời tạo regex để kiểm tra không phân biệt hoa thường và khoảng trắng
     const formattedClassificationName = classificationName
       .trim()
-      .replace(/\s+/g, " ");
+      .replace(/\s+/g, " ") // Loại bỏ khoảng trắng dư thừa
+      .toLowerCase(); // Chuyển đổi thành chữ thường để so sánh không phân biệt hoa thường
 
     // Sử dụng regex để tìm tên phân loại không phân biệt hoa thường và khoảng trắng
     const existingClassification = await ClassificationModel.findOne({
       classificationName: {
-        $regex: `^${formattedClassificationName}$`,
-        $options: "i",
+        $regex: `^${formattedClassificationName}$`, // Sử dụng regex với tên chuẩn hóa
+        $options: "i", // Đảm bảo so sánh không phân biệt hoa thường
       },
     });
 
     if (existingClassification) {
-      return res.status(400).json({ message: "Tên họ cây đã tồn tại." });
+      return res.status(400).json({ message: "Tên phân loại đã tồn tại." });
     }
 
     // Tạo phân loại mới với tên đã được định dạng

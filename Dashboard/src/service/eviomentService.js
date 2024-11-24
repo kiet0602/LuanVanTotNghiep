@@ -32,9 +32,11 @@ export const createEnvironment = async (nameEnviroment) => {
       `http://localhost:2000/api/environment/addEnvironments`,
       { nameEnviroment }
     );
-    return response.data;
+    console.log(response);
+
+    return response;
   } catch (error) {
-    throw new Error("Failed to create environment");
+    throw new Error(error.response.data.message);
   }
 };
 

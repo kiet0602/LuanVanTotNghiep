@@ -7,6 +7,12 @@ export const addComment = async (req, res) => {
     const { content, rating } = req.body;
     const { userId } = req.user;
 
+    if (!parentId && (rating === undefined || rating < 1 || rating > 5)) {
+      return res
+        .status(400)
+        .json({ message: "Bạn phải nhập rating từ 1 đến 5!" });
+    }
+
     // Tạo bình luận mới hoặc phản hồi
     const newComment = new commentModel({
       productId,

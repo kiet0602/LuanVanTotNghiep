@@ -25,6 +25,7 @@ import { VscComment, VscCommentDiscussion } from "react-icons/vsc";
 import { TbPencilPlus } from "react-icons/tb";
 import userTokenAtom from "../Atom/userAtom.js";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { toast } from "react-toastify";
 
 const Review = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -74,6 +75,7 @@ const Review = ({ productId }) => {
       const data = await getCommentsByProduct(productId);
       setComments(data);
     } catch (error) {
+      toast.error(error.response?.data?.message);
       console.error("Lỗi khi gửi đánh giá:", error.message);
     }
   };

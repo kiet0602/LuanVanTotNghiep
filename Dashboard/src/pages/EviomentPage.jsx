@@ -9,7 +9,7 @@ import EviomentsTable from "../components/evioments/EvimentsTable";
 const EviomentPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Môi trường sống" />
+      <Header title="Môi trường ưa thích" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}

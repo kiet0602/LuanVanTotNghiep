@@ -6,9 +6,12 @@ import { getProducts } from "../service/productService";
 import ImportForm from "../components/import/import";
 import axios from "axios";
 import ImportTable from "../components/import/ImportTable";
+import StatCard from "../components/common/StatCard";
+import { AlertTriangle, DollarSign, Package, TrendingUp } from "lucide-react";
 
 const ImportPage = () => {
   const [products, setProducts] = useState([]);
+  const [totalImportCost, setTotalImportCost] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,7 +27,6 @@ const ImportPage = () => {
   }, []);
 
   const handleImportSubmit = async (importData) => {
-    console.log("Dữ liệu phiếu nhập:", importData);
     try {
       const reponse = await axios.post(
         `http://localhost:2000/api/import/createImport`,
@@ -34,7 +36,20 @@ const ImportPage = () => {
       console.log(error);
     }
   };
+  const getTotalImportCost = async () => {
+    try {
+      const reponse = await axios.get(
+        `http://localhost:2000/api/import/getTotalImportCost`
+      );
+      setTotalImportCost(reponse.data.totalImportCost);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  useEffect(() => {
+    getTotalImportCost();
+  }, []);
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Phiếu nhập" />
@@ -47,12 +62,13 @@ const ImportPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          {/* <StatCard
-            name="Tổng số thể loại"
+          <StatCard
+            name="Tổng giá đã nhập"
             icon={Package}
-            value={1234}
+            value={`${totalImportCost?.toLocaleString()} Đ`}
             color="#6366F1"
           />
+          {/*
           <StatCard
             name="Top Selling"
             icon={TrendingUp}

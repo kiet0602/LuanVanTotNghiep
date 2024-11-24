@@ -114,14 +114,6 @@ export async function createOrder(orderData) {
                 currency_code: "USD",
                 value: itemTotal,
               },
-              shipping: {
-                currency_code: "USD",
-                value: shippingFee,
-              },
-              discount: {
-                currency_code: "USD",
-                value: discount.toFixed(2),
-              },
             },
           },
           shipping: {
@@ -188,27 +180,12 @@ export async function saveOrderAfterPayment(orderId, orderData) {
     });
 
     const totalPrice = Number(orderData.totalPrice);
-    const shippingFee = Number(orderData.shippingFee) || 0; // Gán 0 nếu shippingFee không hợp lệ
+    // Gán 0 nếu shippingFee không hợp lệ
 
     // Sử dụng giá trị discount từ mã giảm giá đã xử lý
-    let discount = 0;
-    if (orderData.couponCode) {
-      const coupon = await couponModel.findOne({ code: orderData.couponCode });
-      if (coupon && coupon.isActive && coupon.expirationDate > Date.now()) {
-        discount = (totalPrice * coupon.discountPercentage) / 100;
-
-        // Cập nhật số lần sử dụng của mã giảm giá
-        coupon.usageCount += 1;
-        coupon.maxUsage -= 1;
-        if (coupon.usageCount >= coupon.maxUsage) {
-          coupon.isActive = false; // Vô hiệu hóa mã khuyến mãi nếu đã sử dụng đủ số lần
-        }
-        await coupon.save(); // Lưu thay đổi
-      }
-    }
 
     // Tính toán finalPrice
-    const finalPrice = totalPrice - discount + shippingFee + 20000;
+    const finalPrice = totalPrice + 20000;
 
     if (isNaN(finalPrice)) {
       throw new Error("Tính toán finalPrice không hợp lệ.");
@@ -219,12 +196,12 @@ export async function saveOrderAfterPayment(orderId, orderData) {
       items: orderData.items.map((item) => ({
         product: item.product,
         quantity: item.quantity,
-        price: (item.totalPriceItemCart / 23000).toFixed(2), // Nếu cần phải chuyển đổi
+        price: item.totalPriceItemCart, // Nếu cần phải chuyển đổi
       })),
       totalPrice: orderData.totalPrice,
-      shippingFee: shippingFee.toString(), // Chuyển đổi shippingFee thành chuỗi nếu cần
+      shippingFee: 0, // Chuyển đổi shippingFee thành chuỗi nếu cần
       shippingMethod: orderData.selectedShippingMethod,
-      discount: discount, // Sử dụng discount đã tính toán
+      discount: 0, // Sử dụng discount đã tính toán
       finalPrice: finalPrice, // Sử dụng giá trị đã tính toán cho finalPrice
       shippingAddress: {
         street: address.street,

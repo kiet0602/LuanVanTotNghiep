@@ -9,7 +9,7 @@ import {
 } from "../../service/eviomentService";
 import UpdateEvironmentModal from "../update/UpdateEvironmentModal.jsx";
 
-const PRODUCTS_PER_PAGE = 5;
+const PRODUCTS_PER_PAGE = 10;
 
 const EviomentsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -105,7 +105,7 @@ const EviomentsTable = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="">
           <h2 className="text-xl font-semibold text-gray-100 mb-4">
-            Danh sách môi trường sống
+            Danh sách môi trường ưa thích
           </h2>
           <button
             className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"

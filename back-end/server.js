@@ -20,7 +20,7 @@ import searchRouter from "./routers/searchRouter.js";
 import fillterRouter from "./routers/fillter.js";
 import addressRouter from "./routers/addressRouter.js";
 import routerPaypal from "./routers/paypalRouter.js";
-import contactRouter from "./routers/contactRouter.js";
+
 import importRouter from "./routers/importRouter.js";
 
 /* import commentRouter from "./routers/commentRouter.js";
@@ -54,7 +54,7 @@ app.use("/api/coupon", couponRouter);
 app.use("/api/checkout", checkoutRouter);
 app.use("/api/classification", classificationRouter);
 app.use("/api/address", addressRouter);
-app.use("/api/contact", contactRouter);
+
 app.use("/api/import", importRouter);
 
 app.use("/api/search", searchRouter);

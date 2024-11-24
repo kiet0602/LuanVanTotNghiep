@@ -13,8 +13,8 @@ const addProduct = async (req, res) => {
       originalPrice,
       discount = 0,
       size,
-      quantity, // Thêm trường quantity
-      care, // Thêm trường care
+      quantity, // Không gán giá trị mặc định ở đây
+      care,
     } = req.body;
 
     // Tạo mảng để lưu trữ các trường thiếu
@@ -26,7 +26,6 @@ const addProduct = async (req, res) => {
     if (!color) missingFields.push("color");
     if (!size) missingFields.push("size");
     if (!originalPrice) missingFields.push("originalPrice");
-    if (quantity === undefined) missingFields.push("quantity");
     if (!care) missingFields.push("care");
 
     // Nếu có trường thiếu, trả về thông báo lỗi cụ thể
@@ -36,16 +35,22 @@ const addProduct = async (req, res) => {
       });
     }
 
+    // Kiểm tra tên sản phẩm đã tồn tại
     const existingProduct = await productModel.findOne({ productName });
     if (existingProduct) {
       return res.status(400).json({ error: "Tên sản phẩm đã tồn tại" });
     }
 
+    // Nếu `quantity` không được gửi hoặc không hợp lệ, mặc định là 0
+    const validQuantity = !isNaN(quantity) && quantity >= 0 ? quantity : 0;
+
+    // Xử lý hình ảnh và video
     const images = req.files.image
       ? req.files.image.map((file) => file.filename)
       : [];
     const video = req.files.video ? req.files.video[0].filename : null;
 
+    // Tạo sản phẩm mới
     const newProduct = new productModel({
       productName,
       category,
@@ -55,8 +60,8 @@ const addProduct = async (req, res) => {
       originalPrice,
       discount,
       size,
-      quantity, // Thêm trường quantity
-      care, // Thêm trường care
+      quantity: validQuantity, // Gán giá trị đã xử lý
+      care,
       image: images,
       video,
     });

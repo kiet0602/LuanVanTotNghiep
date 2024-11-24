@@ -13,6 +13,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Tạo các phiên bản motion của các component Chakra
 const MotionInputGroup = motion(InputGroup);
@@ -54,7 +55,7 @@ const InputSearch = ({ onClose }) => {
 
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
-      alert("Please enter a search term");
+      toast.error(`Vui lòng nhập thông tin tìm kiếm!`);
       return;
     }
 

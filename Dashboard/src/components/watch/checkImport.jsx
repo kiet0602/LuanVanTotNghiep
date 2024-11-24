@@ -77,7 +77,7 @@ export default function Import({ isOpen, setIsOpenSeeImport, oneImport }) {
             table: {
               widths: ["*", "auto", "auto"],
               body: [
-                ["Tên sản phẩm", "Giá (đ)", "Số lượng"],
+                ["Tên sản phẩm", "Tổng giá (đ)", "Số lượng"],
                 ...oneImport.items.map((item) => [
                   item.product.productName,
                   item.cost.toLocaleString(),
@@ -214,7 +214,7 @@ export default function Import({ isOpen, setIsOpenSeeImport, oneImport }) {
                             Tên sản phẩm
                           </th>
                           <th className="px-4 py-2 text-left  font-medium text-gray-700">
-                            Giá
+                            Tổng giá
                           </th>
                           <th className="px-4 py-2 text-left  font-medium text-gray-700">
                             Số lượng nhập

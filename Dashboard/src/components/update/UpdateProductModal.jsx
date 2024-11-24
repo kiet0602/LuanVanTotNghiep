@@ -131,7 +131,26 @@ export default function UpdateProductModal({
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
+      // Kiểm tra các trường dữ liệu
+      if (
+        !nameProduct ||
+        !description ||
+        !originalPrice ||
+        quantity === undefined || // Kiểm tra cả trường hợp số lượng bằng 0
+        !care ||
+        !size ||
+        !selectedCategory ||
+        !selectedEnvironment ||
+        !selectedColor
+      ) {
+        setLoading(false);
+        return toast.error(
+          "Vui lòng điền đầy đủ thông tin trước khi cập nhật."
+        );
+      }
+
       const productData = {
         productName: nameProduct,
         description,

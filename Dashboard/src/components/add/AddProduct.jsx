@@ -21,7 +21,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
   const [description, setDescription] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
   const [size, setSize] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState(0);
   const [care, setCare] = useState("");
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -101,10 +101,10 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
       return;
     }
 
-    if (!quantity) {
-      toast.error("Vui lòng nhập số lượng sản phẩm.");
-      return;
-    }
+    // if (!quantity) {
+    //   toast.error("Vui lòng nhập số lượng sản phẩm.");
+    //   return;
+    // }
 
     if (images.length === 0) {
       toast.error("Vui lòng thêm ít nhất một hình ảnh.");
@@ -124,7 +124,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
     formData.append("discount", discount || 0);
 
     formData.append("size", size);
-    formData.append("quantity", quantity);
+    formData.append("quantity", quantity || 0);
     formData.append("care", care);
 
     images.forEach((image) => {
@@ -214,7 +214,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                     </div>
                   </div>
                   {/* Số lượng */}
-                  <div className="sm:col-span-3">
+                  {/* <div className="sm:col-span-3">
                     <label
                       htmlFor="username"
                       className="block text-sm font-medium leading-6 text-gray-900"
@@ -233,7 +233,7 @@ export default function AddProduct({ isOpen, setIsOpen, onAdd }) {
                         />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   {/* Mô tả */}
                   <div className="col-span-full">
                     <label

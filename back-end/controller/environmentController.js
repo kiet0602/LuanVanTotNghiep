@@ -29,6 +29,10 @@ export const createEnvironment = async (req, res) => {
   try {
     const { nameEnviroment } = req.body;
 
+    if (!nameEnviroment) {
+      return res.status(404).json({ message: "Environment not blank" });
+    }
+
     // Loại bỏ khoảng trắng dư thừa và chuẩn hóa khoảng trắng
     const formattedEnvironmentName = nameEnviroment.trim().replace(/\s+/g, " ");
 
@@ -51,9 +55,11 @@ export const createEnvironment = async (req, res) => {
     });
 
     const savedEnvironment = await newEnvironment.save();
-    res.status(201).json(savedEnvironment);
+    return res
+      .status(201)
+      .json({ message: "Tạo thành công", savedEnvironment });
   } catch (error) {
-    res.status(400).json({ message: "Failed to create environment", error });
+    res.status(500).json({ message: "Failed to create environment", error });
   }
 };
 

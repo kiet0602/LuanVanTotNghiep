@@ -120,7 +120,7 @@ const ColorTable = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="">
           <h2 className="text-xl font-semibold text-gray-100 mb-4">
-            Danh sách màu sắc
+            Danh sách màu sắc đặc trưng
           </h2>
           <button
             className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"

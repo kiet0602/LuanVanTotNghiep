@@ -88,6 +88,16 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
                 order.paymentMethod,
               ],
               [
+                { text: "Phương thức vận chuyển:", bold: true },
+                order.shippingMethod,
+              ],
+              [
+                { text: "Phí vận chuyển:", bold: true },
+                order.paymentMethod === "PayPal"
+                  ? "0đ"
+                  : `${order.shippingFee.toLocaleString()}đ`,
+              ],
+              [
                 { text: "Khuyến mãi:", bold: true },
                 `${order.discount.toLocaleString("vi-VN")} đ`,
               ],
@@ -111,10 +121,10 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
               ],
               ...order.items.map((item) => [
                 {
-                  text: item.product.productName,
+                  text: item?.product?.productName,
                 },
                 {
-                  text: item.quantity.toString(),
+                  text: item?.quantity?.toString(),
                   alignment: "center",
                 },
                 {
@@ -132,7 +142,7 @@ const ModalDetailOrders = ({ isOpen, onClose, order }) => {
           alignment: "right",
         },
         {
-          text: `Tổng tiền: ${order.finalPrice.toLocaleString("vi-VN")} đ`,
+          text: `Tổng tiền: ${order?.finalPrice?.toLocaleString("vi-VN")} đ`,
           margin: [0, 5, 0, 0],
           bold: true,
           alignment: "right",

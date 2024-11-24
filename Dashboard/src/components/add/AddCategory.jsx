@@ -51,6 +51,18 @@ export default function AddCategory({ isOpen, setIsOpen, onAdd, categories }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!categoryName) {
+      alert("Tên thể loại không được bỏ trống!"); // Thông báo nếu chưa upload ảnh
+      return; // Dừng hàm nếu chưa có ảnh
+    }
+    if (!classification) {
+      alert("Vui lòng chọn họ thể loại!"); // Thông báo nếu chưa upload ảnh
+      return; // Dừng hàm nếu chưa có ảnh
+    }
+    if (!descriptionCategory) {
+      alert("Mô tả thể loại không thể bỏ trống!"); // Thông báo nếu chưa upload ảnh
+      return; // Dừng hàm nếu chưa có ảnh
+    }
 
     if (!imageCategory) {
       alert("Vui lòng upload ảnh trước khi thêm thể loại."); // Thông báo nếu chưa upload ảnh

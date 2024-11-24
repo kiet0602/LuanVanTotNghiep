@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Axe, Edit, Plus, Search, Trash2 } from "lucide-react";
+import { Axe, Edit, Eye, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Pagination from "../pagination/Pagination.jsx";
 import axios from "axios";
@@ -163,14 +163,14 @@ const ImportTable = () => {
                       setIsOpen(true);
                     }}
                   >
-                    <Edit size={18} />
+                    <Eye size={18} />
                   </button>
-                  <button
+                  {/* <button
                     className="text-red-400 hover:text-red-300"
                     onClick={() => handleDeleteImport(importItem._id)}
                   >
                     <Trash2 size={18} />
-                  </button>
+                  </button> */}
                 </td>
               </motion.tr>
             ))}

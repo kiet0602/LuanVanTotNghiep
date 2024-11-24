@@ -233,35 +233,48 @@ const updateUser = async (req, res) => {
     if (!userId) {
       return res
         .status(401)
-        .send({ error: "Lỗi chưa xác định được người dùng!" });
+        .send({ message: "Lỗi chưa xác định được người dùng!" });
     }
 
     // Tìm người dùng hiện tại
     const existingUser = await userModel.findById(userId);
 
     if (!existingUser) {
-      return res.status(404).send({ error: "Không tìm thấy được người dùng!" });
+      return res
+        .status(404)
+        .send({ message: "Không tìm thấy được người dùng!" });
     }
 
     // Kiểm tra email có thay đổi hay không và email mới có bị trùng không
     if (email && email !== existingUser.email) {
+      // Biểu thức chính quy để kiểm tra định dạng email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      // Kiểm tra định dạng email
+      if (!emailRegex.test(email)) {
+        return res
+          .status(400)
+          .send({ message: "Định dạng email không hợp lệ." });
+      }
+
+      // Kiểm tra email đã tồn tại trong cơ sở dữ liệu
       const emailExists = await userModel.findOne({ email });
       if (emailExists) {
-        return res.status(400).send({ error: "Email này đã được sử dụng." });
+        return res.status(400).send({ message: "Email này đã được sử dụng." });
       }
     }
 
     // Kiểm tra số điện thoại có thay đổi và tính hợp lệ
     if (numberPhone && numberPhone !== existingUser.numberPhone) {
       if (!validator.isMobilePhone(numberPhone, "vi-VN")) {
-        return res.status(400).send({ error: "Số điện thoại không hợp lệ" });
+        return res.status(400).send({ message: "Số điện thoại không hợp lệ" });
       }
 
       const numberPhoneExists = await userModel.findOne({ numberPhone });
       if (numberPhoneExists) {
         return res
           .status(400)
-          .send({ error: "Số điện thoại này đã được sử dụng." });
+          .send({ message: "Số điện thoại này đã được sử dụng." });
       }
     }
 
@@ -289,7 +302,9 @@ const updateUser = async (req, res) => {
 
     return res.status(200).send({ updatedUser, updatedAddress });
   } catch (error) {
-    return res.status(500).send({ error: "Lỗi server, vui lòng thử lại sau." });
+    return res
+      .status(500)
+      .send({ message: "Lỗi server, vui lòng thử lại sau." });
   }
 };
 
