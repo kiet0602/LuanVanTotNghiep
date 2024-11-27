@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import userAtom from "../Atom/userAtom";
+
 import {
   getCartById,
   updateItemQuantity,
@@ -31,23 +31,10 @@ import {
 } from "../service/cartService";
 import { toast } from "react-toastify";
 
-import {
-  cartItemProducts,
-  cartItemProductsCount,
-} from "../Atom/cartCountProductAtom.js";
-
 const ItemCart = () => {
-  // const user = useRecoilValue(userAtom);
-  // const userId = user?._id;
-
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]); // Thêm state để lưu các sản phẩm được chọn
-
-  const [itemsCart, setItemsCart] = useRecoilState(cartItemProducts);
-  const [ItemsCartCount, setItemsCartCount] = useRecoilState(
-    cartItemProductsCount
-  );
 
   const navigate = useNavigate();
   const boxBgColor = useColorModeValue("white", "gray.700");
@@ -58,6 +45,7 @@ const ItemCart = () => {
     try {
       const response = await getCartById();
       setCart(response.cart);
+
       setLoading(false);
     } catch (error) {
       setLoading(false);

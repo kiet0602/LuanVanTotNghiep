@@ -479,12 +479,17 @@ export const getOrderCountByStatus = async (req, res) => {
 //Hàm lấy số lượng đơn hàng theo ngày
 export const getOrderCountByDate = async (req, res) => {
   try {
-    // Sử dụng aggregate để nhóm đơn hàng theo ngày và đếm số lượng đơn hàng
     const ordersCountByDate = await orderModel.aggregate([
       {
-        // Chuyển đổi trường createdAt thành ngày
+        // Chuyển đổi trường createdAt thành ngày với múi giờ UTC+7
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt",
+              timezone: "Asia/Ho_Chi_Minh", // Đặt múi giờ Việt Nam
+            },
+          },
           count: { $sum: 1 }, // Đếm số lượng đơn hàng trong mỗi ngày
         },
       },
@@ -509,6 +514,7 @@ export const getOrderCountByDate = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 // Hủy đơn hàng
 export const cancelOrder = async (req, res) => {
   const { orderId } = req.params;

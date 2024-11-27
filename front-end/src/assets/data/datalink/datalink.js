@@ -43,7 +43,7 @@ const footerData = [
 const navLinks = [
   { name: "Trang chủ", path: "/" },
   { name: "Liên hệ", path: "/contact" },
-  { name: "Giới thiệu", path: "/blog" },
+  { name: "Giới thiệu", path: "/aboutUs" },
 ];
 
 const dropdownLinks = [

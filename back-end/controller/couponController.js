@@ -14,6 +14,10 @@ export const createCoupon = async (req, res) => {
   } = req.body;
 
   try {
+    const existingCoupon = await couponModel.findOne({ code });
+    if (existingCoupon) {
+      return res.status(400).json({ message: "Code đã tồn tại!" });
+    }
     // Chuyển đổi ngày từ DD-MM-YYYY sang Date object
     const parsedStartDate = parse(startDate, "dd-MM-yyyy", new Date());
     const parsedExpirationDate = parse(

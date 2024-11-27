@@ -97,23 +97,24 @@ export default function Footter() {
           </Stack>
           <Stack align={"flex-start"}>
             <ListHeader>Cửa hàng</ListHeader>
-            <Box as="a" href={"#"}>
+            <Box as={Link} to="/aboutUs">
               Về chúng tôi
             </Box>
 
-            <Box as="a" href={"#"}>
+            <Box as={Link} to="/contact">
               Liên hệ với chúng tôi
             </Box>
           </Stack>
           <Stack align={"flex-start"}>
             <ListHeader>Hỗ trợ</ListHeader>
-            <Box as="a" href={"#"}>
+            <Box as={Link} to="/warrantyPolicy">
               Chính sách bảo hành
             </Box>
-            <Box as="a" href={"#"}>
+
+            <Box as={Link} to="/qualityAssurance">
               Đảm bảo chất lượng
             </Box>
-            <Box as="a" href={"#"}>
+            <Box as={Link} to="/careSupport">
               Hỗ trợ chăm sóc
             </Box>
             <Box as={Link} to="/returnShiping">

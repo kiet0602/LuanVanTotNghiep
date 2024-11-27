@@ -59,6 +59,15 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
     const file = e.target.files[0];
     setAvatar(file);
 
+    if (!file) {
+      return;
+    }
+    const allowedExtensions = ["image/jpeg", "image/png", "image/gif"];
+    const isValidFileType = allowedExtensions.includes(file.type);
+    if (!isValidFileType) {
+      alert("Vui lòng chọn file có định dạng jpg, png hoặc gif.");
+      return;
+    }
     // Tạo URL để xem trước ảnh
     if (file) {
       const previewUrl = URL.createObjectURL(file);
@@ -196,14 +205,14 @@ const ModalInfoUser = ({ user, isOpen, onClose }) => {
                   </VStack>
                   <VStack w="100%">
                     <Button
+                      mt="5px"
+                      px="50px"
                       onClick={handleUpdateUser}
-                      bg={"red"}
+                      borderRadius="none"
+                      bg="red"
                       color="white"
-                      _hover={{
-                        bg: "green.500",
-                      }}
-                      rounded="md"
-                      w={{ base: "100%", md: "max-content" }}
+                      fontWeight="300"
+                      boxShadow="sm" // Thêm bóng đổ nhẹ cho nút
                     >
                       Lưu thông tin
                     </Button>

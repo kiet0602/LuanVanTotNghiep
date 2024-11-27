@@ -19,10 +19,6 @@ import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import userTokenAtom from "../Atom/userAtom.js";
 import { favoritesAtom, favoritesCountAtom } from "../Atom/favoritesAtom.js";
-import {
-  cartItemProducts,
-  cartItemProductsCount,
-} from "../Atom/cartCountProductAtom.js";
 
 //service
 import { addToCart } from "../service/cartService.js";
@@ -43,9 +39,6 @@ const CardNew = ({ products }) => {
 
   const [favoriteProducts, setFavoriteProducts] = useRecoilState(favoritesAtom);
   const setFavoritesCount = useSetRecoilState(favoritesCountAtom);
-
-  const setItemsCart = useSetRecoilState(cartItemProducts);
-  const setItemsCartCount = useSetRecoilState(cartItemProductsCount);
 
   const fetchFavorites = async () => {
     if (!token) return; // If userId is not available, exit early

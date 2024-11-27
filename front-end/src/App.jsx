@@ -29,6 +29,12 @@ import SuccessOrderPage from "./pages/SuccessOrderPage.jsx";
 // import ContactPage from "./pages/ContactPage.jsx";
 import DiscountProductsPage from "./pages/DiscountProductsPage.jsx";
 import ReturnShipingPage from "./pages/ReturnShipingPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
+import WarrantyPolicyPage from "./pages/WarrantyPolicyPage.jsx";
+import AboutUs from "./components/AboutUs.jsx";
+import CareSupportPage from "./pages/CareSupportPage.jsx";
+import QualityAssurancePage from "./pages/QualityAssurancePage.jsx";
+import AboutUsPage from "./pages/AboutUsPage.jsx";
 
 function App() {
   const token = useRecoilValue(userTokenAtom);
@@ -90,9 +96,13 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          {/* <Route path="/contact" element={<ContactPage />} /> */}
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/DiscountProducts" element={<DiscountProductsPage />} />
           <Route path="/returnShiping" element={<ReturnShipingPage />} />
+          <Route path="/warrantyPolicy" element={<WarrantyPolicyPage />} />
+          <Route path="/aboutUs" element={<AboutUsPage />} />
+          <Route path="/careSupport" element={<CareSupportPage />} />
+          <Route path="/qualityAssurance" element={<QualityAssurancePage />} />
 
           <Route
             path="/category/:categoryId"

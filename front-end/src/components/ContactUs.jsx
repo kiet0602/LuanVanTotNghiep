@@ -1,198 +1,107 @@
-import React, { Fragment, useState } from "react";
+import React from "react";
 import {
+  Box,
   Container,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-  Stack,
-  Button,
   Heading,
-  useColorModeValue,
-  VStack,
-  Flex,
   Text,
+  VStack,
+  HStack,
   Icon,
   Divider,
-  useToast,
+  Stack,
+  Link,
+  useColorModeValue,
 } from "@chakra-ui/react";
-import { GoLocation } from "react-icons/go";
-import { BsPhone } from "react-icons/bs";
-import { HiOutlineMail } from "react-icons/hi";
-import axios from "axios";
-import { toast } from "react-toastify";
-
-const contactOptions = [
-  {
-    label: "Địa chỉ",
-    value: "Đường 3/2, Phường Xuân Khánh, Quận Ninh Kiều, Thành Phố Cần Thơ ",
-    icon: GoLocation,
-  },
-  {
-    label: "Số điện thoại",
-    value: "+84 3570888331",
-    icon: BsPhone,
-  },
-  {
-    label: "Địa chỉ Email",
-    value: "kietB2003838@student.ctu.edu.vn",
-    icon: HiOutlineMail,
-  },
-];
+import { PhoneIcon, EmailIcon, InfoIcon } from "@chakra-ui/icons";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const ContactUs = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
-
-  const createContact = async (e) => {
-    e.preventDefault(); // Ngăn chặn form gửi mặc định
-    try {
-      const response = await axios.post(
-        `http://localhost:2000/api/contact/createContact`,
-        {
-          name,
-          email,
-          title,
-          message,
-        }
-      );
-
-      // Kiểm tra phản hồi và hiển thị thông báo thành công
-      if (response.status === 201) {
-        toast.success("Đã gửi liên hệ thành công.");
-        // Xóa các trường sau khi gửi thành công
-        setName("");
-        setEmail("");
-        setTitle("");
-        setMessage("");
-      }
-    } catch (error) {
-      // Thông báo lỗi nếu có
-      toast.error("Gửi liên hệ thất bại, vui lòng thử lại");
-      console.log(error);
-    }
-  };
+  // Define color values for light and dark mode
+  const bgColor = useColorModeValue("gray.50", "gray.800"); // Background color for light/dark mode
+  const containerBgColor = useColorModeValue("white", "gray.700"); // Container background color
+  const headingColor = useColorModeValue("teal.600", "teal.400"); // Heading color
+  const textColor = useColorModeValue("gray.800", "gray.200"); // Text color
+  const linkColor = useColorModeValue("teal.500", "teal.300"); // Link color
 
   return (
-    <Container maxW="7xl" py={10} px={{ base: 5, md: 8 }}>
-      <Stack spacing={10}>
-        <Flex align="center" justifyContent="center" direction="column">
-          <Heading fontSize="4xl" mb={2}>
-            Liên hệ với chúng tôi
-          </Heading>
-          <Text fontSize="md" textAlign="center">
-            Chúng tôi luôn chào đón bạn đến với cửa hàng Plant Paradise, chúng
-            tôi sẽ giải đáp thắc mắc của bạn khi tin nhắn được gửi đến chúng
-            tôi.
-          </Text>
-        </Flex>
-        <Stack
-          spacing={{ base: 6, md: 0 }}
-          direction={{ base: "column", md: "row" }}
-          justifyContent="space-between"
+    <Box bg={bgColor} py={10}>
+      <Container
+        maxW="container.md"
+        bg={containerBgColor}
+        p={8}
+        borderRadius="lg"
+        shadow="lg"
+      >
+        <Heading
+          as="h1"
+          size="lg"
+          textAlign="center"
+          mb={6}
+          color={headingColor}
         >
-          {contactOptions.map((option, index) => (
-            <Fragment key={index}>
-              <Stack
-                spacing={3}
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                px={3}
+          Liên Hệ Với Chúng Tôi
+        </Heading>
+        <VStack spacing={6} align="start">
+          <Stack direction="row" align="center" spacing={4}>
+            <Icon as={FaMapMarkerAlt} w={6} h={6} color="teal.500" />
+            <Box>
+              <Text fontWeight="bold" color={textColor}>
+                Địa chỉ:
+              </Text>
+              <Text color={textColor}>
+                Đường 3/2, Phường Xuân Khánh, Quận Ninh Kiều, Thành phố Cần Thơ
+              </Text>
+            </Box>
+          </Stack>
+
+          <Stack direction="row" align="center" spacing={4}>
+            <Icon as={PhoneIcon} w={6} h={6} color="teal.500" />
+            <Box>
+              <Text fontWeight="bold" color={textColor}>
+                Số điện thoại:
+              </Text>
+              <Text color={textColor}>0358704733</Text>
+            </Box>
+          </Stack>
+
+          <Stack direction="row" align="center" spacing={4}>
+            <Icon as={EmailIcon} w={6} h={6} color="teal.500" />
+            <Box>
+              <Text fontWeight="bold" color={textColor}>
+                Email:
+              </Text>
+              <Link
+                href="mailto:contact@example.com"
+                color={linkColor}
+                isExternal
               >
-                <Icon as={option.icon} w={10} h={10} color="green.400" />
-                <Text fontSize="lg" fontWeight="semibold">
-                  {option.label}
-                </Text>
-                <Text fontSize="md" textAlign="center">
-                  {option.value}
-                </Text>
-              </Stack>
-              {contactOptions.length - 1 !== index && (
-                <Flex display={{ base: "none", md: "flex" }}>
-                  <Divider orientation="vertical" />
-                </Flex>
-              )}
-            </Fragment>
-          ))}
-        </Stack>
-        <VStack
-          as="form"
-          spacing={8}
-          w="100%"
-          bg={useColorModeValue("white", "gray.700")}
-          rounded="lg"
-          boxShadow="lg"
-          p={{ base: 5, sm: 10 }}
-          onSubmit={createContact}
-        >
-          <VStack spacing={4} w="100%">
-            <Stack
-              w="100%"
-              spacing={3}
-              direction={{ base: "column", md: "row" }}
-            >
-              <FormControl id="name" isRequired>
-                <FormLabel>Tên của bạn</FormLabel>
-                <Input
-                  type="text"
-                  placeholder="Ahmad"
-                  rounded="md"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </FormControl>
-              <FormControl id="email" isRequired>
-                <FormLabel>Địa chỉ email của bạn</FormLabel>
-                <Input
-                  type="email"
-                  placeholder="test@test.com"
-                  rounded="md"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </FormControl>
-            </Stack>
-            <FormControl id="subject" isRequired>
-              <FormLabel>Tiêu đề</FormLabel>
-              <Input
-                type="text"
-                placeholder="Are you available for freelance work?"
-                rounded="md"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </FormControl>
-            <FormControl id="message" isRequired>
-              <FormLabel>Nội dung tin nhắn</FormLabel>
-              <Textarea
-                size="lg"
-                placeholder="Nhập tin nhắn của bạn"
-                rounded="md"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-            </FormControl>
-          </VStack>
-          <VStack w="100%">
-            <Button
-              type="submit"
-              bg="green.300"
-              color="white"
-              _hover={{
-                bg: "green.500",
-              }}
-              rounded="md"
-              w={{ base: "100%", md: "max-content" }}
-            >
-              Gửi tin nhắn
-            </Button>
-          </VStack>
+                kietb2003838@gmail.com
+              </Link>
+            </Box>
+          </Stack>
+
+          <Stack direction="row" align="center" spacing={4}>
+            <Icon as={InfoIcon} w={6} h={6} color="teal.500" />
+            <Box>
+              <Text fontWeight="bold" color={textColor}>
+                Thời gian làm việc:
+              </Text>
+              <Text color={textColor}>Thứ 2 - Thứ 6: 9:00 - 18:00</Text>
+              <Text color={textColor}>Thứ 7: 9:00 - 13:00</Text>
+            </Box>
+          </Stack>
         </VStack>
-      </Stack>
-    </Container>
+
+        <Divider my={6} />
+
+        <Box textAlign="center">
+          <Text color={textColor}>
+            Cảm ơn bạn đã liên hệ! Hãy gửi email hoặc gọi điện cho chúng tôi để
+            nhận được hỗ trợ tốt nhất.
+          </Text>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

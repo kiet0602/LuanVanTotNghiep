@@ -1,16 +1,24 @@
 // atoms/favoritesAtom.js
-import { atom } from "recoil";
+import { atom, selector } from "recoil";
+import { getCartById } from "../service/cartService";
 
-export const cartItemProducts = atom({
-  key: "cartItemProductsAtom", // ID duy nhất (so với các atom/selectors khác)
-  default: [], // giá trị mặc định (trạng thái ban đầu)
+// Atom quản lý giỏ hàng
+export const cartItemProductsAtom = atom({
+  key: "cartItemProductsAtom", // ID duy nhất
+  default: selector({
+    key: "cartItemProductsSelector", // Tên selector
+    get: async () => {
+      try {
+        const response = await getCartById();
+        // Trả về tổng số lượng sản phẩm trong giỏ hàng
+        return response.cart.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu giỏ hàng:", error);
+        return 0; // Trả về giá trị mặc định nếu có lỗi
+      }
+    },
+  }),
 });
-
-export const cartItemProductsCount = atom({
-  key: "cartItemProductsCountAtom",
-  default: JSON.parse(localStorage.getItem("cartCount")) || 0,
-});
-
-export const clearCartCount = () => {
-  localStorage.removeItem("cartCount");
-};

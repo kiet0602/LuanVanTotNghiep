@@ -1,144 +1,143 @@
 import React from "react";
 import {
   Box,
+  Container,
   Heading,
-  Image,
   Text,
   Divider,
-  HStack,
-  Tag,
-  Wrap,
-  WrapItem,
-  useColorModeValue,
-  Container,
   VStack,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
-const ReturnShiping = () => {
+const ReturnShipping = () => {
+  // Define color values for light and dark mode
+  const bgColor = useColorModeValue("gray.50", "gray.800"); // Background color for light/dark mode
+  const containerBgColor = useColorModeValue("white", "gray.700"); // Container background color
+  const headingColor = useColorModeValue("teal.600", "teal.400"); // Heading color
+  const textColor = useColorModeValue("gray.800", "gray.200"); // Text color
+
   return (
-    <Container maxW="4xl" p="12">
-      <Heading as="h1" fontWeight={"bold"} textAlign={"center"}>
-        Giao hàng & đổi trả
-      </Heading>
-      <Heading as="h2" fontFamily="'Quicksand', sans-serif" marginTop="20">
-        GIAO HÀNG ?
-      </Heading>
-      <Heading
-        fontSize={"25px"}
-        fontFamily="'Quicksand', sans-serif"
-        marginTop="5"
+    <Box bg={bgColor} py={10}>
+      <Container
+        maxW="4xl"
+        p={8}
+        bg={containerBgColor}
+        borderRadius="md"
+        shadow="lg"
       >
-        Khi nào:
-      </Heading>
-      <Text as="p" fontSize="lg" mt={5}>
-        Chúng tôi giao hàng từ thứ 2 đến thứ 6 hằng tuần.
-      </Text>{" "}
-      <Heading
-        fontSize={"25px"}
-        fontFamily="'Quicksand', sans-serif"
-        marginTop="5"
-      >
-        Cách thức:
-      </Heading>
-      <Text as="p" fontSize="lg" mt={5}>
-        Việc vận chuyển sẽ thông qua Dịch vụ Bưu chính Hoa Kỳ trong phạm vi Hoa
-        Kỳ và các lãnh thổ lân cận của nó CHỈ. Chúng tôi không vận chuyển quốc
-        tế do quy định về nông nghiệp.
-      </Text>
-      <Text as="p" fontSize="lg" mt={5}>
-        Tất cả các cây của chúng tôi đều được gửi không có rễ và không có chậu
-        vườn gốc. Điều này được thực hiện nhằm bảo vệ cây và giảm chi phí vận
-        chuyển. Khi nhận được cây của bạn, hãy chắc chắn loại bỏ chúng khỏi bao
-        bì ngay lập tức, repot bằng đất khô, và cung cấp đủ ánh sáng mặt trời.
-        Tưới nước khi cần, đảm bảo chỉ tưới nước lại khi đất đã hoàn toàn khô.
-        Cây xương rồng rất cứng cáp và sẽ phục hồi dễ dàng với sự chăm sóc thích
-        hợp.
-      </Text>
-      <Heading
-        fontSize={"25px"}
-        fontFamily="'Quicksand', sans-serif"
-        marginTop="5"
-      >
-        Xử lý đơn hàng:
-      </Heading>
-      <Text as="p" fontSize="lg" mt={5}>
-        Vui lòng cho phép 1-3 ngày làm việc để đơn hàng của bạn được xử lý vì
-        mất một khoảng thời gian hợp lý để tháo dỡ, làm khô, gói và đóng hộp các
-        cây. Thời gian xử lý bổ sung có thể cần thiết trong các đợt giảm giá
-        hoặc khuyến mãi do khối lượng đơn hàng cao hơn mức trung bình. Chúng tôi
-        cảm ơn bạn vì sự kiên nhẫn khi chúng tôi luôn cố gắng làm việc nhanh
-        nhất có thể để đóng gói và vận chuyển đơn hàng của bạn!
-      </Text>
-      <Text as="p" fontSize="lg" mt={5}>
-        Chúng tôi đóng gói sản phẩm bằng tay và rất cẩn thận để đảm bảo rằng
-        chúng đến được điểm đến cuối cùng một cách an toàn.
-      </Text>
-      <Heading
-        fontSize={"25px"}
-        fontFamily="'Quicksand', sans-serif"
-        marginTop="5"
-      >
-        Xử lý đơn hàng:
-      </Heading>
-      <Text as="p" fontSize="lg" mt={5}>
-        Vui lòng cho phép 1-3 ngày làm việc để đơn hàng của bạn được xử lý vì
-        mất một khoảng thời gian hợp lý để tháo dỡ, làm khô, gói và đóng hộp các
-        cây. Thời gian xử lý bổ sung có thể cần thiết trong các đợt giảm giá
-        hoặc khuyến mãi do khối lượng đơn hàng cao hơn mức trung bình. Chúng tôi
-        cảm ơn bạn vì sự kiên nhẫn khi chúng tôi luôn cố gắng làm việc nhanh
-        nhất có thể để đóng gói và vận chuyển đơn hàng của bạn!
-      </Text>
-      <Text as="p" fontSize="lg" mt={5}>
-        Chúng tôi đóng gói sản phẩm bằng tay và rất cẩn thận để đảm bảo rằng
-        chúng đến được điểm đến cuối cùng một cách an toàn.
-      </Text>
-      <Heading
-        fontSize={"25px"}
-        fontFamily="'Quicksand', sans-serif"
-        marginTop="5"
-      >
-        Xử lý đơn hàng:
-      </Heading>
-      <Text as="p" fontSize="lg" mt={5}>
-        Vui lòng cho phép 1-3 ngày làm việc để đơn hàng của bạn được xử lý vì
-        mất một khoảng thời gian hợp lý để tháo dỡ, làm khô, gói và đóng hộp các
-        cây. Thời gian xử lý bổ sung có thể cần thiết trong các đợt giảm giá
-        hoặc khuyến mãi do khối lượng đơn hàng cao hơn mức trung bình. Chúng tôi
-        cảm ơn bạn vì sự kiên nhẫn khi chúng tôi luôn cố gắng làm việc nhanh
-        nhất có thể để đóng gói và vận chuyển đơn hàng của bạn!
-      </Text>
-      <Text as="p" fontSize="lg" mt={5}>
-        Chúng tôi đóng gói sản phẩm bằng tay và rất cẩn thận để đảm bảo rằng
-        chúng đến được điểm đến cuối cùng một cách an toàn.
-      </Text>
-      <Divider marginTop="5" />
-      <Heading as="h2">ĐỔI TRẢ</Heading>
-      <Text as="p" fontSize="lg">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-        condimentum quam arcu, eu tempus tortor molestie at. Vestibulum pretium
-        condimentum dignissim. Vestibulum ultrices vitae nisi sed imperdiet.
-        Mauris quis erat consequat, commodo massa quis, feugiat sapien.
-        Suspendisse placerat vulputate posuere. Curabitur neque tortor, mattis
-        nec lacus non, placerat congue elit.
-      </Text>
-      <Text as="p" fontSize="lg">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-        condimentum quam arcu, eu tempus tortor molestie at. Vestibulum pretium
-        condimentum dignissim. Vestibulum ultrices vitae nisi sed imperdiet.
-        Mauris quis erat consequat, commodo massa quis, feugiat sapien.
-        Suspendisse placerat vulputate posuere. Curabitur neque tortor, mattis
-        nec lacus non, placerat congue elit.
-      </Text>
-      <Text as="p" fontSize="lg">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-        condimentum quam arcu, eu tempus tortor molestie at. Vestibulum pretium
-        condimentum dignissim. Vestibulum ultrices vitae nisi sed imperdiet.
-        Mauris quis erat consequat, commodo massa quis, feugiat sapien.
-        Suspendisse placerat vulputate posuere. Curabitur neque tortor, mattis
-        nec lacus non, placerat congue elit.
-      </Text>
-    </Container>
+        {/* Tiêu đề chính */}
+        <Heading
+          as="h1"
+          fontWeight="bold"
+          textAlign="center"
+          mb={8}
+          color={headingColor}
+        >
+          Giao Hàng & Đổi Trả
+        </Heading>
+
+        {/* Giao Hàng */}
+        <VStack align="start" spacing={5}>
+          <Heading
+            as="h2"
+            size="lg"
+            fontWeight="semibold"
+            mb={4}
+            color={headingColor}
+          >
+            GIAO HÀNG
+          </Heading>
+
+          <Box>
+            <Heading as="h3" size="md" mt={4} mb={2} color={headingColor}>
+              Khi nào:
+            </Heading>
+            <Text fontSize="md" color={textColor}>
+              Chúng tôi giao hàng từ thứ 2 đến thứ 6 hàng tuần. Thời gian giao
+              hàng có thể thay đổi tùy thuộc vào khu vực và điều kiện thời tiết.
+            </Text>
+          </Box>
+
+          <Box>
+            <Heading as="h3" size="md" mt={4} mb={2} color={headingColor}>
+              Cách thức:
+            </Heading>
+            <Text fontSize="md" color={textColor}>
+              Chúng tôi sử dụng dịch vụ vận chuyển uy tín để đảm bảo sản phẩm
+              đến tay khách hàng một cách an toàn. Hiện tại, chúng tôi chỉ giao
+              hàng trong nội địa Việt Nam.
+            </Text>
+          </Box>
+
+          <Box>
+            <Heading as="h3" size="md" mt={4} mb={2} color={headingColor}>
+              Đóng gói:
+            </Heading>
+            <Text fontSize="md" color={textColor}>
+              Tất cả sản phẩm đều được đóng gói cẩn thận, đảm bảo giữ nguyên
+              trạng trong quá trình vận chuyển. Cây bonsai sẽ được bọc gốc và
+              bảo vệ bằng chất liệu chuyên dụng.
+            </Text>
+          </Box>
+
+          <Box>
+            <Heading as="h3" size="md" mt={4} mb={2} color={headingColor}>
+              Thời gian xử lý đơn hàng:
+            </Heading>
+            <Text fontSize="md" color={textColor}>
+              Vui lòng cho phép 1-3 ngày làm việc để đơn hàng của bạn được xử
+              lý. Chúng tôi cần thời gian để chuẩn bị, đóng gói và sắp xếp vận
+              chuyển. Trong các dịp khuyến mãi lớn, thời gian xử lý có thể kéo
+              dài thêm do số lượng đơn hàng tăng cao.
+            </Text>
+          </Box>
+
+          <Text fontSize="md" mt={4} color={textColor}>
+            Cảm ơn bạn đã tin tưởng và kiên nhẫn. Chúng tôi cam kết mang đến
+            trải nghiệm mua sắm tốt nhất!
+          </Text>
+        </VStack>
+
+        <Divider my={8} />
+
+        {/* Đổi Trả */}
+        <VStack align="start" spacing={5}>
+          <Heading
+            as="h2"
+            size="lg"
+            fontWeight="semibold"
+            mb={4}
+            color={headingColor}
+          >
+            ĐỔI TRẢ
+          </Heading>
+
+          <Text fontSize="md" color={textColor}>
+            Chúng tôi chấp nhận đổi trả trong vòng 7 ngày kể từ ngày nhận hàng.
+            Để đảm bảo quyền lợi của bạn, sản phẩm cần được giữ nguyên tình
+            trạng ban đầu, bao gồm cả bao bì và các phụ kiện đi kèm.
+          </Text>
+
+          <Text fontSize="md" color={textColor}>
+            Nếu sản phẩm bị lỗi do vận chuyển hoặc không đúng mô tả, vui lòng
+            liên hệ với chúng tôi ngay để được hỗ trợ. Chúng tôi cam kết đổi sản
+            phẩm mới hoặc hoàn tiền nếu không thể đáp ứng yêu cầu của bạn.
+          </Text>
+
+          <Text fontSize="md" color={textColor}>
+            Lưu ý: Chi phí vận chuyển cho việc đổi trả sẽ do khách hàng chịu,
+            trừ trường hợp lỗi thuộc về chúng tôi.
+          </Text>
+
+          <Text fontSize="md" color={textColor}>
+            Để bắt đầu quy trình đổi trả, vui lòng liên hệ bộ phận chăm sóc
+            khách hàng qua email: <b>kietb2003838@gmail.com</b> hoặc gọi đến số
+            hotline: <b>0358704733</b>.
+          </Text>
+        </VStack>
+      </Container>
+    </Box>
   );
 };
 
-export default ReturnShiping;
+export default ReturnShipping;

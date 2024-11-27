@@ -38,6 +38,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRecoilValue } from "recoil";
 import userTokenAtom from "../Atom/userAtom.js";
+import { cartItemProductsAtom } from "../Atom/cartCountProductAtom.js";
+
 const Navbar = () => {
   // Use React
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -49,6 +51,7 @@ const Navbar = () => {
   const [userCurrent, setuserCurrent] = useState(null);
 
   const token = useRecoilValue(userTokenAtom);
+  const cartItemProducts = useRecoilValue(cartItemProductsAtom);
 
   const fetchUser = async () => {
     if (!token) return;
@@ -80,9 +83,11 @@ const Navbar = () => {
   const favorites = favoritesCount ? JSON.parse(favoritesCount) : 0;
   // Style
   // Lấy giá trị cartCount từ localStorage
-  const cartCount = JSON.parse(localStorage.getItem("cartCount")) || 0;
+  // const cartCount = useRecoilValue(cartItemProductsAtom);
+  // console.log(cartCount);
 
   // Sử dụng cartCount trong component hoặc logic của bạn
+  const cartCount = cartItemProducts;
 
   return (
     <Box
