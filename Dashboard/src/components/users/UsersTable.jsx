@@ -40,12 +40,12 @@ const UsersTable = () => {
     setSearchTerm(term);
     const filtered = users.filter(
       (user) =>
-        user.username.toLowerCase().includes(term) ||
-        user.email.toLowerCase().includes(term) ||
-        user.numberPhone.toLowerCase().includes(term) ||
-        user.ward.toLowerCase().includes(term) ||
-        user.district.toLowerCase().includes(term) ||
-        user.city.toLowerCase().includes(term)
+        (user.username?.toLowerCase() || "").includes(term) ||
+        (user.email?.toLowerCase() || "").includes(term) ||
+        (user.numberPhone?.toLowerCase() || "").includes(term) ||
+        (user.ward?.toLowerCase() || "").includes(term) ||
+        (user.district?.toLowerCase() || "").includes(term) ||
+        (user.city?.toLowerCase() || "").includes(term)
     );
     setFilteredUsers(filtered);
     setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
@@ -69,22 +69,22 @@ const UsersTable = () => {
   }, [users.length]);
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">Người dùng</h2>
+        <h2 className="text-xl font-semibold text-black">Người dùng</h2>
         <div className="relative">
           <input
             type="text"
-            placeholder="Search users..."
-            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tìm kiếm người dùng..."
+            className="bg-gray-300 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-2.5 text-black" size={18} />
         </div>
       </div>
 
@@ -105,7 +105,7 @@ const UsersTable = () => {
               ].map(({ label, key }) => (
                 <th
                   key={key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort(key)}
                 >
                   {label}
@@ -122,7 +122,7 @@ const UsersTable = () => {
                   ) : null}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                 Hành động
               </th>
             </tr>
@@ -136,7 +136,7 @@ const UsersTable = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black flex gap-2 items-center">
                   <img
                     src={
                       user?.avatar
@@ -150,7 +150,7 @@ const UsersTable = () => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">{user?.email}</div>
+                  <div className="text-sm text-black">{user?.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
@@ -165,9 +165,7 @@ const UsersTable = () => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
-                    {user?.numberPhone}
-                  </div>
+                  <div className="text-sm text-black">{user?.numberPhone}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-800 text-blue-100">
@@ -181,7 +179,7 @@ const UsersTable = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button
-                    className="text-red-400 font-bold hover:text-indigo-300 mr-2 bg-slate-200 rounded-lg text-xs p-1"
+                    className="text-blue-900 font-bold hover:text-indigo-300 mr-2 bg-slate-200 rounded-lg text-xs p-1"
                     onClick={() => {
                       setIsOpenSendVoucher(true);
                       setSelectedUser(user);
@@ -197,7 +195,7 @@ const UsersTable = () => {
       </div>
       <div className="mt-4 flex justify-end">
         <Pagination
-          pageCount={Math.ceil(setFilteredUsers.length / PRODUCTS_PER_PAGE)}
+          pageCount={Math.ceil(filteredUsers.length / PRODUCTS_PER_PAGE)}
           onPageChange={handlePageChange}
         />
       </div>

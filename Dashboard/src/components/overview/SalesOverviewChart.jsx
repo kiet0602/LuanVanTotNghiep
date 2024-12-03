@@ -45,12 +45,12 @@ const SalesOverviewChart = () => {
   const strokeColor = "9CA3AF";
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-lg font-medium mb-4 text-gray-100">
+      <h2 className="text-lg font-medium mb-4 text-black">
         Doanh số bán hàng theo tháng
       </h2>
 
@@ -62,7 +62,7 @@ const SalesOverviewChart = () => {
             <XAxis dataKey={"name"} stroke="#9ca3af" />
 
             <YAxis
-              stroke="#FFFFFF" // Đặt màu chữ thành trắng
+              stroke="#000" // Đặt màu chữ thành trắng
               tickFormatter={(value) => {
                 // Định dạng giá trị với "M" và giới hạn tối đa 3 triệu VNĐ
                 const maxLimit = 3000000; // 3 triệu VNĐ

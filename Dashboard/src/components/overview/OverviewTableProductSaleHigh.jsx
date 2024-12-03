@@ -20,19 +20,19 @@ const OverviewTableProductSaleHigh = () => {
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100 mb-4">
+        <h2 className="text-xl font-semibold text-black mb-4">
           Danh sách top 5 sản phẩm bán chạy
         </h2>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
+        <table className="min-w-full divide-y divide-black">
           <thead>
             <tr>
               {[
@@ -46,7 +46,7 @@ const OverviewTableProductSaleHigh = () => {
               ].map(({ label, key }) => (
                 <th
                   key={key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
                 >
                   {label}
                 </th>
@@ -62,7 +62,7 @@ const OverviewTableProductSaleHigh = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black flex gap-2 items-center">
                   <img
                     src={`http://localhost:2000/images/${product.image[0]}`}
                     alt="Product img"
@@ -71,23 +71,23 @@ const OverviewTableProductSaleHigh = () => {
                   {product?.productName}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   {product?.category?.categoryName}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   {product?.originalPrice?.toLocaleString("vi-VN")} Đ
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   {product?.finalPrice?.toLocaleString("vi-VN")} Đ
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   {product?.quantity}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   {product?.orderCount}
                 </td>
 

@@ -129,14 +129,14 @@ const CategorysTable = () => {
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
         <div className="">
-          <h2 className="text-xl font-semibold text-gray-100 mb-4">
+          <h2 className="text-xl font-semibold text-black mb-4">
             Danh sách thể loại
           </h2>
           <button
@@ -149,17 +149,17 @@ const CategorysTable = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search products..."
-            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tìm kiếm thể loại..."
+            className="bg-gray-300 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={handleSearch}
             value={searchTerm}
           />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-2.5 text-black" size={18} />
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
+        <table className="min-w-full divide-y divide-black">
           <thead>
             <tr>
               {[
@@ -169,7 +169,7 @@ const CategorysTable = () => {
                 <th
                   key={key}
                   onClick={() => handleSort(key)}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
                 >
                   {label}
                   {sortConfig.key === key && (
@@ -185,7 +185,7 @@ const CategorysTable = () => {
                   )}
                 </th>
               ))}
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-black uppercase tracking-wider">
                 Hành động
               </th>
             </tr>
@@ -199,7 +199,7 @@ const CategorysTable = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black flex gap-2 items-center">
                   <img
                     src={`http://localhost:2000/images/${category?.imageCategory}`}
                     alt="Product img"
@@ -208,7 +208,7 @@ const CategorysTable = () => {
                   {category?.categoryName}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   {category?.classification?.classificationName}
                 </td>
 

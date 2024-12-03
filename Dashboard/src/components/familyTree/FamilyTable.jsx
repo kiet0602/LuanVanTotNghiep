@@ -121,14 +121,14 @@ const FamilyTable = () => {
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-100 mb-4">
+          <h2 className="text-xl font-semibold text-black mb-4">
             Danh sách họ cây
           </h2>
           <button
@@ -141,16 +141,16 @@ const FamilyTable = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search products..."
-            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tìm kiếm họ cây..."
+            className="bg-gray-300 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={handleSearch}
             value={searchTerm}
           />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-2.5 text-black" size={18} />
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
+        <table className="min-w-full divide-y divide-black">
           <thead>
             <tr>
               {[{ label: "Tên họ cây", key: "classificationName" }].map(
@@ -158,7 +158,7 @@ const FamilyTable = () => {
                   <th
                     key={key}
                     onClick={() => handleSort(key)}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                    className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
                     style={{ textAlign: "left" }}
                   >
                     {label}
@@ -177,7 +177,7 @@ const FamilyTable = () => {
                 )
               )}
               <th
-                className="px-6 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider text-right"
+                className="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider text-right"
                 style={{ textAlign: "right" }}
               >
                 Hành động
@@ -193,10 +193,10 @@ const FamilyTable = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 text-left">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black text-left">
                   {classification.classificationName}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 text-right">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black text-right">
                   <button
                     className="text-indigo-400 hover:text-indigo-300 mr-2"
                     onClick={() => {

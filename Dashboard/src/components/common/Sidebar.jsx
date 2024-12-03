@@ -190,7 +190,7 @@ const SIDEBAR_ITEMS = [
     name: "Tổng quan",
     icon: ChartLine,
     color: "#4F46E5",
-    href: "/overview",
+    href: "/",
   },
   {
     name: "Khuyến mãi",
@@ -269,16 +269,16 @@ const Sidebar = () => {
     <motion.div
       className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${
         isSidebarOpen ? "w-64" : "w-20"
-      }`}
+      } bg-white`}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-      <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700">
+      <div className="h-full bg-white bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-red-200 shadow-lg">
         <div className="flex items-center gap-2 cursor-pointer">
           <img className="h-8 w-8 rounded-full" src={imgSenda} alt="" />
           <AnimatePresence>
             {isSidebarOpen && (
               <motion.span
-                className="text-transparent bg-clip-text bg-gradient-to-l from-sky-500 to-blue-600 font-bold italic text-[20px]"
+                className="text-transparent bg-clip-text bg-gradient-to-l from-sky-500 to-black font-bold italic text-[20px]"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -294,7 +294,7 @@ const Sidebar = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 rounded-full hover:bg-gray-700 transition-colors max-w-fit mt-4"
+          className="p-2 rounded-full hover:bg-red-300 transition-colors max-w-fit mt-4"
         ></motion.button>
 
         {/* Thanh cuộn sidebar */}
@@ -312,7 +312,7 @@ const Sidebar = () => {
           {SIDEBAR_ITEMS.map((item, index) => (
             <div key={item.href}>
               <div
-                className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 cursor-pointer"
+                className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-red-300 transition-colors mb-2 cursor-pointer"
                 onClick={() => handleItemClick(item, index)} // Sử dụng index để xác định mục
               >
                 <item.icon
@@ -322,7 +322,7 @@ const Sidebar = () => {
                 <AnimatePresence>
                   {isSidebarOpen && (
                     <motion.span
-                      className="ml-4 whitespace-nowrap"
+                      className="ml-4 whitespace-nowrap text-black"
                       initial={{ opacity: 0, width: 0 }}
                       animate={{ opacity: 1, width: "auto" }}
                       exit={{ opacity: 0, width: 0 }}
@@ -351,7 +351,7 @@ const Sidebar = () => {
               {/* Show subItems when the dropdown is open */}
               {item.subItems && openDropdown === index && (
                 <motion.div
-                  className="ml-6 mt-2 bg-gray-700 rounded-md"
+                  className="ml-6 mt-2 bg-white rounded-md"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -359,7 +359,7 @@ const Sidebar = () => {
                 >
                   {item.subItems.map((subItem) => (
                     <Link key={subItem.href} to={subItem.href}>
-                      <motion.div className="p-3 text-sm text-white hover:bg-gray-600 rounded-md flex items-center">
+                      <motion.div className="p-3 text-sm text-black hover:bg-red-300 rounded-md flex items-center">
                         {/* Render the icon for each subItem with its specific color */}
                         <subItem.icon
                           size={20}

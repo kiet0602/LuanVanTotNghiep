@@ -642,7 +642,7 @@ export const resetOrder = async (req, res) => {
     }
 
     // Cập nhật trạng thái đơn hàng thành "Đang xử lý"
-    order.status = "Đang xử lý";
+    order.status = "Chờ xử lý";
     await order.save();
 
     res.status(200).json({ message: "Đặt lại đơn hàng thành công", order });

@@ -51,7 +51,7 @@ const ImportPage = () => {
     getTotalImportCost();
   }, []);
   return (
-    <div className="flex-1 overflow-auto relative z-10">
+    <div className="flex-1 overflow-auto relative z-10 bg-white">
       <Header title="Phiếu nhập" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
@@ -90,7 +90,7 @@ const ImportPage = () => {
         </motion.div>
         {/* Button to open modal */}
         <div>
-          <h1 className="text-2xl font-bold text-center mt-6">
+          <h1 className="text-2xl font-bold text-center mt-6 text-black">
             Quản Lý Nhập Kho
           </h1>
           <ImportForm products={products} onSubmit={handleImportSubmit} />

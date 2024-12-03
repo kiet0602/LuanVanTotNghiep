@@ -138,18 +138,18 @@ const CouponTable = () => {
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
         <div className="">
-          <h2 className="text-xl font-semibold text-gray-100 mb-4">
+          <h2 className="text-xl font-semibold text-black mb-4">
             Danh sách mã khuyến mãi
           </h2>
           <button
-            className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+            className="mb-4 px-4 py-2 bg-blue-500 text-black font-semibold rounded hover:bg-blue-600"
             onClick={(e) => setCouponIsOpen(true)}
           >
             <Plus size={18} />
@@ -159,11 +159,11 @@ const CouponTable = () => {
           <input
             type="text"
             placeholder="Tìm kiếm mã khuyến mãi..."
-            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-300 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-2.5 text-black" size={18} />
         </div>
       </div>
 
@@ -181,7 +181,7 @@ const CouponTable = () => {
               ].map(({ label, key }) => (
                 <th
                   key={key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort(key)}
                 >
                   {label}
@@ -198,7 +198,7 @@ const CouponTable = () => {
                   ) : null}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                 Hành động
               </th>
             </tr>
@@ -212,22 +212,22 @@ const CouponTable = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
                   {coupon?.code}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-black">
                     {coupon?.discountPercentage}%
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-black">
                     {coupon?.startDate ? coupon.startDate : "Chưa có ngày"}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-black">
                     {coupon?.expirationDate
                       ? coupon.expirationDate
                       : "Chưa có ngày"}
@@ -235,7 +235,7 @@ const CouponTable = () => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-black">
                     {coupon?.minimumPurchaseAmount.toLocaleString("vi-VN")} Đ
                   </div>
                 </td>
@@ -252,7 +252,7 @@ const CouponTable = () => {
                   </span>
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   <button
                     className="text-blue-400 font-bold hover:text-indigo-300 mr-2 rounded-lg text-xs p-1"
                     onClick={(e) => {

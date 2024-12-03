@@ -57,6 +57,7 @@ const OrdersTable = () => {
       const OrderData = await getAllOrders();
       setOrders(OrderData); // Lưu danh sách người dùng vào state
       setFilteredOrders(OrderData);
+      console.log(OrderData);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách đơn hàng:", error);
     }
@@ -85,7 +86,7 @@ const OrdersTable = () => {
 
   const offset = currentPage * PRODUCTS_PER_PAGE;
   const currentOrder = filteredOrders.slice(offset, offset + PRODUCTS_PER_PAGE);
-  console.log(currentOrder);
+
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -140,19 +141,19 @@ const OrdersTable = () => {
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center justify-between mb-4 ">
-          <h2 className="text-xl font-semibold text-gray-100">
+          <h2 className="text-xl font-semibold text-black">
             Danh sách đơn hàng
           </h2>
           <button
             onClick={exportToExcel}
-            className="text-green-500 hover:text-green-400 bg-white rounded-lg p-1 ml-3"
+            className="text-green-500 hover:text-green-400 bg-black p-1 ml-3"
           >
             Xuất Excel
           </button>
@@ -161,12 +162,12 @@ const OrdersTable = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search users..."
-            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tìm kiếm đơn hàng..."
+            className="bg-gray-300 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-2.5 text-black" size={18} />
         </div>
       </div>
 
@@ -183,7 +184,7 @@ const OrdersTable = () => {
               ].map(({ label, key }) => (
                 <th
                   key={key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort(key)}
                 >
                   {label}
@@ -200,7 +201,7 @@ const OrdersTable = () => {
                   ) : null}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                 Hành động
               </th>
             </tr>
@@ -214,17 +215,17 @@ const OrdersTable = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black flex gap-2 items-center">
                   {order?._id}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-black">
                     {order?.user?.username}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-black">
                     {" "}
                     {order?.finalPrice?.toLocaleString("vi-VN")} Đ
                   </div>
@@ -248,7 +249,7 @@ const OrdersTable = () => {
                   </span>
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                   <button
                     className="text-indigo-400 hover:text-indigo-300 mr-2 "
                     onClick={() => {

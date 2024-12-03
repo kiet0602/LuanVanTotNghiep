@@ -42,11 +42,10 @@ const ImportForm = ({ products, onSubmit }) => {
       );
     }
   };
-  console.log(items);
 
   return (
-    <div className="p-6 bg-dark rounded-lg shadow-md max-w-3lg mx-auto">
-      <h2 className="text-xl font-bold mb-4">Thêm Phiếu Nhập</h2>
+    <div className="p-6 bg-dark rounded-lg shadow-md max-w-3lg mx-auto bg-white mb-3 ">
+      <h2 className="text-xl font-bold mb-4 text-black">Thêm Phiếu Nhập</h2>
 
       {/* Nút để hiển thị form */}
       {!showImport && (

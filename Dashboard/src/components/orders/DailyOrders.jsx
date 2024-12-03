@@ -12,16 +12,6 @@ import {
 } from "recharts";
 import { getOrderCountByDate } from "../../service/orderService";
 
-const dailyOrdersData = [
-  { date: "07/01", orders: 45 },
-  { date: "07/02", orders: 52 },
-  { date: "07/03", orders: 49 },
-  { date: "07/04", orders: 60 },
-  { date: "07/05", orders: 55 },
-  { date: "07/06", orders: 58 },
-  { date: "07/07", orders: 62 },
-];
-
 const DailyOrders = () => {
   const [ordersByDate, setOrdersByDate] = useState([]);
 
@@ -40,12 +30,12 @@ const DailyOrders = () => {
   const strokeColor = "9CA3AF";
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">
+      <h2 className="text-xl font-semibold text-black mb-4">
         Đơn hàng theo ngày
       </h2>
 

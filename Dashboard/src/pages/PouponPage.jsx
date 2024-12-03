@@ -2,12 +2,11 @@ import { UserCheck, UserPlus, UsersIcon, UserX } from "lucide-react";
 import { motion } from "framer-motion";
 
 import Header from "../components/common/Header";
-
 import CouponTable from "../components/coupon/CouponTable";
 
 const PouponPage = () => {
   return (
-    <div className="flex-1 overflow-auto relative z-10">
+    <div className="flex-1 overflow-auto relative z-10 bg-white">
       <Header title="Khuyến mãi" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">

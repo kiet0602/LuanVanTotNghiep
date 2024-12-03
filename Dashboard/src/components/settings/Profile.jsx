@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -15,7 +14,7 @@ const Profile = () => {
     if (tokenAdmin) {
       // Xóa tokenAdmin khỏi localStorage
       localStorage.removeItem("adminToken");
-  
+
       // Sau khi xóa token, điều hướng người dùng đến trang đăng nhập
       navigate("/signIn"); // Dùng navigate để điều hướng
     }
@@ -63,9 +62,7 @@ const Profile = () => {
         />
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-100">
-            {user.username}
-          </h3>
+          <h3 className="text-lg font-semibold text-black">{user.username}</h3>
           <p className="text-gray-400">{user.email}</p>
         </div>
       </div>

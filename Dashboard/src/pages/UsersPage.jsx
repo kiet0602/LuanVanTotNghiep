@@ -13,13 +13,6 @@ import {
   getAllUsersWithOrderStatus,
 } from "../service/userService";
 
-const userStats = {
-  totalUsers: 152845,
-  newUsersToday: 243,
-  activeUsers: 98520,
-  churnRate: "2.4%",
-};
-
 const UsersPage = () => {
   const [usersOrdered, setUserOrdered] = useState(null);
   const [usersNoOrdered, setUserNoOrdered] = useState(null);
@@ -50,7 +43,7 @@ const UsersPage = () => {
   }, []);
 
   return (
-    <div className="flex-1 overflow-auto relative z-10">
+    <div className="flex-1 overflow-auto relative z-10 bg-white">
       <Header title="Người dùng" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
