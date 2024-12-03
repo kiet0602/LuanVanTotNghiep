@@ -26,6 +26,7 @@ import userTokenAtom from "../Atom/userAtom.js";
 import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
+import { CiShoppingCart } from "react-icons/ci";
 
 const ListOrderUserUpdate = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -86,7 +87,7 @@ const ListOrderUserUpdate = () => {
         fetchOrdersByUser();
         toast.success("Bạn đã đặt lại đơn hàng thành công");
       } catch (error) {
-        console.log(error.message);
+        toast.error(error.response.data.message);
       }
     }
   };
@@ -103,9 +104,12 @@ const ListOrderUserUpdate = () => {
   return (
     <Container maxW="7xl" p={{ base: 5, md: 10 }}>
       <Flex justifyContent="center" mb={10}>
-        <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-          Danh sách đơn hàng của bạn
-        </Text>
+        <Box display="flex" alignItems="center" justifyContent="center" mt={4}>
+          <CiShoppingCart size="32px" style={{ marginRight: "8px" }} />
+          <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+            Danh sách đơn hàng của bạn
+          </Text>
+        </Box>
       </Flex>
       <Tabs isLazy>
         <TabList>

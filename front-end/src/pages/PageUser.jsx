@@ -16,6 +16,7 @@ const PageUser = () => {
         <Divider />
         {/* <ListOrderUser /> */}
         <ListOrderUserUpdate />
+        <Divider />
         <ListCouponUser />
         <Divider />
         <Features />

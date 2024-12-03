@@ -623,13 +623,13 @@ export const resetOrder = async (req, res) => {
     for (const item of order.items) {
       const product = await productModel.findById(item.product);
       if (!product) {
-        return res
-          .status(404)
-          .json({ message: `Sản phẩm với ID ${item.product} không tồn tại` });
+        return res.status(404).json({
+          message: `Sản phẩm với tên ${item.productName} không tồn tại`,
+        });
       }
       if (product.quantity < item.quantity) {
         return res.status(400).json({
-          message: `Số lượng sản phẩm ${product.name} không đủ, còn lại ${product.quantity}`,
+          message: `Số lượng sản phẩm ${product.productName} không đủ, còn lại ${product.quantity}`,
         });
       }
     }

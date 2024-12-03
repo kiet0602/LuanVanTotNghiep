@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import ImageIntroduceShop from "../assets/data/image/Senda/Who_We_Are_2160x.jpg";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import { NavLink } from "react-router-dom";
 
 const IntroduceShop = () => {
   return (
@@ -95,13 +96,15 @@ const IntroduceShop = () => {
             ))}
           </SimpleGrid> */}
               <Button
-                mt={"40px"}
-                px={"50px"}
-                borderRadius={"none"}
-                color={"black"}
+                as={NavLink} // Đặt nút làm NavLink
+                to="/aboutUs"
+                mt="40px"
+                px="50px"
+                borderRadius="none"
+                color="black"
                 bg={useColorModeValue("green.50", "white")}
                 mx="auto"
-                fontWeight="300" // Giảm độ đậm của chữ
+                fontWeight="300"
               >
                 Cửa hàng của chúng tôi
               </Button>
@@ -145,15 +148,17 @@ const IntroduceShop = () => {
                         justifyContent="space-between"
                         p={4}
                       >
-                        <Text fontSize="sm">What advantages to use?</Text>
+                        <Text fontSize="sm">
+                          Lợi ích khi sử dụng cây cảnh mini là gì?
+                        </Text>
                         <ChevronDownIcon fontSize="24px" />
                       </AccordionButton>
                       <AccordionPanel pb={4}>
                         <Text color="gray.600">
-                          Chakra UI offers a variety of advantages including
-                          ease of use, accessibility, and customization options.
-                          It also provides a comprehensive set of UI components
-                          and is fully compatible with React.
+                          Cây cảnh mini không chỉ giúp làm đẹp không gian sống
+                          mà còn cải thiện chất lượng không khí, giảm căng thẳng
+                          và tạo cảm giác thư thái. Chúng cũng rất dễ chăm sóc
+                          và phù hợp với nhiều loại không gian.
                         </Text>
                       </AccordionPanel>
                     </AccordionItem>
@@ -164,16 +169,19 @@ const IntroduceShop = () => {
                         justifyContent="space-between"
                         p={4}
                       >
-                        <Text fontSize="sm">How to start using Chakra UI?</Text>
+                        <Text fontSize="sm">
+                          Làm thế nào để bắt đầu chơi cây cảnh mini?
+                        </Text>
                         <ChevronDownIcon fontSize="24px" />
                       </AccordionButton>
                       <AccordionPanel>
                         <Text color="gray.600">
-                          To get started with Chakra UI, you can install it via
-                          npm or yarn, and then import the components you need
-                          in your project. The Chakra UI documentation is also a
-                          great resource for getting started and learning more
-                          about the library.
+                          Để bắt đầu, bạn có thể chọn loại cây cảnh mini phù hợp
+                          với không gian và phong cách của mình. Hãy tìm hiểu về
+                          cách chăm sóc từng loại cây, bao gồm ánh sáng, nước,
+                          và đất trồng. Bạn cũng có thể tham khảo các hướng dẫn
+                          chi tiết trên website hoặc tham gia cộng đồng yêu cây
+                          cảnh để học hỏi thêm kinh nghiệm.
                         </Text>
                       </AccordionPanel>
                     </AccordionItem>

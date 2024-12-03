@@ -27,6 +27,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import userTokenAtom from "../Atom/userAtom.js";
+import { CiDiscount1 } from "react-icons/ci";
 
 const ListCouponUser = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -101,9 +102,18 @@ const ListCouponUser = () => {
       <Box bg={useColorModeValue("white", "black")}>
         <Container maxW="7xl" p={{ base: 5, md: 10 }}>
           <Flex justifyContent="center" mb={3}>
-            <chakra.h3 fontSize="2xl" fontWeight="bold" textAlign="center">
-              Danh sách mã khuyến mãi
-            </chakra.h3>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              mt={4}
+              mb={6}
+            >
+              <CiDiscount1 size="32px" style={{ marginRight: "8px" }} />
+              <chakra.h3 fontSize="2xl" fontWeight="bold" textAlign="center">
+                Danh sách mã khuyến mãi
+              </chakra.h3>
+            </Box>
           </Flex>
           <TableContainer>
             <Table size="sm">

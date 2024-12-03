@@ -319,6 +319,7 @@ const getAllProductsDiscount = async (req, res) => {
   try {
     const products = await productModel
       .find({ discount: { $gt: 0 } }) // Lọc các sản phẩm có discount > 0
+      .sort({ discount: -1 }) // Sắp xếp theo % giảm giá giảm dần
       .populate("category", "categoryName imageCategory descriptionCategory")
       .populate("environment", "nameEnviroment")
       .populate("color", "nameColor");

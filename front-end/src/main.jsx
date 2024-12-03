@@ -64,7 +64,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <App />
         </ChakraProvider>
         <ToastContainer
-          autoClose={1000}
+          autoClose={5000}
           position="bottom-center"
           hideProgressBar={true}
           style={{ width: "270px", fontSize: "12px" }}
