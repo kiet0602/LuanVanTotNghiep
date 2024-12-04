@@ -201,9 +201,10 @@ const CardProductDetail = ({ product }) => {
                         Thuộc loại:
                       </Box>
                       <Box width="60%" textAlign="end" fontWeight="bold">
-                        {product?.category?.categoryName}
+                        {product?.category?.categoryName || "Đang cập nhật"}
                       </Box>
                     </Flex>
+
                     <Flex width="100%" justify="space-between" mb={2}>
                       <Box width="40%" as="i">
                         Môi trường ưa thích:

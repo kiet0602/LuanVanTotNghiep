@@ -60,25 +60,31 @@ export default function UpdateProductModal({
 
   useEffect(() => {
     if (product) {
-      setProductName(product.productName);
-      setDescription(product.description);
-      setOriginalPrice(product.originalPrice);
-      setQuantity(product.quantity);
-      setCare(product.care);
-      setDiscount(product.discount);
-      setSize(product.size);
-      const imageUrls = product.image.map(
-        (img) => `http://localhost:2000/images/${img}`
-      );
+      setProductName(product.productName || "");
+      setDescription(product.description || "");
+      setOriginalPrice(product.originalPrice || 0);
+      setQuantity(product.quantity || 0);
+      setCare(product.care || "");
+      setDiscount(product.discount || 0);
+      setSize(product.size || "");
+
+      // Xử lý image
+      const imageUrls =
+        product.image?.map((img) => `http://localhost:2000/images/${img}`) ||
+        [];
       setImages(imageUrls); // Giữ lại tên tệp để gửi đi
       setImagePreviews(imageUrls); // Thiết lập để xem trước
-      setSelectedCategory(product.category._id);
-      setSelectedEnvironment(product.environment._id);
-      setSelectedColor(product.color._id);
+
+      // Xử lý category, environment, color
+      setSelectedCategory(product.category?._id || null);
+      setSelectedEnvironment(product.environment?._id || null);
+      setSelectedColor(product.color?._id || null);
+
+      // Xử lý video
       if (product.video) {
         setVideoOldPreview(`http://localhost:2000/images/${product.video}`);
       } else {
-        setVideoOldPreview(null); // Hoặc không thiết lập gì nếu không có video
+        setVideoOldPreview(null); // Không thiết lập nếu không có video
       }
     }
   }, [product]);

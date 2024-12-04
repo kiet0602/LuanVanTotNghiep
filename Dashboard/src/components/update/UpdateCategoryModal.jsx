@@ -41,12 +41,13 @@ export default function UpdateCategoryModal({
   // lấy giá trị của 1 category để cập nhật
   useEffect(() => {
     if (category) {
-      setCategoryName(category.categoryName);
-      setDescriptionCategory(category.descriptionCategory);
-      setClassification(category.classification._id); // Assuming classification is an object
-      setImageCategory(category.imageCategory);
+      setCategoryName(category.categoryName || "");
+      setDescriptionCategory(category.descriptionCategory || "");
+      setClassification(category.classification?._id || null); // Kiểm tra classification trước khi truy cập _id
+      setImageCategory(category.imageCategory || "");
     }
   }, [category]);
+
   // lưu giá trị id của họ cây
   const handleSelectChange = (e) => {
     const selectedId = e.target.value;

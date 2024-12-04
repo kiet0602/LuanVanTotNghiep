@@ -29,7 +29,7 @@ const LoginForm = () => {
       });
 
       // Điều hướng đến trang Overview
-      window.location.href = "/overview"; // Dùng navigate thay vì window.location.href
+      window.location.href = "/"; // Dùng navigate thay vì window.location.href
     } catch (error) {
       // Xử lý lỗi
       if (error.response) {
